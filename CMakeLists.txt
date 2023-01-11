@@ -17,12 +17,12 @@ macro(addPackage)
 endmacro()
 
 macro(addNode node_name)
-    add_executable(${node_name}
+    add_executable("${node_name}"
             "include/${node_name}.h" "src/${node_name}.cpp"
             ${RapidJSON}
     )
     ament_target_dependencies(
-            ${node_name}
+            "${node_name}"
             ${packages}
     )
     if (NEW_DISTRO)
@@ -30,13 +30,13 @@ macro(addNode node_name)
                 ${PROJECT_NAME} "rosidl_typesupport_cpp")
         target_link_libraries(${node_name} "${cpp_typesupport_target}")
     else()
-        rosidl_target_interfaces(${node_name}
+        rosidl_target_interfaces("${node_name}"
                 ${PROJECT_NAME} "rosidl_typesupport_cpp")
     endif()
 
     install(TARGETS
-            ${node_name}
-            DESTINATION include/${PROJECT_NAME})
+            "${node_name}"
+            DESTINATION lib/${PROJECT_NAME})
 endmacro()
 
 ##############################################################################################
