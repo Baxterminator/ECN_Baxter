@@ -40,7 +40,7 @@ namespace ECNBaxter {
         // Gripper properties
         bool _initialized = false;
         std::string _side;
-        GripperType _type;
+        GripperType _type = CLAMP;
         unsigned char _calibrated = false;
 
         // Gripper latest_state

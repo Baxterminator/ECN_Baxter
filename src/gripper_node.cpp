@@ -59,6 +59,7 @@ namespace ECNBaxter {
         // Check if gripper properties are set and calibrated before launching any action
         if (!_initialized & !_calibrated)
             return;
+        action(msg->action);
     }
 
     /**
