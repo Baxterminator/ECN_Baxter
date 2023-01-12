@@ -88,6 +88,8 @@ namespace ECNBaxter {
             double pressure = latest_state["vacuum sensor"].GetDouble();
             double threshold = latest_state["vacuum threshold"].GetDouble();
 
+            RCLCPP_INFO(get_logger(), "Actual vacuum sensor %1d / %2d", pressure, threshold);
+
             if (pressure < threshold) {
                 release();
             }
