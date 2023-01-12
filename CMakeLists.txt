@@ -4,7 +4,7 @@ project(ecn_baxter)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(NEW_DISTRO ON)
+set(NEW_DISTRO OFF)
 
 macro(addPackage)
     # Did we get any optional args?
