@@ -84,8 +84,8 @@ namespace ECNBaxter {
         // Decode JSON
         state_process(msg);
 
-        if (latest_state.HasMember("sensor") && latest_state.HasMember("vacuum threshold")) {
-            double pressure = latest_state["sensor"].GetDouble();
+        if (latest_state.HasMember("vacuum sensor") && latest_state.HasMember("vacuum threshold")) {
+            double pressure = latest_state["vacuum sensor"].GetDouble();
             double threshold = latest_state["vacuum threshold"].GetDouble();
 
             if (pressure < threshold) {
