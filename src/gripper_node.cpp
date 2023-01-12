@@ -85,7 +85,7 @@ namespace ECNBaxter {
         state_process(msg);
 
         if (latest_state.HasMember("vacuum")) {
-            bool isVacuum = latest_state["vacuum"].GetBool();*
+            bool isVacuum = latest_state["vacuum"].GetBool();
 
             if (!isVacuum) {
                 release();
