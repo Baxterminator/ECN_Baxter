@@ -16,11 +16,11 @@ macro(addPackage)
     endif ()
 endmacro()
 
-macro(addNode node_name)
+macro(addNode node_name dir)
     add_executable("${node_name}"
-            "include/${node_name}.h" "src/${node_name}.cpp"
-            ${RapidJSON}
+            "${dir}/${node_name}.h" "${dir}/${node_name}.cpp"
     )
+    target_link_libraries("${node_name}" RapidJSON)
     ament_target_dependencies(
             "${node_name}"
             ${packages}
@@ -51,7 +51,9 @@ set(packages
 set(msg_files
         "msg/BaxterAction.msg"
         )
-file(GLOB_RECURSE RapidJSON include/rapidjson/*.h)
+file(GLOB_RECURSE RapidJSON_File include/rapidjson/*.h)
+add_library(RapidJSON INTERFACE)
+target_include_directories(RapidJSON INTERFACE RapidJSON_File)
 
 find_package(ament_cmake REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
@@ -64,6 +66,6 @@ rosidl_generate_interfaces(
 )
 ament_export_dependencies(rosidl_default_runtime)
 
-addNode(gripper_node ${packages})
+addNode(gripper_node "components/gripper" ${packages})
 
 ament_package()

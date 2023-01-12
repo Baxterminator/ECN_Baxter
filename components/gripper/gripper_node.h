@@ -6,15 +6,15 @@
 #ifndef ECN_BAXTER_GRIPPER_NODE_H
 #define ECN_BAXTER_GRIPPER_NODE_H
 
-#include <rclcpp/rclcpp.hpp>
-#include <baxter_core_msgs/msg/end_effector_command.hpp>
-#include <baxter_core_msgs/msg/end_effector_state.hpp>
-#include <ecn_baxter/msg/baxter_action.hpp>
+#include "../../../../../../../../../opt/ros/humble/include/rclcpp/rclcpp/rclcpp.hpp"
+#include "../../../../../Baxter/install/baxter_core_msgs/include/baxter_core_msgs/baxter_core_msgs/msg/end_effector_command.hpp"
+#include "../../../../../Baxter/install/baxter_core_msgs/include/baxter_core_msgs/baxter_core_msgs/msg/end_effector_state.hpp"
+#include "../../../../build/ecn_baxter/rosidl_generator_cpp/ecn_baxter/msg/baxter_action.hpp"
 
-#include "rapidjson/document.h"
+#include "../../include/rapidjson/document.h"
 
-#include <chrono>
-#include <thread>
+#include <c++/11/chrono>
+#include <c++/11/thread>
 
 namespace ECNBaxter {
     using baxter_core_msgs::msg::EndEffectorCommand;
