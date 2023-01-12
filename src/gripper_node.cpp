@@ -84,13 +84,10 @@ namespace ECNBaxter {
         // Decode JSON
         state_process(msg);
 
-        if (latest_state.HasMember("vacuum sensor") && latest_state.HasMember("vacuum threshold")) {
-            double pressure = latest_state["vacuum sensor"].GetDouble();
-            double threshold = latest_state["vacuum threshold"].GetDouble();
+        if (latest_state.HasMember("vacuum")) {
+            bool isVacuum = latest_state["vacuum"].GetBool();*
 
-            RCLCPP_INFO(get_logger(), "Actual vacuum sensor %1d / %2d", pressure, threshold);
-
-            if (pressure < threshold) {
+            if (!isVacuum) {
                 release();
             }
         }
