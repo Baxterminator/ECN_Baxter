@@ -46,9 +46,10 @@ namespace ECNBaxter {
         // Gripper latest_state
         std::string latest_state_src;
         bool is_state_latest = false;
+        EndEffectorState::UniquePtr latest_state_obj;
         Document latest_state;
-
-
+        std::future<void>* check_vacuum = nullptr;
+        bool isSucking = false;
 
         // Communication
         const int QOS = 10;
@@ -61,7 +62,9 @@ namespace ECNBaxter {
         void action_process(const BaxterAction::UniquePtr &msg);
         void state_process(const EndEffectorState::UniquePtr &msg);
         void initialize(const EndEffectorState::UniquePtr &msg);
-        void vacuum_check(const EndEffectorState::UniquePtr &msg);
+        const char* VACUUM_SENSOR = "vacuum sensor";
+        const char* VACUUM_THRESHOLD = "vacuum threshold";
+        void vacuum_check();
 
         void parse_state();
 
