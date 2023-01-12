@@ -74,6 +74,24 @@ namespace ECNBaxter {
         if (!_initialized)
             this->initialize(msg);
         _calibrated = msg->calibrated;
+
+        // If vacuum gripper is gripping, check if the pressure is enough
+        if (_type == VACUUM && cmd.command == "grip")
+            vacuum_check(msg);
+    }
+
+    void GripperNode::vacuum_check(const EndEffectorState::UniquePtr &msg) {
+        // Decode JSON
+        state_process(msg);
+
+        if (latest_state.HasMember("vacuum sensor") && latest_state.HasMember("vacuum threshold")) {
+            double pressure = latest_state["vacuum sensor"].GetDouble();
+            double threshold = latest_state["vacuum threshold"].GetDouble();
+
+            if (pressure < threshold) {
+                release();
+            }
+        }
     }
 
     /**

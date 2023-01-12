@@ -61,12 +61,14 @@ namespace ECNBaxter {
         void action_process(const BaxterAction::UniquePtr &msg);
         void state_process(const EndEffectorState::UniquePtr &msg);
         void initialize(const EndEffectorState::UniquePtr &msg);
+        void vacuum_check(const EndEffectorState::UniquePtr &msg);
 
         void parse_state();
 
         void action(const std::string &action_id);
         void reset() { action("reset"); };
         void calibrate() { action("calibrate"); };
+        void release() { action("release"); };
 
         // Topic-related members
         rclcpp::Subscription<BaxterAction>::SharedPtr act_sub;
