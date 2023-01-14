@@ -51,7 +51,7 @@ set(packages
 set(msg_files
         "msg/BaxterAction.msg"
         )
-file(GLOB_RECURSE RapidJSON_File include/rapidjson/*.h)
+file(GLOB_RECURSE RapidJSON_File rapidjson/*.h)
 add_library(RapidJSON INTERFACE)
 target_include_directories(RapidJSON INTERFACE RapidJSON_File)
 
@@ -67,5 +67,6 @@ rosidl_generate_interfaces(
 ament_export_dependencies(rosidl_default_runtime)
 
 addNode(gripper_node "components/gripper" ${packages})
+#target_include_directories(gripper_node PRIVATE include)
 
 ament_package()

@@ -57,7 +57,7 @@ namespace ECNBaxter {
      */
     void GripperNode::action_process(const BaxterAction::UniquePtr &msg) {
         // Check if gripper properties are set and calibrated before launching any action
-        if (!_initialized & !_calibrated)
+        if (!_initialized || !_calibrated)
             return;
         action(msg->action);
     }
@@ -69,45 +69,12 @@ namespace ECNBaxter {
     void GripperNode::state_process(const EndEffectorState::UniquePtr &msg) {
         // Latest
         RCLCPP_INFO(get_logger(), "Timestamp %d", msg->timestamp.sec);
+        latest_cmd = msg->command;
         latest_state_src = msg->state;
-        is_state_latest = false;
 
         if (!_initialized)
             this->initialize(msg);
         _calibrated = msg->calibrated;
-
-        parse_state();
-        // If vacuum gripper is gripping, check if the pressure is enough
-        if (_type == VACUUM && cmd.command == "grip") {
-            if (check_vacuum == nullptr) {
-                std::future<void> check = std::async(std::launch::async, [this]() {
-                    sleep_for(500ms);
-                    isSucking = true;
-                    check_vacuum = nullptr;
-                    vacuum_check();
-                });
-                check_vacuum = &check;
-            }
-        }
-    }
-
-    void GripperNode::vacuum_check() {
-        if (isSucking) {
-            RCLCPP_INFO(get_logger(), "State %s", latest_state_src.c_str());
-            parse_state();
-            // Decode JSON
-            if (latest_state.HasMember(VACUUM_SENSOR) && latest_state.HasMember(VACUUM_THRESHOLD)) {
-                int sensor = latest_state[VACUUM_SENSOR].GetUint();
-                int thres = latest_state[VACUUM_THRESHOLD].GetUint();
-
-                RCLCPP_INFO(get_logger(), "Vacuum : %1u / %2u", sensor, thres);
-
-                if (sensor < thres) {
-                    isSucking = false;
-                    //release();
-                }
-            }
-        }
     }
 
     /**
@@ -124,11 +91,12 @@ namespace ECNBaxter {
         switch (_type) {
             case VACUUM:
                 RCLCPP_INFO(get_logger(), "%s_gripper is a vacuum one !", _side.c_str());
+                checker = AsyncTimer([this](){
+                    vacuum_check();
+                }, timer_duration);
                 break;
             case CLAMP:
                 RCLCPP_INFO(get_logger(), "%s_gripper is a clamp one !", _side.c_str());
-                break;
-            default:
                 break;
         };
 
@@ -136,7 +104,6 @@ namespace ECNBaxter {
         sleep_for(500ms);
         calibrate();
         _initialized = true;
-
     }
 
     /**
@@ -145,10 +112,33 @@ namespace ECNBaxter {
      */
     void GripperNode::parse_state() {
         latest_state.Parse(&latest_state_src[0]);
-        is_state_latest = true;
 
         if (latest_state.HasParseError()) {
             RCLCPP_FATAL(get_logger(), "%s_gripper has a JSON parsing error.", _side.c_str());
+        }
+    }
+
+    void GripperNode::vacuum_check() {
+        // If we grip, we check
+        if (latest_cmd != "grip")
+            return;
+        // Waiting for the suction to appear
+
+        sleep_for(check_delay);
+
+        while (latest_cmd != "release") {
+            parse_state();
+            if (latest_state.HasMember(VACUUM_SENSOR) && latest_state.HasMember(VACUUM_THRESHOLD)) {
+                unsigned char sensor = latest_state[VACUUM_SENSOR].GetUint();
+                unsigned char threshold = latest_state[VACUUM_THRESHOLD].GetUint();
+
+                RCLCPP_INFO(get_logger(), "Vacuum : %1u / %2u", sensor, threshold);
+
+                if (sensor < threshold) {
+                    release();
+                }
+            }
+            sleep_for(timer_loop_time);
         }
     }
 

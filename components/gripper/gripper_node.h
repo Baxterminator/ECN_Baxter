@@ -6,15 +6,16 @@
 #ifndef ECN_BAXTER_GRIPPER_NODE_H
 #define ECN_BAXTER_GRIPPER_NODE_H
 
-#include "../../../../../../../../../opt/ros/humble/include/rclcpp/rclcpp/rclcpp.hpp"
-#include "../../../../../Baxter/install/baxter_core_msgs/include/baxter_core_msgs/baxter_core_msgs/msg/end_effector_command.hpp"
-#include "../../../../../Baxter/install/baxter_core_msgs/include/baxter_core_msgs/baxter_core_msgs/msg/end_effector_state.hpp"
-#include "../../../../build/ecn_baxter/rosidl_generator_cpp/ecn_baxter/msg/baxter_action.hpp"
+#include "rclcpp/rclcpp.hpp"
+#include "baxter_core_msgs/msg/end_effector_command.hpp"
+#include "baxter_core_msgs/msg/end_effector_state.hpp"
+#include "ecn_baxter/msg/baxter_action.hpp"
 
-#include "../../include/rapidjson/document.h"
+#include "../../rapidjson/document.h"
+#include "../../include/async_timer.hpp"
 
-#include <c++/11/chrono>
-#include <c++/11/thread>
+#include <chrono>
+#include <thread>
 
 namespace ECNBaxter {
     using baxter_core_msgs::msg::EndEffectorCommand;
@@ -23,6 +24,7 @@ namespace ECNBaxter {
 
     using namespace std::this_thread;
     using namespace std::chrono_literals;
+    using namespace std::chrono;
     using namespace rapidjson;
 
     enum GripperType {
@@ -45,11 +47,8 @@ namespace ECNBaxter {
 
         // Gripper latest_state
         std::string latest_state_src;
-        bool is_state_latest = false;
-        EndEffectorState::UniquePtr latest_state_obj;
+        std::string latest_cmd;
         Document latest_state;
-        std::future<void>* check_vacuum = nullptr;
-        bool isSucking = false;
 
         // Communication
         const int QOS = 10;
@@ -57,13 +56,20 @@ namespace ECNBaxter {
         std::string CMD_TOPIC;
         std::string STATE_TOPIC;
 
+        // Vacuum checker properties
+        milliseconds timer_duration = 500ms;
+        milliseconds check_delay = 200ms;
+        milliseconds timer_loop_time = 500ms;
+        const char* VACUUM_SENSOR = "vacuum sensor";
+        const char* VACUUM_THRESHOLD = "vacuum threshold";
+        AsyncTimer checker;
+
         // Methods
         void topics_init();
         void action_process(const BaxterAction::UniquePtr &msg);
         void state_process(const EndEffectorState::UniquePtr &msg);
         void initialize(const EndEffectorState::UniquePtr &msg);
-        const char* VACUUM_SENSOR = "vacuum sensor";
-        const char* VACUUM_THRESHOLD = "vacuum threshold";
+
         void vacuum_check();
 
         void parse_state();
@@ -77,6 +83,7 @@ namespace ECNBaxter {
         rclcpp::Subscription<BaxterAction>::SharedPtr act_sub;
         rclcpp::Subscription<EndEffectorState>::SharedPtr state_sub;
         rclcpp::Publisher<EndEffectorCommand>::SharedPtr cmd_pub;
+        rclcpp::TimerBase::SharedPtr vacuum_checker;
 
         EndEffectorCommand cmd;
     };
