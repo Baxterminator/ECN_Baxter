@@ -21,6 +21,11 @@ ament_auto_add_executable(gripper_node components/gripper_node.cpp)
 target_include_directories(gripper_node PRIVATE include)
 rosidl_target_interfaces(gripper_node ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
-ament_auto_add_library(step_node game/step_node.cpp)
+ament_auto_add_library(step_node STATIC game/step_node.cpp)
+target_include_directories(step_node PRIVATE include)
+
+install(DIRECTORY include/${PROJECT_NAME}
+        DESTINATION include)
+ament_export_include_directories(include/${PROJECT_NAME})
 
 ament_package()
