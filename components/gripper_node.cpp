@@ -3,7 +3,7 @@
 // Gripper Node utils
 // Copyright
 
-#include "ecn_baxter/gripper/gripper_node.h"
+#include "ecn_baxter/gripper/gripper_node.hpp"
 namespace ECNBaxter {
     /*
      * ========================================
