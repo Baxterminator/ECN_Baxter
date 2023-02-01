@@ -22,8 +22,8 @@
 #include "internal/strfunc.h"
 #include "memorystream.h"
 #include "encodedstream.h"
-#include <new>      // placement new
-#include <limits>
+#include <c++/9/new>      // placement new
+#include <c++/9/limits>
 
 RAPIDJSON_DIAG_PUSH
 #ifdef _MSC_VER
@@ -45,11 +45,11 @@ RAPIDJSON_DIAG_OFF(terminate) // ignore throwing RAPIDJSON_ASSERT in RAPIDJSON_N
 #endif // __GNUC__
 
 #ifndef RAPIDJSON_NOMEMBERITERATORCLASS
-#include <iterator> // std::iterator, std::random_access_iterator_tag
+#include <c++/9/iterator> // std::iterator, std::random_access_iterator_tag
 #endif
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
-#include <utility> // std::move
+#include <c++/9/utility> // std::move
 #endif
 
 RAPIDJSON_NAMESPACE_BEGIN

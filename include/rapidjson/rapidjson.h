@@ -36,8 +36,8 @@
           different translation units of a single application.
  */
 
-#include <cstdlib>  // malloc(), realloc(), free(), size_t
-#include <cstring>  // memset(), memcpy(), memmove(), memcmp()
+#include <c++/9/cstdlib>  // malloc(), realloc(), free(), size_t
+#include <c++/9/cstring>  // memset(), memcpy(), memmove(), memcmp()
 
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_VERSION_STRING
@@ -398,7 +398,7 @@ RAPIDJSON_NAMESPACE_END
           \ref RAPIDJSON_ERRORS APIs.
 */
 #ifndef RAPIDJSON_ASSERT
-#include <cassert>
+#include <c++/9/cassert>
 #define RAPIDJSON_ASSERT(x) assert(x)
 #endif // RAPIDJSON_ASSERT
 

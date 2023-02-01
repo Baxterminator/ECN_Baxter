@@ -11,8 +11,8 @@
 #include "baxter_core_msgs/msg/end_effector_state.hpp"
 #include "ecn_baxter/msg/baxter_action.hpp"
 
-#include "../../rapidjson/document.h"
-#include "../../include/async_timer.hpp"
+#include "rapidjson/document.h"
+#include "ecn_baxter/async_timer.hpp"
 
 #include <chrono>
 #include <thread>
