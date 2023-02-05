@@ -1,9 +1,5 @@
 #include <ecn_baxter/game/node.hpp>
 #include <csignal>
-#include <cstdlib>
-#include <iostream>
-#include <thread>
-#include <chrono>
 
 using namespace ECNBaxter;
 

@@ -56,7 +56,7 @@ endmacro()
 # =================================================================
 ament_auto_add_executable(gripper_node components/gripper_node.cpp)
 target_include_directories(gripper_node PRIVATE include)
-add_message("gripper_node")
+add_message(gripper_node)
 
 ament_auto_add_executable(game_master game/game_master.cpp game/node.cpp)
 target_include_directories(game_master PRIVATE
@@ -65,12 +65,8 @@ target_include_directories(game_master PRIVATE
         )
 target_link_libraries(game_master ${ROS1_LIBS})
 
-# =================================================================
-#                             PYTHON
-# =================================================================
-#   ament_python_install_package("ecnbaxter"        )
 install(PROGRAMS
-        scripts/ui_node.py
+        gui/ui_node.py
         DESTINATION lib/${PROJECT_NAME}
         )
 
