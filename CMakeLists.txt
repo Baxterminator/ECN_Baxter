@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(ecn_baxter)
+project(ecn_baxter VERSION 0.0.1)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE Release)
@@ -33,12 +33,30 @@ rosidl_generate_interfaces(
 )
 ament_export_dependencies(rosidl_default_runtime)
 
+if("$ENV{ROS_DISTRO}" STREQUAL "galactic" OR "$ENV{ROS_DISTRO}" STREQUAL "foxy")
+    set(LEGACY_IDL TRUE)
+else()
+    set(LEGACY_IDL FALSE)
+endif()
+
+if(NOT ${LEGACY_IDL})
+    rosidl_get_typesupport_target(cpp_typesupport_target "${PROJECT_NAME}" "rosidl_typesupport_cpp")
+endif()
+
+macro(add_message node_name)
+    if(${LEGACY_IDL})
+        rosidl_target_interfaces(${node_name} "${PROJECT_NAME}" "rosidl_typesupport_cpp")
+    else()
+        target_link_libraries(${node_name} "${cpp_typesupport_target}")
+    endif()
+endmacro()
+
 # =================================================================
-#                           OUTPUT
+#                              OUTPUT
 # =================================================================
 ament_auto_add_executable(gripper_node components/gripper_node.cpp)
 target_include_directories(gripper_node PRIVATE include)
-rosidl_target_interfaces(gripper_node ${PROJECT_NAME} "rosidl_typesupport_cpp")
+add_message("gripper_node")
 
 ament_auto_add_executable(game_master game/game_master.cpp game/node.cpp)
 target_include_directories(game_master PRIVATE
@@ -48,25 +66,20 @@ target_include_directories(game_master PRIVATE
 target_link_libraries(game_master ${ROS1_LIBS})
 
 # =================================================================
+#                             PYTHON
+# =================================================================
+#   ament_python_install_package("ecnbaxter"        )
+install(PROGRAMS
+        scripts/ui_node.py
+        DESTINATION lib/${PROJECT_NAME}
+        )
+
+# =================================================================
 #                          EXPORT HPP
 # =================================================================
-#include_directories(include/ecn_baxter/export)
-#set(HEADER_FILES include/ecn_baxter/export/step_node.hpp)
-#add_library(game_lib ${HEADER_FILES})
-#set_target_properties(game_lib PROPERTIES LINKER_LANGUAGE CXX)
-#ament_export_targets(game_lib HAS_LIBRARY_TARGET)
 install(
         DIRECTORY include/${PROJECT_NAME}
         DESTINATION include/${PROJECT_NAME}
 )
-#install(
-#        TARGETS game_lib
-#        EXPORT game_lib
-#        LIBRARY DESTINATION lib
-#        ARCHIVE DESTINATION lib
-#        RUNTIME DESTINATION bin
-#        INCLUDES DESTINATION include
-#)
-
 
 ament_auto_package()
