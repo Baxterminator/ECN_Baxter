@@ -16,7 +16,7 @@ This packages actually provide a node that simplify the use of the two grippers 
 the robot. It automates the calibration and the auto-release of the vacuum gripper.
 
 This simplification use a new topic and a new message (ecn_baxter::msg::BaxterAction)
-```asm
+```YAML
 Topic : /baxter/action
 
 #######################
@@ -30,7 +30,7 @@ The two values for the components are *"left_gripper"* and *"right_gripper"* and
 two main action are *"grip"* and *"release"*.
 
 But before that, a node should be launched for each gripper, so to launch both grippers :
-```asm
+```YAML
 ros2 run ecn_baxter gripper_node --ros-arg -p gripper_side:=right
 ros2 run ecn_baxter gripper_node --ros-arg -p gripper_side:=left
 ```
