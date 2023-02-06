@@ -7,6 +7,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
+find_package(Qt5 COMPONENTS Core Widgets WebKit WebKitWidgets REQUIRED)
 
 # =================================================================
 #                           ROS 1
@@ -26,11 +27,11 @@ endif()
 # =================================================================
 #                           INTERFACE
 # =================================================================
-set(msg_files "msg/BaxterAction.msg")
-rosidl_generate_interfaces(
-        ${PROJECT_NAME}
-        ${msg_files}
+file(GLOB msg_files RELATIVE "${CMAKE_CURRENT_LIST_DIR}"
+        "${CMAKE_CURRENT_LIST_DIR}/msg/*.msg"
+        "${CMAKE_CURRENT_LIST_DIR}/srv/*.srv"
 )
+rosidl_generate_interfaces(${PROJECT_NAME} ${msg_files})
 ament_export_dependencies(rosidl_default_runtime)
 
 if("$ENV{ROS_DISTRO}" STREQUAL "galactic" OR "$ENV{ROS_DISTRO}" STREQUAL "foxy")
@@ -52,30 +53,46 @@ macro(add_message node_name)
 endmacro()
 
 # =================================================================
+#                        QT 5 UI Generator
+# =================================================================
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOUIC_SEARCH_PATHS resource/ui)
+set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_RELEASE} -fprofile-arcs -ftest-coverage")
+set_target_properties(Qt5::Core PROPERTIES MAP_IMPORTED_CONFIG_COVERAGE "RELEASE")
+
+# Excluding files rosidl files from autouic generation
+file(GLOB_RECURSE exclude_file
+        "${CMAKE_CURRENT_BINARY_DIR}/ecn*/*.[hc]"
+        "${CMAKE_CURRENT_BINARY_DIR}/ecn*/*.[hc]pp"
+        "${CMAKE_CURRENT_BINARY_DIR}/ros*/*.[hc]"
+        "${CMAKE_CURRENT_BINARY_DIR}/ros*/*.[hc]pp"
+        )
+foreach(X IN LISTS exclude_file)
+    set_property(SOURCE ${X} PROPERTY SKIP_AUTOUIC ON)
+endforeach()
+
+# =================================================================
 #                              OUTPUT
 # =================================================================
 ament_auto_add_executable(gripper_node components/gripper_node.cpp)
-target_include_directories(gripper_node PRIVATE include)
+target_include_directories(gripper_node PRIVATE
+        include/ecn_baxter
+        include/rapidjson)
 add_message(gripper_node)
 
-ament_auto_add_executable(game_master game/game_master.cpp game/node.cpp)
+ament_auto_add_executable(game_master
+        game/game_master.cpp
+        game/node.cpp
+        resource/ui/main.ui
+)
 target_include_directories(game_master PRIVATE
-        include
+        include/ecn_baxter
         ${ROS1_ROOT}/include
-        )
-target_link_libraries(game_master ${ROS1_LIBS})
-
-install(PROGRAMS
-        gui/ui_node.py
-        DESTINATION lib/${PROJECT_NAME}
-        )
+)
+target_link_libraries(game_master ${ROS1_LIBS} Qt5::Core Qt5::Widgets Qt5::WebKit Qt5::WebKitWidgets)
 
 # =================================================================
 #                          EXPORT HPP
 # =================================================================
-install(
-        DIRECTORY include/${PROJECT_NAME}
-        DESTINATION include/${PROJECT_NAME}
-)
 
 ament_auto_package()
