@@ -5,40 +5,39 @@
 
 using namespace ECNBaxter;
 
-volatile sig_atomic_t stop;
+shared_ptr<QApplication> app = nullptr;
 
 void sighandler(int s)
 {
-    stop = 1;
+    app->quit();
 }
 
 int main(int argc, char** argv) {
 
+    // Add callback on force quit to stop everything
     signal(SIGINT, &sighandler);
 
-    Ui_BaxterMaster gui;
-
-    //QWebView::initialize();
-    QApplication app(argc, argv);
-    QMainWindow widget;
-
-
-    gui.setupUi(&widget);
-    widget.show();
-    app.exec();
-
-    // Init the two nodes
+    // Init the two ros nodes
     if (!Node::init(argc, argv))
         return -1;
 
-    //ros::AsyncSpinner async(1);
-    //async.start();
+    // Launching GUI on main thread
+    Ui_BaxterMaster gui;
+    //QWebView::initialize();
+    app = make_shared<QApplication>(argc, argv);
+    QMainWindow widget;
+    gui.setupUi(&widget);
+    widget.show();
+    app->exec();
 
-    // Main loop
-    while (ros::ok() && rclcpp::ok() && !stop) {
-        Node::spinOnce();
-    }
+    app.reset();
+
+    RCLCPP_INFO(Node::ros2()->get_logger(), "Stop normally");
+
+    // Stop ROS 1&2 thread and wait for its end
     Node::stop();
+    if (Node::main_thread()->joinable())
+        Node::main_thread()->join();
 
     return 0;
 }
