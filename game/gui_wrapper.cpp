@@ -1,5 +1,5 @@
 #include "ecn_baxter/game/gui_wrapper.hpp"
-
+#include "ui_main.h"
 
 namespace ECNBaxter {
     std::shared_ptr<Ui_BaxterMaster> UIWrapper::gui_instance;

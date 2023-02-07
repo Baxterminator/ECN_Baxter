@@ -83,8 +83,8 @@ add_message(gripper_node)
 ament_auto_add_executable(game_master
         game/game_master.cpp
         game/node.cpp
-        resource/ui/main.ui
         game/gui_wrapper.cpp
+        resource/ui/main.ui
 )
 target_include_directories(game_master PRIVATE
         include/ecn_baxter

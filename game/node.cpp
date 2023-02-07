@@ -1,6 +1,4 @@
 #include <ecn_baxter/game/node.hpp>
-#include <iostream>
-#include <vector>
 
 namespace ECNBaxter {
     std::unique_ptr<ros::NodeHandle> Node::ros1_node{};
