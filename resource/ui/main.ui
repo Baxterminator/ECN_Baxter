@@ -309,7 +309,7 @@
          <widget class="QWebView" name="webView">
           <property name="url">
            <url>
-            <string>https://meltwin-ecn.github.io/Baxter/</string>
+            <string>https://baxterminator.github.io/Baxter/</string>
            </url>
           </property>
           <property name="zoomFactor">

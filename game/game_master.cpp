@@ -1,7 +1,8 @@
 #include <ecn_baxter/game/node.hpp>
 #include <csignal>
-#include <ui_main.h>
 #include "QtWebKit"
+#include "ecn_baxter/game/gui_wrapper.hpp"
+#include <iostream>
 
 using namespace ECNBaxter;
 
@@ -22,22 +23,19 @@ int main(int argc, char** argv) {
         return -1;
 
     // Launching GUI on main thread
-    Ui_BaxterMaster gui;
-    //QWebView::initialize();
     app = make_shared<QApplication>(argc, argv);
-    QMainWindow widget;
-    gui.setupUi(&widget);
-    widget.show();
+    UIWrapper::instance();
+    UIWrapper::showW();
     app->exec();
-
     app.reset();
-
-    RCLCPP_INFO(Node::ros2()->get_logger(), "Stop normally");
+    UIWrapper::clean();
 
     // Stop ROS 1&2 thread and wait for its end
     Node::stop();
     if (Node::main_thread()->joinable())
         Node::main_thread()->join();
+    Node::clean();
+    rclcpp::shutdown();
 
     return 0;
 }

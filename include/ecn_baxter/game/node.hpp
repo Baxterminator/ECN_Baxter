@@ -17,14 +17,11 @@ namespace ECNBaxter {
         inline static rclcpp::Node* ros2() {return ros2_node.get();}
         inline static thread* main_thread() {return &ros_thread;}
         inline static void spinOnce() { ex->spin_once(10ms); }
-        inline static void shutdown() {
-            ros2_node.reset();
-            ex.reset();
-            rclcpp::shutdown();
-        }
+
         inline static void stop() {
             stop_cmd = 1;
         }
+        static void clean();
 
     protected:
 

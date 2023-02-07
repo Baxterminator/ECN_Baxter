@@ -13,6 +13,7 @@
   <depend>rclpy</depend>
   <depend>Qt5</depend>
   <depend>baxter_core_msgs</depend>
+  <depend>image_orchestra</depend>
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>ament_cmake_python</buildtool_depend>
   <buildtool_depend>rosidl_default_generators</buildtool_depend>

@@ -84,6 +84,7 @@ ament_auto_add_executable(game_master
         game/game_master.cpp
         game/node.cpp
         resource/ui/main.ui
+        game/gui_wrapper.cpp
 )
 target_include_directories(game_master PRIVATE
         include/ecn_baxter
@@ -92,7 +93,9 @@ target_include_directories(game_master PRIVATE
 target_link_libraries(game_master ${ROS1_LIBS} Qt5::Core Qt5::Widgets Qt5::WebKit Qt5::WebKitWidgets)
 
 # =================================================================
-#                          EXPORT HPP
+#                        EXPORT OTHERS
 # =================================================================
+install(DIRECTORY launch
+        DESTINATION share/${PROJECT_NAME})
 
 ament_auto_package()

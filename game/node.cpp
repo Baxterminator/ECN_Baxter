@@ -56,6 +56,11 @@ namespace ECNBaxter {
         while (ros::ok() && rclcpp::ok() && !stop_cmd) {
             Node::spinOnce();
         }
-        Node::shutdown();
+    }
+
+    void Node::clean() {
+        timer.reset();
+        ros2_node.reset();
+        ex.reset();
     }
 }
