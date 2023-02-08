@@ -6,17 +6,15 @@ set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(ament_cmake_auto REQUIRED)
-find_package(tf2 REQUIRED)
-find_package(tf2_ros REQUIRED)
 ament_auto_find_build_dependencies()
 find_package(Qt5 COMPONENTS Core Widgets WebKit WebKitWidgets REQUIRED)
 
 # =================================================================
 #                           ROS 1
 # =================================================================
-# find ROS 1 packages we depend on
+#find ROS 1 packages we depend on
 set(ROS1_ROOT "/opt/ros/noetic")
-set(ROS1_LIBS roscpp rosconsole roscpp_serialization rostime xmlrpcpp)
+set(ROS1_LIBS roscpp)
 
 # if libraries in ROS1_ROOT, explicitely give their location
 if(EXISTS ${ROS1_ROOT})
@@ -32,8 +30,13 @@ endif()
 file(GLOB msg_files RELATIVE "${CMAKE_CURRENT_LIST_DIR}"
         "${CMAKE_CURRENT_LIST_DIR}/msg/*.msg"
         "${CMAKE_CURRENT_LIST_DIR}/srv/*.srv"
+        "${CMAKE_CURRENT_LIST_DIR}/action/*.action"
 )
-rosidl_generate_interfaces(${PROJECT_NAME} ${msg_files})
+set(dependencies
+        "geometry_msgs")
+rosidl_generate_interfaces(${PROJECT_NAME}
+        ${msg_files}
+        DEPENDENCIES ${dependencies})
 ament_export_dependencies(rosidl_default_runtime)
 
 if("$ENV{ROS_DISTRO}" STREQUAL "galactic" OR "$ENV{ROS_DISTRO}" STREQUAL "foxy")
@@ -76,32 +79,33 @@ endforeach()
 # =================================================================
 #                              OUTPUT
 # =================================================================
+## Gripper management
 ament_auto_add_executable(gripper_node components/gripper_node.cpp)
-target_include_directories(gripper_node PRIVATE
+target_include_directories(gripper_node PUBLIC
         include/ecn_baxter
-        include/rapidjson)
+        include/rapidjson
+)
 add_message(gripper_node)
 
-add_executable(game_master
+## Setup Node
+ament_auto_add_executable(setup_node game/setup_node.cpp)
+target_include_directories(setup_node PRIVATE
+        include/ecn_baxter
+)
+add_message(setup_node)
+
+## Main Game Master executable
+ament_auto_add_executable(game_master
         game/game_master.cpp
         game/node.cpp
         game/gui_wrapper.cpp
-        game/setup_node.cpp
         resource/ui/main.ui
 )
-ament_target_dependencies(game_master
-    rclcpp baxter_core_msgs geometry_msgs tf2_ros tf2 Qt5
-)
-target_include_directories(game_master PRIVATE
+target_include_directories(game_master PUBLIC
         include
-        {ROS1_ROOT}/include
+        ${ROS1_ROOT}/include
 )
 target_link_libraries(game_master ${ROS1_LIBS} Qt5::Core Qt5::Widgets Qt5::WebKit Qt5::WebKitWidgets)
-add_dependencies()
-install(TARGETS game_master
-ARCHIVE DESTINATION lib
-LIBRARY DESTINATION lib
-RUNTIME DESTINATION lib/${PROJECT_NAME})
 
 # =================================================================
 #                        EXPORT OTHERS

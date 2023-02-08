@@ -2,10 +2,11 @@
 #include <csignal>
 #include "QtWebKit"
 #include "ecn_baxter/game/gui_wrapper.hpp"
+#include <memory>
 
 using namespace ECNBaxter;
 
-shared_ptr<QApplication> app = nullptr;
+std::shared_ptr<QApplication> app = nullptr;
 
 void sighandler(int s)
 {
@@ -22,7 +23,7 @@ int main(int argc, char** argv) {
         return -1;
 
     // Launching GUI on main thread
-    app = make_shared<QApplication>(argc, argv);
+    app = std::make_shared<QApplication>(argc, argv);
     UIWrapper::instance();
     UIWrapper::showW();
     app->exec();

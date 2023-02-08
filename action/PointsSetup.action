@@ -1,0 +1,17 @@
+bool RIGHT = 0
+bool LEFT = 1
+
+# The ids of the wanted points
+string[] ptns_name
+# The side of the gripper used for this point setup
+bool[] sides
+---
+bool success
+---
+# The actual step
+int32 step
+
+# the names of the configuration points corresponding to the returned position
+string ptn_name
+# The different configuration points
+geometry_msgs/Point ptn
