@@ -1,7 +1,3 @@
-//
-// Created by gcote2021 on 01/02/23.
-//
-
 #ifndef BUILD_STEP_NODE_HPP
 #define BUILD_STEP_NODE_HPP
 

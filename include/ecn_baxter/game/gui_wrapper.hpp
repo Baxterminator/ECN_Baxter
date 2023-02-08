@@ -1,8 +1,8 @@
 #ifndef PROJ1_GUI_WRAPPER_H
 #define PROJ1_GUI_WRAPPER_H
 
-#include "ui_main.h"
 #include <iostream>
+#include <memory>
 
 namespace ECNBaxter {
 class UIWrapper {

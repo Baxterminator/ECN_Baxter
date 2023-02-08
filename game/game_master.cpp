@@ -2,7 +2,6 @@
 #include <csignal>
 #include "QtWebKit"
 #include "ecn_baxter/game/gui_wrapper.hpp"
-#include <iostream>
 
 using namespace ECNBaxter;
 

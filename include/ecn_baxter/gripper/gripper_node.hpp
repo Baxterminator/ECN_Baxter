@@ -1,8 +1,3 @@
-//
-// Created by Geoffrey Côte on 05/01/23.
-// Gripper Node utils
-//
-
 #ifndef ECN_BAXTER_GRIPPER_NODE_H
 #define ECN_BAXTER_GRIPPER_NODE_H
 

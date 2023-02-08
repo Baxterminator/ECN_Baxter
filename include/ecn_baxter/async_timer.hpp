@@ -1,7 +1,3 @@
-//
-// Created by Geoffrey Côte on 14/01/23.
-//
-
 #ifndef ASYNC_TIMER_H
 #define ASYNC_TIMER_H
 

@@ -6,6 +6,8 @@ set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(ament_cmake_auto REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(tf2_ros REQUIRED)
 ament_auto_find_build_dependencies()
 find_package(Qt5 COMPONENTS Core Widgets WebKit WebKitWidgets REQUIRED)
 
@@ -80,17 +82,26 @@ target_include_directories(gripper_node PRIVATE
         include/rapidjson)
 add_message(gripper_node)
 
-ament_auto_add_executable(game_master
+add_executable(game_master
         game/game_master.cpp
         game/node.cpp
         game/gui_wrapper.cpp
+        game/setup_node.cpp
         resource/ui/main.ui
 )
+ament_target_dependencies(game_master
+    rclcpp baxter_core_msgs geometry_msgs tf2_ros tf2 Qt5
+)
 target_include_directories(game_master PRIVATE
-        include/ecn_baxter
-        ${ROS1_ROOT}/include
+        include
+        {ROS1_ROOT}/include
 )
 target_link_libraries(game_master ${ROS1_LIBS} Qt5::Core Qt5::Widgets Qt5::WebKit Qt5::WebKitWidgets)
+add_dependencies()
+install(TARGETS game_master
+ARCHIVE DESTINATION lib
+LIBRARY DESTINATION lib
+RUNTIME DESTINATION lib/${PROJECT_NAME})
 
 # =================================================================
 #                        EXPORT OTHERS

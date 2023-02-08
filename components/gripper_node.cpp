@@ -1,8 +1,3 @@
-//
-// Created by Geoffrey Côte on 05/01/23.
-// Gripper Node utils
-// Copyright
-
 #include "ecn_baxter/gripper/gripper_node.hpp"
 namespace ECNBaxter {
     /*
