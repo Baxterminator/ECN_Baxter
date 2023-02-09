@@ -5,6 +5,7 @@
 #include <ros/master.h>
 #include <rclcpp/rclcpp.hpp>
 #include <thread>
+#include <ecn_baxter/game/node2.hpp>
 
 namespace ECNBaxter {
 
@@ -18,6 +19,9 @@ namespace ECNBaxter {
         inline static thread* main_thread() {return &ros_thread;}
         inline static void spinOnce() { ex->spin_once(10ms); }
 
+        inline static void bind_gui() {
+            ros2_node->bind_gui();
+        }
         inline static void stop() {
             stop_cmd = 1;
         }
@@ -31,7 +35,7 @@ namespace ECNBaxter {
 
         static unique_ptr<ros::NodeHandle> ros1_node;
         static rclcpp::executors::SingleThreadedExecutor::SharedPtr ex;
-        static rclcpp::Node::SharedPtr ros2_node;
+        static std::shared_ptr<GMROS2> ros2_node;
         static rclcpp::TimerBase::SharedPtr timer;
     };
 }

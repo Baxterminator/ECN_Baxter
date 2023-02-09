@@ -14,6 +14,7 @@ private:
 public:
     inline static void showW() {win->show();}
     inline static QPushButton* slave() {return instance()->slave;}
+    inline static QPushButton* setup() {return instance()->setup;}
     static std::shared_ptr<Ui_BaxterMaster> instance();
     static void clean();
 };

@@ -1,8 +1,8 @@
 #include <ecn_baxter/game/node.hpp>
 
 namespace ECNBaxter {
-    std::unique_ptr<ros::NodeHandle> Node::ros1_node{};
-    rclcpp::Node::SharedPtr Node::ros2_node{};
+    std::unique_ptr<ros::NodeHandle> Node::ros1_node;
+    std::shared_ptr<GMROS2> Node::ros2_node;
     rclcpp::executors::SingleThreadedExecutor::SharedPtr Node::ex;
     rclcpp::TimerBase::SharedPtr Node::timer;
     thread Node::ros_thread;
@@ -19,10 +19,7 @@ namespace ECNBaxter {
 
         stop_cmd = 0;
 
-        ros2_node = rclcpp::Node::make_shared("game_master_2", rclcpp::NodeOptions{});
-        timer = ros2_node->create_wall_timer(10ms, [&](){
-            RCLCPP_INFO(ros2_node->get_logger(), "Hello");
-        });
+        ros2_node = std::make_shared<GMROS2>(rclcpp::NodeOptions{});
 
         ros::init(argc, argv, "game_master_1");
         ex = rclcpp::executors::SingleThreadedExecutor::make_shared();

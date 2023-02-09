@@ -135,6 +135,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="setup">
+         <property name="text">
+          <string>Setup Game</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="slave">
          <property name="text">
           <string>Slave ON</string>

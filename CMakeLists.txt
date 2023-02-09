@@ -97,6 +97,7 @@ add_message(setup_node)
 ## Main Game Master executable
 ament_auto_add_executable(game_master
         game/game_master.cpp
+        game/node2.cpp
         game/node.cpp
         game/gui_wrapper.cpp
         resource/ui/main.ui

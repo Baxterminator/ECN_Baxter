@@ -26,6 +26,7 @@ int main(int argc, char** argv) {
     app = std::make_shared<QApplication>(argc, argv);
     UIWrapper::instance();
     UIWrapper::showW();
+    Node::bind_gui();
     app->exec();
     app.reset();
     UIWrapper::clean();

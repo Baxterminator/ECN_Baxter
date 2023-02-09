@@ -63,7 +63,7 @@ namespace ECNBaxter {
         current_step = 0;
 
         sptr<PointsSetup::Feedback> feedback;
-        while (current_step>0) {
+        while (current_step<names.size()) {
             if (publish) {
                 feedback = std::make_shared<PointsSetup::Feedback>();
                 feedback->step = (int) current_step;
