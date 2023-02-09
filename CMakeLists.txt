@@ -81,7 +81,7 @@ endforeach()
 # =================================================================
 ## Gripper management
 ament_auto_add_executable(gripper_node components/gripper_node.cpp)
-target_include_directories(gripper_node PUBLIC
+target_include_directories(gripper_node PRIVATE
         include/ecn_baxter
         include/rapidjson
 )
@@ -90,7 +90,7 @@ add_message(gripper_node)
 ## Setup Node
 ament_auto_add_executable(setup_node game/setup_node.cpp)
 target_include_directories(setup_node PRIVATE
-        include/ecn_baxter
+        include
 )
 add_message(setup_node)
 
@@ -102,11 +102,12 @@ ament_auto_add_executable(game_master
         game/gui_wrapper.cpp
         resource/ui/main.ui
 )
-target_include_directories(game_master PUBLIC
+target_include_directories(game_master PRIVATE
         include
         ${ROS1_ROOT}/include
 )
 target_link_libraries(game_master ${ROS1_LIBS} Qt5::Core Qt5::Widgets Qt5::WebKit Qt5::WebKitWidgets)
+add_message(game_master)
 
 # =================================================================
 #                        EXPORT OTHERS
