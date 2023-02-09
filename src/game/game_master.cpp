@@ -24,10 +24,16 @@ int main(int argc, char** argv) {
 
     // Launching GUI on main thread
     app = std::make_shared<QApplication>(argc, argv);
+
+    // GUI Initialization
     UIWrapper::instance();
     UIWrapper::showW();
     Node::bind_gui();
+
+    // Running GUI
     app->exec();
+
+    // Cleaning procedure on stop
     app.reset();
     UIWrapper::clean();
 

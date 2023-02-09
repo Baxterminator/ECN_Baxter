@@ -16,6 +16,7 @@ namespace ECNBaxter {
      # =================================================================*/
 
     void GMROS2::launch_setup() {
+        using namespace std::placeholders;
         RCLCPP_INFO(get_logger(), "Setup launch !");
 
         // Setup MSG
@@ -34,7 +35,7 @@ namespace ECNBaxter {
         };
 
         auto goal_options = Client<PointsSetup>::SendGoalOptions();
-        goal_options.goal_response_callback = [&] (const PtnSetupHandler::SharedPtr &handle) {
+        goal_options.goal_response_callback = [&](const PtnSetupHandler::SharedPtr &handle) {
             ptn_setup_goal(handle);
         };
         goal_options.feedback_callback = [&] (PtnSetupHandler::SharedPtr handle, const sptr<const PointsSetup::Feedback> feedback) {
@@ -54,6 +55,11 @@ namespace ECNBaxter {
         RCLCPP_INFO(get_logger(), "Setup launched !");
     }
 
+    void GMROS2::ptn_setup_goal(std::shared_future<PtnSetupHandler::SharedPtr> future) {
+        auto handle = future.get();
+        ptn_setup_goal(handle);
+    }
+
     void GMROS2::ptn_setup_result(const PtnSetupHandler::WrappedResult &result) {
         switch (result.code) {
             case ResultCode::ABORTED:
@@ -66,7 +72,7 @@ namespace ECNBaxter {
                 RCLCPP_ERROR(get_logger(), "Unknown result code :/");
                 break;
         }
-        RCLCPP_INFO(get_logger(), "Setup done with result %d", result.result);
+        RCLCPP_INFO(get_logger(), "Setup done with result %d", result.result->success);
     }
 
     void GMROS2::ptn_setup_feedback(PtnSetupHandler::SharedPtr &handle,

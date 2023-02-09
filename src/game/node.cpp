@@ -1,12 +1,13 @@
 #include <ecn_baxter/game/node.hpp>
 
 namespace ECNBaxter {
-    std::unique_ptr<ros::NodeHandle> Node::ros1_node;
+    std::unique_ptr<GMROS1> Node::ros1_node;
     std::shared_ptr<GMROS2> Node::ros2_node;
     rclcpp::executors::SingleThreadedExecutor::SharedPtr Node::ex;
     rclcpp::TimerBase::SharedPtr Node::timer;
     thread Node::ros_thread;
     sig_atomic_t Node::stop_cmd;
+    bool Node::LEGACY;
 
 
     /**
@@ -14,6 +15,11 @@ namespace ECNBaxter {
      * @return
      */
     bool Node::init(int argc, char** argv) {
+        // Determine if distro is foxy or galactic => LEGACY = true
+        // Else legacy = false
+        const std::string distro = std::getenv("ROS_DISTRO");
+        LEGACY = (distro == "galactic" || distro == "foxy");
+
         // ROS 2 initialization
         rclcpp::init(argc, argv);
 
@@ -31,15 +37,11 @@ namespace ECNBaxter {
         if (it != nodes.end()) {
             RCLCPP_FATAL(ros2()->get_logger(), "Game master is already launched !");
             return false;
-        }
-
-
-        RCLCPP_INFO(ros2()->get_logger(), "Running Master on %s", std::getenv("ROS_MASTER_URI"));
+        }*/
 
         // ROS 1 initialization
-        ros1_node = make_unique<ros::NodeHandle>();
+        ros1_node = make_unique<GMROS1>();
 
-*/
         ros_thread = thread(Node::ros_loop);
         return true;
     }
@@ -48,6 +50,8 @@ namespace ECNBaxter {
      * Main task for ros loop
      */
     void Node::ros_loop() {
+        ros::AsyncSpinner async(1);
+        async.start();
         while (ros::ok() && rclcpp::ok() && !stop_cmd) {
             Node::spinOnce();
         }

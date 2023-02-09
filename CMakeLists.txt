@@ -14,7 +14,7 @@ find_package(Qt5 COMPONENTS Core Widgets WebKit WebKitWidgets REQUIRED)
 # =================================================================
 #find ROS 1 packages we depend on
 set(ROS1_ROOT "/opt/ros/noetic")
-set(ROS1_LIBS roscpp)
+set(ROS1_LIBS roscpp rosconsole roscpp_serialization rostime xmlrpcpp)
 
 # if libraries in ROS1_ROOT, explicitely give their location
 if(EXISTS ${ROS1_ROOT})
@@ -75,12 +75,26 @@ file(GLOB_RECURSE exclude_file
 foreach(X IN LISTS exclude_file)
     set_property(SOURCE ${X} PROPERTY SKIP_AUTOUIC ON)
 endforeach()
+# =================================================================
+#                        QT 5 UI Generator
+# =================================================================
+function(legacy_cpp files out_l)
+    foreach(f ${${files}})
+        if(${LEGACY_IDL})
+            string(CONCAT _out "src/legacy/" ${f})
+        else()
+            string(CONCAT _out "src/" ${f})
+        endif()
+        set(${out_l} ${${out_l}} ${_out})
+    endforeach()    
+    set(${out_l} ${${out_l}} PARENT_SCOPE)
+endfunction(legacy_cpp)
 
 # =================================================================
 #                              OUTPUT
 # =================================================================
 ## Gripper management
-ament_auto_add_executable(gripper_node components/gripper_node.cpp)
+ament_auto_add_executable(gripper_node src/components/gripper_node.cpp)
 target_include_directories(gripper_node PRIVATE
         include/ecn_baxter
         include/rapidjson
@@ -88,19 +102,24 @@ target_include_directories(gripper_node PRIVATE
 add_message(gripper_node)
 
 ## Setup Node
-ament_auto_add_executable(setup_node game/setup_node.cpp)
+ament_auto_add_executable(setup_node src/game/setup_node.cpp)
 target_include_directories(setup_node PRIVATE
         include
 )
 add_message(setup_node)
 
 ## Main Game Master executable
+set(legacy_files_gm
+    "game/node2.cpp"
+)
+legacy_cpp(legacy_files_gm legacy_gm)
 ament_auto_add_executable(game_master
-        game/game_master.cpp
-        game/node2.cpp
-        game/node.cpp
-        game/gui_wrapper.cpp
+        src/game/game_master.cpp
+        src/game/node1.cpp
+        src/game/node.cpp
+        src/game/gui_wrapper.cpp
         resource/ui/main.ui
+        ${legacy_gm}
 )
 target_include_directories(game_master PRIVATE
         include
