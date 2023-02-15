@@ -1,7 +1,7 @@
 #include <ecn_baxter/game/node.hpp>
 #include <csignal>
 #include "QtWebKit"
-#include "ecn_baxter/game/gui_wrapper.hpp"
+#include "ecn_baxter/ui/main_wrapper.hpp"
 #include <memory>
 
 using namespace ECNBaxter;
@@ -26,8 +26,9 @@ int main(int argc, char** argv) {
     app = std::make_shared<QApplication>(argc, argv);
 
     // GUI Initialization
-    UIWrapper::instance();
-    UIWrapper::showW();
+    UIWrapper main_gui;
+    main_gui.instance();
+    main_gui.show();
     Node::bind_gui();
 
     // Running GUI
@@ -35,7 +36,7 @@ int main(int argc, char** argv) {
 
     // Cleaning procedure on stop
     app.reset();
-    UIWrapper::clean();
+    main_gui.clean();
 
     // Stop ROS 1&2 thread and wait for its end
     Node::stop();

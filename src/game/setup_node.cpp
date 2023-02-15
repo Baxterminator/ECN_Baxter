@@ -40,9 +40,11 @@ namespace ECNBaxter {
         return GoalResponse::ACCEPT_AND_EXECUTE;
     }
     void SetupNode::handle_accepted(const sptr<PtnHandle> goal_handle) {
-        std::thread{[&](){
+        auto th = std::thread{[&](){
             ptn_setup_exec(goal_handle);
-        }}.detach();
+        }};
+        RCLCPP_INFO(get_logger(), "Launching setup action on thread [%d]", th.get_id());
+        th.detach();
     }
 
     void convertSides(const std::vector<bool> &ori, std::vector<Side> &dest) {
@@ -58,13 +60,17 @@ namespace ECNBaxter {
     }
 
     void SetupNode::ptn_setup_exec(const sptr<PtnHandle> handle) {
+        RCLCPP_INFO(get_logger(), "Start exec");
         names = handle->get_goal()->ptns_name;
+        RCLCPP_INFO(get_logger(), "Convert sides");
         convertSides(handle->get_goal()->sides, sides);
         current_step = 0;
 
+        RCLCPP_INFO(get_logger(), "Before loop");
         sptr<PointsSetup::Feedback> feedback;
         while (current_step<names.size()) {
             if (publish) {
+                RCLCPP_INFO(get_logger(), "If can publish");
                 feedback = std::make_shared<PointsSetup::Feedback>();
                 feedback->step = (int) current_step;
                 feedback->ptn_name = names[current_step];

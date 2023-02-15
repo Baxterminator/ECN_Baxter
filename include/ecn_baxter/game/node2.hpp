@@ -3,7 +3,8 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_action/rclcpp_action.hpp>
-#include <ecn_baxter/game/gui_wrapper.hpp>
+#include <ecn_baxter/ui/main_wrapper.hpp>
+#include <ecn_baxter/ui/file_loader_wrapper.hpp>
 #include <ecn_baxter/action/points_setup.hpp>
 
 #include <future>
@@ -22,8 +23,6 @@ namespace ECNBaxter {
     template<typename F>
     using sptr = std::shared_ptr<F>;
 
-    template<class T>
-    using legacy_goal_callback = std::function<void(T)>;
 
 /**
  * ROS 2 Node for the game master

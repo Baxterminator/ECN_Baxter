@@ -82,9 +82,57 @@
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
+        <widget class="QLabel" name="label_1">
+         <property name="text">
+          <string>Game :</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_game_2">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <italic>true</italic>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>NO GAME</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="load_game">
+         <property name="text">
+          <string>Load Game</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="Line" name="line">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QWidget" name="widget" native="true">
          <layout class="QGridLayout" name="gridLayout">
-          <item row="0" column="1">
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Slave</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
            <widget class="QLabel" name="slave_on">
             <property name="font">
              <font>
@@ -94,28 +142,21 @@
              </font>
             </property>
             <property name="text">
-             <string>ON</string>
+             <string>OFF</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_slave">
-            <property name="text">
-             <string>Slave</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_game">
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_3">
             <property name="text">
              <string>Game</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
+          <item row="2" column="1">
            <widget class="QLabel" name="game_on">
             <property name="font">
              <font>
@@ -124,7 +165,7 @@
              </font>
             </property>
             <property name="text">
-             <string>ON</string>
+             <string>OFF</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -136,6 +177,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="setup">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="text">
           <string>Setup Game</string>
          </property>
@@ -143,6 +187,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="slave">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="text">
           <string>Slave ON</string>
          </property>
@@ -150,8 +197,11 @@
        </item>
        <item>
         <widget class="QPushButton" name="launch">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="text">
-          <string>Launch Game</string>
+          <string>Launch ON</string>
          </property>
         </widget>
        </item>
@@ -209,7 +259,7 @@
          <widget class="QWidget" name="widget_2" native="true">
           <layout class="QHBoxLayout" name="horizontalLayout_2">
            <item>
-            <widget class="QLabel" name="label_co">
+            <widget class="QLabel" name="label_4">
              <property name="text">
               <string>Connected players:</string>
              </property>
@@ -218,7 +268,7 @@
            <item>
             <widget class="QLabel" name="n_co">
              <property name="text">
-              <string>TextLabel</string>
+              <string>0/0</string>
              </property>
             </widget>
            </item>
@@ -246,7 +296,7 @@
            <bool>false</bool>
           </property>
           <property name="rowCount">
-           <number>10</number>
+           <number>0</number>
           </property>
           <property name="columnCount">
            <number>3</number>
@@ -272,16 +322,6 @@
           <attribute name="verticalHeaderStretchLastSection">
            <bool>false</bool>
           </attribute>
-          <row/>
-          <row/>
-          <row/>
-          <row/>
-          <row/>
-          <row/>
-          <row/>
-          <row/>
-          <row/>
-          <row/>
           <column>
            <property name="text">
             <string notr="true">Player</string>

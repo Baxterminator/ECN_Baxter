@@ -1,12 +1,16 @@
-#include "ecn_baxter/game/gui_wrapper.hpp"
+#include "ecn_baxter/ui/main_wrapper.hpp"
 #include "ui_main.h"
 
-namespace ECNBaxter {
-    std::shared_ptr<Ui_BaxterMaster> UIWrapper::gui_instance;
-    std::shared_ptr<QMainWindow> UIWrapper::win;
+namespace ECNBaxter{
+    sptr<Ui_BaxterMaster> UIWrapper::gui_instance;
     bool UIWrapper::initialized;
+    sptr<QMainWindow> UIWrapper::win;
 
-    std::shared_ptr<Ui_BaxterMaster> UIWrapper::instance() {
+    QPushButton* UIWrapper::slave() {return instance()->slave;}
+    QPushButton* UIWrapper::setup() {return instance()->setup;}
+    QPushButton* UIWrapper::load_game() {return instance()->load_game;}
+
+    sptr<Ui_BaxterMaster> UIWrapper::instance() {
         if (gui_instance == nullptr) {
             gui_instance = std::make_shared<Ui_BaxterMaster>();
             initialized = false;
@@ -25,4 +29,5 @@ namespace ECNBaxter {
         gui_instance.reset();
         win.reset();
     }
-}
+ 
+} // namespace ECNBaxter

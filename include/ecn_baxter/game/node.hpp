@@ -32,11 +32,8 @@ namespace ECNBaxter {
             stop_cmd = 1;
         }
         static void clean();
-        inline static bool is_legacy() {return LEGACY;}
 
     protected:
-        static bool LEGACY = false;
-
         static thread ros_thread;
         static void ros_loop();
         static sig_atomic_t stop_cmd;

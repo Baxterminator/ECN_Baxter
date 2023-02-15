@@ -7,7 +7,6 @@ namespace ECNBaxter {
     rclcpp::TimerBase::SharedPtr Node::timer;
     thread Node::ros_thread;
     sig_atomic_t Node::stop_cmd;
-    bool Node::LEGACY;
 
 
     /**
@@ -15,11 +14,6 @@ namespace ECNBaxter {
      * @return
      */
     bool Node::init(int argc, char** argv) {
-        // Determine if distro is foxy or galactic => LEGACY = true
-        // Else legacy = false
-        const std::string distro = std::getenv("ROS_DISTRO");
-        LEGACY = (distro == "galactic" || distro == "foxy");
-
         // ROS 2 initialization
         rclcpp::init(argc, argv);
 

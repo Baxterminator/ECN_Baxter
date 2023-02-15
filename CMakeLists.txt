@@ -25,6 +25,28 @@ if(EXISTS ${ROS1_ROOT})
 endif()
 
 # =================================================================
+#             LEGACY CODE (FOXY, GALACTIC COMPATIBILITY)
+# =================================================================
+if("$ENV{ROS_DISTRO}" STREQUAL "galactic" OR "$ENV{ROS_DISTRO}" STREQUAL "foxy")
+    set(LEGACY_IDL TRUE)
+else()
+    set(LEGACY_IDL FALSE)
+endif()
+
+function(legacy_cpp files out_l)
+    foreach(f ${${files}})
+        if(${LEGACY_IDL})
+            string(CONCAT _out "src/legacy/" ${f})
+        else()
+            string(CONCAT _out "src/" ${f})
+        endif()
+        set(${out_l} ${${out_l}} ${_out})
+    endforeach()    
+    set(${out_l} ${${out_l}} PARENT_SCOPE)
+endfunction(legacy_cpp)
+
+
+# =================================================================
 #                           INTERFACE
 # =================================================================
 file(GLOB msg_files RELATIVE "${CMAKE_CURRENT_LIST_DIR}"
@@ -38,12 +60,6 @@ rosidl_generate_interfaces(${PROJECT_NAME}
         ${msg_files}
         DEPENDENCIES ${dependencies})
 ament_export_dependencies(rosidl_default_runtime)
-
-if("$ENV{ROS_DISTRO}" STREQUAL "galactic" OR "$ENV{ROS_DISTRO}" STREQUAL "foxy")
-    set(LEGACY_IDL TRUE)
-else()
-    set(LEGACY_IDL FALSE)
-endif()
 
 if(NOT ${LEGACY_IDL})
     rosidl_get_typesupport_target(cpp_typesupport_target "${PROJECT_NAME}" "rosidl_typesupport_cpp")
@@ -75,20 +91,6 @@ file(GLOB_RECURSE exclude_file
 foreach(X IN LISTS exclude_file)
     set_property(SOURCE ${X} PROPERTY SKIP_AUTOUIC ON)
 endforeach()
-# =================================================================
-#                        QT 5 UI Generator
-# =================================================================
-function(legacy_cpp files out_l)
-    foreach(f ${${files}})
-        if(${LEGACY_IDL})
-            string(CONCAT _out "src/legacy/" ${f})
-        else()
-            string(CONCAT _out "src/" ${f})
-        endif()
-        set(${out_l} ${${out_l}} ${_out})
-    endforeach()    
-    set(${out_l} ${${out_l}} PARENT_SCOPE)
-endfunction(legacy_cpp)
 
 # =================================================================
 #                              OUTPUT
@@ -110,15 +112,18 @@ add_message(setup_node)
 
 ## Main Game Master executable
 set(legacy_files_gm
-    "game/node2.cpp"
+    "game/node2_setup.cpp"
 )
 legacy_cpp(legacy_files_gm legacy_gm)
 ament_auto_add_executable(game_master
         src/game/game_master.cpp
         src/game/node1.cpp
+        src/game/node2.cpp
         src/game/node.cpp
-        src/game/gui_wrapper.cpp
+        src/ui/main_wrapper.cpp
+        src/ui/file_loader_wrapper.cpp
         resource/ui/main.ui
+        resource/ui/game_loader.ui
         ${legacy_gm}
 )
 target_include_directories(game_master PRIVATE
