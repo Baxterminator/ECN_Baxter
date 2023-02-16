@@ -1,5 +1,6 @@
 #include <ecn_baxter/ui/file_loader_wrapper.hpp>
 #include "ui_game_loader.h"
+#include <iostream>
 
 namespace ECNBaxter{
     sptr<Ui_game_loader> FileLoaderWrapper::gui_instance;
@@ -77,7 +78,12 @@ namespace ECNBaxter{
     } 
 
     bool FileLoaderWrapper::eventFilter(QObject *obj, QEvent *event) {
+        
+        if (obj == list_game()->viewport() && event->type() == QEvent::MouseButtonDblClick) {
+            std::cout << "Double click" << std::endl;
+        }
         return false;
     };
 
 } // namespace ECNBaxter
+    
