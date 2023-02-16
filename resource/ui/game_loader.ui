@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>150</height>
+    <width>450</width>
+    <height>300</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -17,19 +17,29 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Load Game</string>
   </property>
   <property name="locale">
    <locale language="French" country="France"/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
+    <widget class="QRadioButton" name="install_game">
+     <property name="text">
+      <string>Installed .game files :</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QListView" name="list_files"/>
    </item>
    <item>
-    <widget class="QLabel" name="label">
+    <widget class="QRadioButton" name="custom_game">
      <property name="text">
-      <string>Select the .game file :</string>
+      <string>Custom .game file :</string>
      </property>
     </widget>
    </item>
@@ -54,8 +64,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
+     <x>254</x>
+     <y>293</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -76,6 +86,38 @@
     <hint type="destinationlabel">
      <x>286</x>
      <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>list_files</sender>
+   <signal>clicked(QModelIndex)</signal>
+   <receiver>install_game</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>324</x>
+     <y>110</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>142</x>
+     <y>13</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>custom_game</sender>
+   <signal>clicked()</signal>
+   <receiver>list_files</receiver>
+   <slot>clearSelection()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>140</x>
+     <y>247</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>244</x>
+     <y>199</y>
     </hint>
    </hints>
   </connection>

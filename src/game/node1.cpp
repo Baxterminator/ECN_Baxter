@@ -20,7 +20,6 @@ namespace ECNBaxter {
     }
 
     void GMROS1::broadcast_ptn() {
-        std::cout << "Broadcast" << std::endl;
         for (auto ptn : point_to_broadcast) {
             tf_pub.publish(ptn);
         }

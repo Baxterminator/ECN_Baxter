@@ -1,4 +1,5 @@
 #include <ecn_baxter/game/node2.hpp>
+#include <iostream>
 
 namespace ECNBaxter {
 
@@ -10,8 +11,7 @@ namespace ECNBaxter {
         UIWrapper main_gui;
         QObject::connect(main_gui.setup(), &QPushButton::clicked, [this]() {launch_setup();});
         QObject::connect(main_gui.load_game(), &QPushButton::clicked, [this]() {
-            FileLoaderWrapper loader;
-            loader.show();
+            FileLoaderWrapper::display();
         });
     }
 
