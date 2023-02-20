@@ -15,7 +15,7 @@
 #include <thread>
 #include <chrono>
 
-namespace ECNBaxter {
+namespace ecn_baxter {
     using baxter_core_msgs::msg::NavigatorStates;
     using baxter_core_msgs::msg::NavigatorState;
     using geometry_msgs::msg::TransformStamped;

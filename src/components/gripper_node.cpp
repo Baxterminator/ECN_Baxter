@@ -1,5 +1,5 @@
 #include "ecn_baxter/gripper/gripper_node.hpp"
-namespace ECNBaxter {
+namespace ecn_baxter {
     /*
      * ========================================
      *               Gripper Node
@@ -150,7 +150,7 @@ namespace ECNBaxter {
  */
 int main(int argc, char** argv) {
     rclcpp::init(argc, argv);
-    rclcpp::spin(std::make_shared<ECNBaxter::GripperNode>(rclcpp::NodeOptions{}));
+    rclcpp::spin(std::make_shared<ecn_baxter::GripperNode>(rclcpp::NodeOptions{}));
     rclcpp::shutdown();
     return 0;
 }

@@ -112,14 +112,15 @@ add_message(setup_node)
 
 ## Main Game Master executable
 set(legacy_files_gm
-    "game/node2_setup.cpp"
+    "setup/setup_client.cpp"
 )
 legacy_cpp(legacy_files_gm legacy_gm)
 ament_auto_add_executable(game_master
         src/game/game_master.cpp
-        src/game/node1.cpp
-        src/game/node2.cpp
-        src/game/node.cpp
+        src/game/game_master_1.cpp
+        src/game/game_master_2.cpp
+        src/setup/client_points.cpp
+        src/game/game.cpp
         src/ui/main_wrapper.cpp
         src/ui/file_loader_wrapper.cpp
         resource/ui/main.ui

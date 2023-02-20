@@ -12,7 +12,7 @@
 #include <chrono>
 #include <thread>
 
-namespace ECNBaxter {
+namespace ecn_baxter {
     using baxter_core_msgs::msg::EndEffectorCommand;
     using baxter_core_msgs::msg::EndEffectorState;
     using ecn_baxter::msg::BaxterAction;

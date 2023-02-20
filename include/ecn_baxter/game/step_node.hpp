@@ -4,7 +4,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include <chrono>
 
-namespace ECNBaxter {
+namespace ecn_baxter {
 
     using namespace rclcpp;
     using namespace std::chrono_literals;
