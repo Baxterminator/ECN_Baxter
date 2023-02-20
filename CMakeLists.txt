@@ -137,7 +137,7 @@ add_message(game_master)
 # =================================================================
 #                        EXPORT OTHERS
 # =================================================================
-install(DIRECTORY launch
+install(DIRECTORY resource/launch
         DESTINATION share/${PROJECT_NAME})
 
 ament_auto_package()

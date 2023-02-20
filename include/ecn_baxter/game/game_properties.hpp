@@ -11,9 +11,24 @@
 #define GAME_PROPERTIES_HPP
 
 #include <string>
+#include <vector>
+
+enum class Side
+{
+    RIGHT_ARM,
+    LEFT_ARM
+};
+
+struct Point
+{
+    std::string name;
+    Side arm_side;
+    bool w_angles = false;
+};
 
 struct SetupRequirements
 {
+    std::vector<Point> needed_points;
 };
 
 struct GameProperties
@@ -22,4 +37,4 @@ struct GameProperties
     SetupRequirements setup;
 };
 
-#endif
+#endif // GAME_PROPERTIES_HPP
