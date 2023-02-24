@@ -13,15 +13,11 @@
 #include <ecn_baxter/action/points_setup.hpp>
 #include <ecn_baxter/game/game_properties.hpp>
 #include <ecn_baxter/setup/client_points.hpp>
-#include <ecn_baxter/ui/main_wrapper.hpp>
-#include <ecn_baxter/utils.hpp>
-#include <qobject.h>
 #include <rclcpp/rclcpp.hpp>
 
 namespace ecn_baxter::game {
 
 using ecn_baxter::action::PointsSetup;
-using namespace ecn_baxter::gui;
 
 class GameMaster_2 : public rclcpp::Node,
                      public ecn_baxter::setup::SetupPointsClient {

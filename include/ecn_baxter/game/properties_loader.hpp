@@ -14,7 +14,6 @@
 #include <ecn_baxter/utils.hpp>
 #include <fstream>
 #include <iostream>
-#include <memory>
 #include <rapidjson/document.h>
 #include <sstream>
 #include <string>

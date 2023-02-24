@@ -6,9 +6,7 @@
  * @createdOn      :  19/02/2023
  * @description    :  ROS2 part of the GameMaster
  *========================================================================**/
-#include "ecn_baxter/ui/file_loader_wrapper.hpp"
 #include <ecn_baxter/game/game_master_2.hpp>
-#include <qpushbutton.h>
 
 namespace ecn_baxter::game {
 

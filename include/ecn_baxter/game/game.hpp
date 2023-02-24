@@ -10,22 +10,18 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
-#include "ecn_baxter/game/properties_loader.hpp"
-#include "ecn_baxter/ui/file_loader_wrapper.hpp"
 #include <chrono>
 #include <cstdlib>
 #include <ecn_baxter/game/game_master_1.hpp>
 #include <ecn_baxter/game/game_master_2.hpp>
 #include <ecn_baxter/game/game_properties.hpp>
 #include <ecn_baxter/game/properties_loader.hpp>
+#include <ecn_baxter/ui/file_loader_wrapper.hpp>
 #include <ecn_baxter/ui/main_wrapper.hpp>
 #include <ecn_baxter/utils.hpp>
-#include <memory>
-#include <qapplication.h>
 #include <rapidjson/document.h>
 #include <rclcpp/rclcpp.hpp>
 #include <ros/master.h>
-#include <ros/node_handle.h>
 #include <thread>
 
 namespace ecn_baxter::game {
@@ -40,7 +36,7 @@ public:
   /**========================================================================
    *?                             ROS Node
    *========================================================================**/
-  inline static ros::NodeHandle *ros1() { return ros1_node.get(); }
+  inline static GameMaster_1 *ros1() { return ros1_node.get(); }
   inline static GameMaster_2 *ros2() { return ros2_node.get(); }
   inline static std::thread *main_thread() { return &ros_thread; }
 
@@ -96,7 +92,7 @@ protected:
   /**========================================================================
    **                            UI Management
    *========================================================================**/
-  static sptr<MainUI> main_window;
+  static sptr<gui::MainUI> main_window;
   static sptr<std::function<void()>> bindings;
   static void _bind_gui();
 

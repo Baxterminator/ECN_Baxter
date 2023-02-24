@@ -18,11 +18,12 @@ namespace ecn_baxter::game {
 enum class Side { RIGHT_ARM, LEFT_ARM };
 
 inline std::string side2str(Side s) {
-  if (s == Side::RIGHT_ARM)
+  switch (s) {
+  case Side::RIGHT_ARM:
     return "right_arm";
-  if (s == Side::LEFT_ARM)
+  case Side::LEFT_ARM:
     return "left_arm";
-  return "";
+  }
 }
 
 inline bool side2bool(Side s) {

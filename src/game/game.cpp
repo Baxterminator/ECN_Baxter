@@ -6,15 +6,13 @@
  * @createdOn      :  19/02/2023
  * @description    :  Main class for game management and logic
  *========================================================================**/
-#include "ecn_baxter/ui/main_wrapper.hpp"
-#include "rapidjson/document.h"
 #include <ecn_baxter/game/game.hpp>
 
 namespace ecn_baxter::game {
 sptr<GameMaster_1> Game::ros1_node;
 sptr<GameMaster_2> Game::ros2_node;
 sptr<rclcpp::executors::SingleThreadedExecutor> Game::ex;
-sptr<MainUI> Game::main_window;
+sptr<gui::MainUI> Game::main_window;
 std::thread Game::ros_thread;
 sig_atomic_t Game::stop_cmd;
 
@@ -93,7 +91,7 @@ void Game::ros_loop() {
  *========================================================================**/
 
 void Game::show_gui() {
-  main_window = std::make_shared<MainUI>(bindings);
+  main_window = std::make_shared<gui::MainUI>(bindings);
   main_window->setup_ui();
   main_window->show();
 }

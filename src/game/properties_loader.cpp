@@ -6,11 +6,7 @@
  * @createdOn      :  19/02/2023
  * @description    :  OS 2 Node part for loading game properties
  *========================================================================**/
-#include "ecn_baxter/game/game_properties.hpp"
-#include "rapidjson/document.h"
 #include <ecn_baxter/game/properties_loader.hpp>
-#include <iostream>
-#include <memory>
 
 namespace ecn_baxter::game {
 sptr<GameProperties> GamePropertiesLoader::game_props;
