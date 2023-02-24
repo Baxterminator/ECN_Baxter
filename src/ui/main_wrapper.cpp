@@ -1,39 +1,55 @@
-#include "ecn_baxter/ui/main_wrapper.hpp"
+/**========================================================================
+ * ?                                ABOUT
+ * @author         :  Geoffrey Côte
+ * @email          :  geoffrey.cote@centraliens-nantes.org
+ * @repo           :  https://github.com/Baxterminator/ecn_baxter/
+ * @createdOn      :  19/02/2023
+ * @description    :  GUI Wrapper for the main GUI
+ *========================================================================**/
 #include "ui_main.h"
+#include <ecn_baxter/ui/main_wrapper.hpp>
 
-namespace ecn_baxter::gui
-{
-    sptr<Ui_BaxterMaster> UIWrapper::gui_instance;
-    bool UIWrapper::initialized;
-    sptr<QMainWindow> UIWrapper::win;
+namespace ecn_baxter::gui {
 
-    QPushButton *UIWrapper::slave() { return instance()->slave; }
-    QPushButton *UIWrapper::setup() { return instance()->setup; }
-    QPushButton *UIWrapper::load_game() { return instance()->load_game; }
+/**========================================================================
+ *!                           INITIALIZATION
+ *========================================================================**/
+MainUI::MainUI(sptr<std::function<void(void)>> binds)
+    : BaseGUI<Ui::BaxterMaster, QMainWindow>(), bindings(binds) {}
 
-    sptr<Ui_BaxterMaster> UIWrapper::instance()
-    {
-        if (gui_instance == nullptr)
-        {
-            gui_instance = std::make_shared<Ui_BaxterMaster>();
-            initialized = false;
-        }
-        if (win == nullptr)
-        {
-            win = std::make_shared<QMainWindow>();
-        }
-        if (!initialized)
-        {
-            gui_instance->setupUi(win.get());
-            initialized = true;
-        }
-        return gui_instance;
-    }
+/**========================================================================
+ **                            EVENT Callbacks
+ *========================================================================**/
+void MainUI::setup_internal_callbacks() {
+  gui->load_game->installEventFilter(this);
+  //  connect(setup, &QPushButton::clicked, [this]() { launch_game_loader(); });
+}
 
-    void UIWrapper::clean()
-    {
-        gui_instance.reset();
-        win.reset();
-    }
+/// @brief Get all events and process internal events
+bool MainUI::eventFilter(QObject *obj, QEvent *e) {
+  if (obj == gui->load_game && e->type() == QEvent::MouseButtonRelease) {
+    launch_game_loader();
+    return true;
+  }
+  return false;
+}
 
-} // namespace ecn_baxter
+/**========================================================================
+ **                            GAME Loader
+ *========================================================================**/
+/// @brief Setup the mgame selector menu
+void MainUI::setup_game_loader() {
+  game_loader = std::make_shared<FileLoaderWrapper>();
+  game_loader->setup_ui();
+  if (bindings != nullptr)
+    (*bindings)();
+}
+
+/// @brief Launch the game selector menu
+void MainUI::launch_game_loader() {
+  if (game_loader == nullptr)
+    setup_game_loader();
+  game_loader->show();
+}
+
+} // namespace ecn_baxter::gui

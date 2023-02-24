@@ -1,0 +1,17 @@
+{
+  "name": "Test 1",
+  "setup": {
+    "points": [
+      {
+        "name": "source_r",
+        "side": false,
+        "angles": false
+      },
+      {
+        "name": "source_g",
+        "side": true,
+        "angles": false
+      }
+    ]
+  }
+}

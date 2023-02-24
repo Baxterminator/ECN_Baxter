@@ -11,33 +11,37 @@
 #define MAIN_WRAPPER_H
 
 #include "ui_main.h"
-#include <iostream>
-#include <memory>
+#include <ecn_baxter/ui/base_gui.hpp>
+#include <ecn_baxter/ui/file_loader_wrapper.hpp>
+#include <ecn_baxter/utils.hpp>
+#include <functional>
+#include <qcoreevent.h>
+#include <qmainwindow.h>
+#include <qobject.h>
+#include <qpushbutton.h>
 
-template <typename T>
-using sptr = std::shared_ptr<T>;
+namespace ecn_baxter::gui {
+class MainUI : public BaseGUI<Ui::BaxterMaster, QMainWindow> {
+protected:
+  /**========================================================================
+   **                            GAME Loader
+   *========================================================================**/
+  sptr<FileLoaderWrapper> game_loader;
+  sptr<std::function<void(void)>> bindings;
+  void setup_game_loader();
+  void launch_game_loader();
 
-namespace ecn_baxter::gui
-{
-    class UIWrapper
-    {
-    protected:
-        static sptr<Ui_BaxterMaster> gui_instance;
-        static bool initialized;
-        static sptr<QMainWindow> win;
+  /**========================================================================
+   **                            EVENT Callbacks
+   *========================================================================**/
+  void setup_internal_callbacks() override;
+  bool eventFilter(QObject *obj, QEvent *e) override;
 
-    public:
-        inline void show()
-        {
-            instance();
-            win->show();
-        }
-        sptr<Ui_BaxterMaster> instance();
-        void clean();
-        QPushButton *slave();
-        QPushButton *setup();
-        QPushButton *load_game();
-    };
-}
+public:
+  explicit MainUI(sptr<std::function<void(void)>> = nullptr);
+  sptr<FileLoaderWrapper> get_game_loader() { return game_loader; }
+  ~MainUI() { game_loader.reset(); }
+};
+} // namespace ecn_baxter::gui
 
 #endif // MAIN_WRAPPER_H

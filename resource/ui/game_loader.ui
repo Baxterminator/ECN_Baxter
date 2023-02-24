@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>450</width>
-    <height>300</height>
+    <height>352</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -44,7 +44,48 @@
     </widget>
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
+    <widget class="QLabel" name="custom_file">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>1</horstretch>
+       <verstretch>1</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="sizeIncrement">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="browse_file">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>5</horstretch>
+       <verstretch>1</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>210</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Browse File</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="select_buttons">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -58,14 +99,14 @@
  <resources/>
  <connections>
   <connection>
-   <sender>buttonBox</sender>
+   <sender>select_buttons</sender>
    <signal>accepted()</signal>
    <receiver>game_loader</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>254</x>
-     <y>293</y>
+     <x>260</x>
+     <y>345</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -74,14 +115,14 @@
    </hints>
   </connection>
   <connection>
-   <sender>buttonBox</sender>
+   <sender>select_buttons</sender>
    <signal>rejected()</signal>
    <receiver>game_loader</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
+     <x>322</x>
+     <y>345</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
@@ -118,6 +159,22 @@
     <hint type="destinationlabel">
      <x>244</x>
      <y>199</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>browse_file</sender>
+   <signal>clicked()</signal>
+   <receiver>custom_game</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>368</x>
+     <y>267</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>84</x>
+     <y>255</y>
     </hint>
    </hints>
   </connection>

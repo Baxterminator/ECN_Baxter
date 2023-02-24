@@ -5,47 +5,49 @@
  * @repo           :  https://github.com/Baxterminator/ecn_baxter/
  * @createdOn      :  19/02/2023
  * @description    :  ROS 2 Node part for point setuping
- * @deprecated     :  These functions are only for legacy ROS2 version support (foxy, galactic, ...).
+ * @deprecated     :  These functions are only for legacy ROS2 version support
+ *(foxy, galactic, ...).
  *========================================================================**/
 #include <ecn_baxter/setup/client_points.hpp>
 
-namespace ecn_baxter::Setup
-{
-    /// @brief Launch the call to the action for point setuping
-    /// @deprecated This function is only for legacy ROS2 version support (foxy, galactic, ...).
-    void SetupPointsClient::launch_setup()
-    {
-        using namespace std::placeholders;
-        RCLCPP_INFO(logger, "Setup launch !");
+namespace ecn_baxter::setup {
+/// @brief Launch the call to the action for point setuping
+/// @deprecated This function is only for legacy ROS2 version support (foxy,
+/// galactic, ...).
+void SetupPointsClient::launch_setup(const sptr<game::GameProperties> props) {
+  using namespace std::placeholders;
+  RCLCPP_INFO(logger, "Launching setup phase !");
 
-        // Setup MSG
-        auto setup_msg = PointsSetup::Goal();
-        setup_msg.ptns_name = std::vector<std::string>{
-            "test1",
-            "test2",
-            "test3",
-            "test4"};
-        setup_msg.sides = std::vector<bool>{
-            setup_msg.LEFT,
-            setup_msg.LEFT,
-            setup_msg.RIGHT,
-            setup_msg.RIGHT};
+  // Setup MSG
+  auto setup_msg = PointsSetup::Goal();
+  setup_msg.ptns_name = std::vector<std::string>(0);
+  setup_msg.sides = std::vector<bool>(0);
 
-        auto goal_options = Client<PointsSetup>::SendGoalOptions();
-        goal_options.goal_response_callback = [&](std::shared_future<PtnSetupHandler::SharedPtr> future)
-        {
-            ptn_setup_goal(future);
-        };
-        goal_options.goal_response_callback = std::bind(&GMROS2::ptn_setup_goal, this);
-        goal_options.feedback_callback = [&](PtnSetupHandler::SharedPtr handle, const sptr<const PointsSetup::Feedback> feedback)
-        {
-            ptn_setup_feedback(handle, feedback);
-        };
-        goal_options.result_callback = [&](const PtnSetupHandler::WrappedResult &result)
-        {
-            ptn_setup_result(result);
-        };
+  RCLCPP_INFO(logger, "Preparing %zu markers to setup",
+              props->setup.needed_points.size());
+  for (auto point : props->setup.needed_points) {
+    setup_msg.ptns_name.push_back(point.name);
+    setup_msg.sides.push_back(game::side2bool(point.arm_side));
+  }
 
-        ptn_setup->async_send_goal(setup_msg, goal_options);
-    }
+  auto goal_options = Client<PointsSetup>::SendGoalOptions();
+  goal_options.goal_response_callback =
+      [&](std::shared_future<PtnSetupHandler::SharedPtr> future) {
+        ptn_setup_goal(future);
+      };
+  goal_options.goal_response_callback =
+      std::bind(&GameMaster_2::ptn_setup_goal, this);
+  goal_options.feedback_callback =
+      [&](PtnSetupHandler::SharedPtr handle,
+          const sptr<const PointsSetup::Feedback> feedback) {
+        ptn_setup_feedback(handle, feedback);
+      };
+  goal_options.result_callback =
+      [&](const PtnSetupHandler::WrappedResult &result) {
+        ptn_setup_result(result);
+      };
+
+  RCLCPP_INFO(logger, "Calling action server");
+  ptn_setup->async_send_goal(setup_msg, goal_options);
 }
+} // namespace ecn_baxter::setup

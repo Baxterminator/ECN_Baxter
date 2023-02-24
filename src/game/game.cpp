@@ -6,55 +6,106 @@
  * @createdOn      :  19/02/2023
  * @description    :  Main class for game management and logic
  *========================================================================**/
+#include "ecn_baxter/ui/main_wrapper.hpp"
+#include "rapidjson/document.h"
 #include <ecn_baxter/game/game.hpp>
 
-namespace ecn_baxter::game
-{
-    std::unique_ptr<GameMaster_1> Game::ros1_node;
-    std::shared_ptr<GameMaster_2> Game::ros2_node;
-    rclcpp::executors::SingleThreadedExecutor::SharedPtr Game::ex;
-    rclcpp::TimerBase::SharedPtr Game::timer;
-    std::thread Game::ros_thread;
-    sig_atomic_t Game::stop_cmd;
+namespace ecn_baxter::game {
+sptr<GameMaster_1> Game::ros1_node;
+sptr<GameMaster_2> Game::ros2_node;
+sptr<rclcpp::executors::SingleThreadedExecutor> Game::ex;
+sptr<MainUI> Game::main_window;
+std::thread Game::ros_thread;
+sig_atomic_t Game::stop_cmd;
 
-    /// @brief Initialize everything related to the ROS 1&2 nodes
-    /// @return true if the initialization as successful
-    bool Game::init(int argc, char **argv)
-    {
-        // ROS 2 initialization
-        rclcpp::init(argc, argv);
+sptr<std::function<void()>> Game::bindings;
 
-        stop_cmd = 0;
+/**========================================================================
+ *!                           INITIALIZATION
+ *========================================================================**/
+/// @brief Initialize everything related to the ROS 1&2 nodes
+/// @return true if the initialization as successful
+bool Game::init(int argc, char **argv) {
+  //* Cycle initialization
+  stop_cmd = 0;
 
-        ros2_node = std::make_shared<GameMaster_2>(rclcpp::NodeOptions{});
+  //* ROS2 Initialization
+  rclcpp::init(argc, argv);
+  ros2_node = std::make_shared<GameMaster_2>(rclcpp::NodeOptions{});
 
-        ros::init(argc, argv, "game_master_1");
-        ex = rclcpp::executors::SingleThreadedExecutor::make_shared();
-        ex->add_node(ros2_node);
-        /*
-                // Checking if another game master is launched
-                vector<string> nodes; ros::master::getNodes(nodes);
-                auto it = find(nodes.begin(), nodes.end(), "game_master_1");
-                if (it != nodes.end()) {
-                    RCLCPP_FATAL(ros2()->get_logger(), "Game master is already launched !");
-                    return false;
-                }*/
+  ex = rclcpp::executors::SingleThreadedExecutor::make_shared();
+  ex->add_node(ros2_node);
 
-        // ROS 1 initialization
-        ros1_node = std::make_unique<GameMaster_1>();
+  //* ROS1 Initialization
+  ros::init(argc, argv, "game_master_1");
+  /*
+          // Checking if another game master is launched
+          vector<string> nodes; ros::master::getNodes(nodes);
+          auto it = find(nodes.begin(), nodes.end(), "game_master_1");
+          if (it != nodes.end()) {
+              RCLCPP_FATAL(ros2()->get_logger(), "Game master is already
+     launched !"); return false;
+          }*/
+  ros1_node = std::make_unique<GameMaster_1>();
 
-        ros_thread = std::thread(Game::ros_loop);
-        return true;
-    }
+  //* Run ROS Loop
+  ros_thread = std::thread(Game::ros_loop);
 
-    /// @brief Main task for ros loop
-    void Game::ros_loop()
-    {
-        ros::AsyncSpinner async(1);
-        async.start();
-        while (ros::ok() && rclcpp::ok() && !stop_cmd)
-        {
-            Game::spinOnce();
-        }
-    }
+  //* UI Initialisation
+  bindings = std::make_shared<std::function<void()>>();
+  *bindings = []() { Game::bind_gui(); };
+
+  return true;
 }
+
+/**========================================================================
+ *?                           Game Management
+ *========================================================================**/
+/// @brief Load the game parameters from a JSON file
+/// @param file_path the path to the configuration file
+void Game::load_game_propeties(const std::string &file_path) {
+  RCLCPP_INFO(ros2_node->get_logger(), "Loading game %s", file_path.c_str());
+  load_file(file_path);
+  main_window->get_ui()->game_name->setText(game_props->game_name.c_str());
+  if (game_props->is_skippable()) {
+    main_window->get_ui()->setup->setEnabled(false);
+    main_window->get_ui()->launch->setEnabled(true);
+  } else {
+    main_window->get_ui()->setup->setEnabled(true);
+    main_window->get_ui()->launch->setEnabled(false);
+  }
+}
+
+/**========================================================================
+ **                            Game Thread
+ *========================================================================**/
+/// @brief Main task for ros loop
+void Game::ros_loop() {
+  ros::AsyncSpinner async(1);
+  async.start();
+  while (ros::ok() && rclcpp::ok() && !stop_cmd) {
+    Game::spinOnce();
+  }
+}
+
+/**========================================================================
+ **                            UI Management
+ *========================================================================**/
+
+void Game::show_gui() {
+  main_window = std::make_shared<MainUI>(bindings);
+  main_window->setup_ui();
+  main_window->show();
+}
+
+/// @brief Set all bindings between GUI and Game Background tasks
+void Game::_bind_gui() {
+  QObject::connect(main_window->get_game_loader()->get_ui()->select_buttons,
+                   &QDialogButtonBox::accepted, [&]() {
+                     Game::load_game_propeties(
+                         main_window->get_game_loader()->get_file_to_load());
+                   });
+  QObject::connect(main_window->get_ui()->setup, &QPushButton::clicked,
+                   [&]() { Game::ros2()->launch_point_setup(game_props); });
+}
+} // namespace ecn_baxter::game

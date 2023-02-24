@@ -119,6 +119,7 @@ ament_auto_add_executable(game_master
         src/game/game_master.cpp
         src/game/game_master_1.cpp
         src/game/game_master_2.cpp
+        src/game/properties_loader.cpp
         src/setup/client_points.cpp
         src/game/game.cpp
         src/ui/main_wrapper.cpp
@@ -137,7 +138,9 @@ add_message(game_master)
 # =================================================================
 #                        EXPORT OTHERS
 # =================================================================
-install(DIRECTORY resource/launch
+install(DIRECTORY 
+        resource/launch
+        resource/games
         DESTINATION share/${PROJECT_NAME})
 
 ament_auto_package()

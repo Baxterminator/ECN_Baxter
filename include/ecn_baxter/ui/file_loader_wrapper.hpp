@@ -11,54 +11,43 @@
 #define FILE_LOADER_WRAPPER_H
 
 #include "ui_game_loader.h"
-#include <qt5/QtWidgets/QDialog>
-#include <qt5/QtCore/QStringListModel>
-#include <qt5/QtCore/QStringList>
-#include <memory>
+#include <ament_index_cpp/get_package_share_directory.hpp>
+#include <ecn_baxter/ui/base_gui.hpp>
+#include <ecn_baxter/utils.hpp>
 #include <map>
+#include <qdialog.h>
+#include <qdialogbuttonbox.h>
+#include <qevent.h>
+#include <qfiledialog.h>
+#include <qpushbutton.h>
+#include <qt5/QtCore/QStringList>
+#include <qt5/QtCore/QStringListModel>
+#include <qt5/QtWidgets/QDialog>
 
-template <typename T>
-using sptr = std::shared_ptr<T>;
+using namespace ament_index_cpp;
 
-namespace ecn_baxter::gui
-{
-    class FileLoaderWrapper : QDialog
-    {
-    protected:
-        /**========================================================================
-         **                            Class Working
-         *========================================================================**/
-        static sptr<Ui_game_loader> gui_instance;
-        static sptr<FileLoaderWrapper> obj_instance;
-        static void setup_members();
+namespace ecn_baxter::gui {
+class FileLoaderWrapper : public BaseGUI<Ui::game_loader, QDialog> {
+protected:
+  /**========================================================================
+   **                            Components
+   *========================================================================**/
+  void setup_list();
+  // void setup_file_browser();
 
-        /**========================================================================
-         **                            Components
-         *========================================================================**/
-        void setup_gui();
-        void setup_list();
-        void setup_internal_action();
-        bool eventFilter(QObject *obj, QEvent *event) override;
+  void setup_internal_callbacks() override;
+  bool eventFilter(QObject *, QEvent *) override;
 
-        QStringListModel *model;
+  QStringListModel *model;
 
-    public:
-        /**========================================================================
-         **                            Initialization
-         *========================================================================**/
-        explicit FileLoaderWrapper();
-        static void display();
-        static sptr<Ui_game_loader> instance();
-        static sptr<FileLoaderWrapper> get_instance();
-        static void clean();
+  std::string install_path = "", custom_path = "";
+  std::string get_install_file_path(QMouseEvent *);
+  std::string get_custom_file_path(bool);
 
-        virtual ~FileLoaderWrapper() {}
-
-        /**========================================================================
-         **                            Components
-         *========================================================================**/
-        static QListView *list_game();
-        static std::map<std::string, QRadioButton *> choices;
-    };
-}
+public:
+  FileLoaderWrapper();
+  std::string get_file_to_load();
+  ~FileLoaderWrapper() {}
+};
+} // namespace ecn_baxter::gui
 #endif // FILE_LOADER_WRAPPER_H
