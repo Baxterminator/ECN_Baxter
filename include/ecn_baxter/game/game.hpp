@@ -10,6 +10,7 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
+#include "ros/init.h"
 #include <chrono>
 #include <cstdlib>
 #include <ecn_baxter/game/game_master_2.hpp>
@@ -17,82 +18,69 @@
 #include <ecn_baxter/game/master/gui_management.hpp>
 #include <ecn_baxter/game/properties_loader.hpp>
 #include <ecn_baxter/game/ros1/game_master_1.hpp>
-#include <ecn_baxter/ui/file_loader_wrapper.hpp>
-#include <ecn_baxter/ui/main_wrapper.hpp>
 #include <ecn_baxter/utils.hpp>
-#include <rapidjson/document.h>
 #include <rclcpp/rclcpp.hpp>
+#include <rclcpp/utilities.hpp>
 #include <ros/master.h>
 #include <thread>
 
 namespace ecn_baxter::game {
 using namespace std::chrono_literals;
-using rapidjson::Document;
 
 /// @brief Main class for game management and logic
 class Game : GamePropertiesLoader, UIManager {
 public:
-  static bool init(int argc, char **argv);
-
-  /**========================================================================
-   *?                             ROS Node
-   *========================================================================**/
-  inline static ros1::GameMaster_1 *ros1() { return ros1_node.get(); }
-  inline static GameMaster_2 *ros2() { return ros2_node.get(); }
-  inline static std::thread *main_thread() { return &ros_thread; }
-
   /**========================================================================
    **                            Cycle Utils
    *========================================================================**/
+  inline static bool Init(int argc, char **argv) {
+    return instance()->init(argc, argv);
+  }
   /// @brief Run one cycle of the ROS nodes
   inline static void spinOnce() {
-    ex->spin_once(10ms);
+    instance()->ex->spin_once(10ms);
     ros::spinOnce();
   }
 
   /// @brief Send a stop signal to all ROS-related thread
-  inline static void stop() { stop_cmd = 1; }
-
-  /// @brief Return whether the ROS tasks are stopping or not
-  /// @return whether or not it is stopping
-  inline static bool isStopping() { return stop_cmd == 1; }
+  inline static void stop() {
+    stop_cmd = 1;
+    if (ros_thread.joinable())
+      ros_thread.join();
+    ros::shutdown();
+    rclcpp::shutdown();
+    clean();
+  }
 
   /// @brief Cleaning procedure for erasing all left pointers that could be left
   inline static void clean() {
-    ros2_node.reset();
-    ex.reset();
     game_props.reset();
-    ros1_node.reset();
-    main_window.reset();
-    bindings.reset();
+    _instance.reset();
   }
 
   /**========================================================================
   **                            UI Management
   *========================================================================**/
   /// @brief Show the main GUI, make events binding, etc
-  static void show_gui();
-
-  /// @brief Set the event callbacks for the UIs
-  inline static void bind_gui() { _bind_gui(); }
+  inline static void showUI() { instance()->show_ui(); };
 
 protected:
   /**========================================================================
    *?                            ROS Node
    *========================================================================**/
-  static sptr<ros1::GameMaster_1> ros1_node;
-  static sptr<rclcpp::executors::SingleThreadedExecutor> ex;
-  static sptr<GameMaster_2> ros2_node;
+  sptr<ros1::GameMaster_1> ros1_node;
+  sptr<rclcpp::executors::SingleThreadedExecutor> ex;
+  sptr<GameMaster_2> ros2_node;
 
   /**========================================================================
    *?                           Game Management
    *========================================================================**/
-  static void load_game_propeties(const std::string &);
+  void load_game_propeties(const std::string &);
 
   /**========================================================================
    **                            UI Management
    *========================================================================**/
-  static void _bind_gui() override;
+  void _bind_ui() override;
 
   /**========================================================================
    **                            Game Thread
@@ -100,6 +88,25 @@ protected:
   static std::thread ros_thread;
   static void ros_loop();
   static sig_atomic_t stop_cmd;
+
+  bool init(int argc, char **argv);
+  inline static sptr<Game> instance() {
+    if (_instance == nullptr)
+      _instance = std::make_shared<Game>();
+    return _instance;
+  }
+
+private:
+  /**========================================================================
+   *!                           SINGLETON PATTERN
+   *========================================================================**/
+  Game();
+  static sptr<Game> _instance;
+  ~Game() {
+    ros1_node.reset();
+    ros2_node.reset();
+    ex.reset();
+  }
 };
 } // namespace ecn_baxter::game
 

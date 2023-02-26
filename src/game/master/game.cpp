@@ -6,27 +6,22 @@
  * @createdOn      :  19/02/2023
  * @description    :  Main class for game management and logic
  *========================================================================**/
+#include "ecn_baxter/game/master/gui_management.hpp"
+#include "ecn_baxter/game/properties_loader.hpp"
 #include <ecn_baxter/game/game.hpp>
 
 namespace ecn_baxter::game {
-sptr<ros1::GameMaster_1> Game::ros1_node;
-sptr<GameMaster_2> Game::ros2_node;
-sptr<rclcpp::executors::SingleThreadedExecutor> Game::ex;
-sptr<gui::MainUI> Game::main_window;
 std::thread Game::ros_thread;
 sig_atomic_t Game::stop_cmd;
-
-sptr<std::function<void()>> Game::bindings;
 
 /**========================================================================
  *!                           INITIALIZATION
  *========================================================================**/
+Game::Game() : GamePropertiesLoader(), UIManager() { stop_cmd = 0; }
+
 /// @brief Initialize everything related to the ROS 1&2 nodes
 /// @return true if the initialization as successful
 bool Game::init(int argc, char **argv) {
-  //* Cycle initialization
-  stop_cmd = 0;
-
   //* ROS2 Initialization
   rclcpp::init(argc, argv);
   ros2_node = std::make_shared<GameMaster_2>(rclcpp::NodeOptions{});
@@ -48,10 +43,6 @@ bool Game::init(int argc, char **argv) {
 
   //* Run ROS Loop
   ros_thread = std::thread(&Game::ros_loop);
-
-  //* UI Initialisation
-  bindings = std::make_shared<std::function<void()>>();
-  *bindings = []() { Game::bind_gui(); };
 
   return true;
 }
@@ -90,20 +81,14 @@ void Game::ros_loop() {
  **                            UI Management
  *========================================================================**/
 
-void Game::show_gui() {
-  main_window = std::make_shared<gui::MainUI>(bindings);
-  main_window->setup_ui();
-  main_window->show();
-}
-
 /// @brief Set all bindings between GUI and Game Background tasks
-void Game::_bind_gui() {
+void Game::_bind_ui() {
   QObject::connect(main_window->get_game_loader()->get_ui()->select_buttons,
                    &QDialogButtonBox::accepted, [&]() {
-                     Game::load_game_propeties(
+                     load_game_propeties(
                          main_window->get_game_loader()->get_file_to_load());
                    });
   QObject::connect(main_window->get_ui()->setup, &QPushButton::clicked,
-                   [&]() { Game::ros2()->launch_point_setup(game_props); });
+                   [&]() { ros2_node->launch_point_setup(game_props); });
 }
 } // namespace ecn_baxter::game

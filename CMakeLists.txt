@@ -123,7 +123,8 @@ ament_auto_add_executable(game_master
         src/game/game_master_2.cpp
         src/game/properties_loader.cpp
         src/setup/client_points.cpp
-        src/game/game.cpp
+        src/game/master/game.cpp
+        src/game/master/gui_management.cpp
         src/ui/main_wrapper.cpp
         src/ui/file_loader_wrapper.cpp
         resource/ui/main.ui

@@ -16,12 +16,13 @@
 namespace ecn_baxter::game {
 class UIManager {
 protected:
-  static sptr<gui::MainUI> main_window;
-  static sptr<std::function<void()>> bindings;
-  inline static void _bind_gui(){};
+  UIManager();
 
-public:
-  static void show_gui();
+  sptr<gui::MainUI> main_window;
+  virtual void _bind_ui() = 0;
+  void show_ui();
+
+  ~UIManager() { main_window.reset(); }
 };
 } // namespace ecn_baxter::game
 
