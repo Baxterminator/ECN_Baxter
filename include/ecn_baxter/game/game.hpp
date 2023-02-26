@@ -12,10 +12,11 @@
 
 #include <chrono>
 #include <cstdlib>
-#include <ecn_baxter/game/game_master_1.hpp>
 #include <ecn_baxter/game/game_master_2.hpp>
 #include <ecn_baxter/game/game_properties.hpp>
+#include <ecn_baxter/game/master/gui_management.hpp>
 #include <ecn_baxter/game/properties_loader.hpp>
+#include <ecn_baxter/game/ros1/game_master_1.hpp>
 #include <ecn_baxter/ui/file_loader_wrapper.hpp>
 #include <ecn_baxter/ui/main_wrapper.hpp>
 #include <ecn_baxter/utils.hpp>
@@ -29,14 +30,14 @@ using namespace std::chrono_literals;
 using rapidjson::Document;
 
 /// @brief Main class for game management and logic
-class Game : GamePropertiesLoader {
+class Game : GamePropertiesLoader, UIManager {
 public:
   static bool init(int argc, char **argv);
 
   /**========================================================================
    *?                             ROS Node
    *========================================================================**/
-  inline static GameMaster_1 *ros1() { return ros1_node.get(); }
+  inline static ros1::GameMaster_1 *ros1() { return ros1_node.get(); }
   inline static GameMaster_2 *ros2() { return ros2_node.get(); }
   inline static std::thread *main_thread() { return &ros_thread; }
 
@@ -46,7 +47,6 @@ public:
   /// @brief Run one cycle of the ROS nodes
   inline static void spinOnce() {
     ex->spin_once(10ms);
-    ros1_node->spin();
     ros::spinOnce();
   }
 
@@ -80,7 +80,7 @@ protected:
   /**========================================================================
    *?                            ROS Node
    *========================================================================**/
-  static sptr<GameMaster_1> ros1_node;
+  static sptr<ros1::GameMaster_1> ros1_node;
   static sptr<rclcpp::executors::SingleThreadedExecutor> ex;
   static sptr<GameMaster_2> ros2_node;
 
@@ -92,9 +92,7 @@ protected:
   /**========================================================================
    **                            UI Management
    *========================================================================**/
-  static sptr<gui::MainUI> main_window;
-  static sptr<std::function<void()>> bindings;
-  static void _bind_gui();
+  static void _bind_gui() override;
 
   /**========================================================================
    **                            Game Thread

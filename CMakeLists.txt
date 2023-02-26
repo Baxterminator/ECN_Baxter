@@ -117,7 +117,9 @@ set(legacy_files_gm
 legacy_cpp(legacy_files_gm legacy_gm)
 ament_auto_add_executable(game_master
         src/game/game_master.cpp
-        src/game/game_master_1.cpp
+        src/game/ros1/game_master_1.cpp
+        src/game/ros1/bridge_lookup.cpp
+        src/game/ros1/tf_broadcast.cpp
         src/game/game_master_2.cpp
         src/game/properties_loader.cpp
         src/setup/client_points.cpp

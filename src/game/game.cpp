@@ -9,7 +9,7 @@
 #include <ecn_baxter/game/game.hpp>
 
 namespace ecn_baxter::game {
-sptr<GameMaster_1> Game::ros1_node;
+sptr<ros1::GameMaster_1> Game::ros1_node;
 sptr<GameMaster_2> Game::ros2_node;
 sptr<rclcpp::executors::SingleThreadedExecutor> Game::ex;
 sptr<gui::MainUI> Game::main_window;
@@ -35,7 +35,7 @@ bool Game::init(int argc, char **argv) {
   ex->add_node(ros2_node);
 
   //* ROS1 Initialization
-  ros::init(argc, argv, "game_master_1");
+  ros::init(argc, argv, ros1::GameMaster_1::NODE_NAME);
   /*
           // Checking if another game master is launched
           vector<string> nodes; ros::master::getNodes(nodes);
@@ -44,10 +44,10 @@ bool Game::init(int argc, char **argv) {
               RCLCPP_FATAL(ros2()->get_logger(), "Game master is already
      launched !"); return false;
           }*/
-  ros1_node = std::make_unique<GameMaster_1>();
+  ros1_node = std::make_shared<ros1::GameMaster_1>();
 
   //* Run ROS Loop
-  ros_thread = std::thread(Game::ros_loop);
+  ros_thread = std::thread(&Game::ros_loop);
 
   //* UI Initialisation
   bindings = std::make_shared<std::function<void()>>();
