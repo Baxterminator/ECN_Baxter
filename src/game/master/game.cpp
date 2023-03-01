@@ -6,13 +6,14 @@
  * @createdOn      :  19/02/2023
  * @description    :  Main class for game management and logic
  *========================================================================**/
-#include "ecn_baxter/game/master/gui_management.hpp"
-#include "ecn_baxter/game/properties_loader.hpp"
 #include <ecn_baxter/game/game.hpp>
+#include <iostream>
+#include <thread>
 
 namespace ecn_baxter::game {
 std::thread Game::ros_thread;
 sig_atomic_t Game::stop_cmd;
+sptr<Game> Game::_instance;
 
 /**========================================================================
  *!                           INITIALIZATION
@@ -22,15 +23,17 @@ Game::Game() : GamePropertiesLoader(), UIManager() { stop_cmd = 0; }
 /// @brief Initialize everything related to the ROS 1&2 nodes
 /// @return true if the initialization as successful
 bool Game::init(int argc, char **argv) {
+
   //* ROS2 Initialization
   rclcpp::init(argc, argv);
   ros2_node = std::make_shared<GameMaster_2>(rclcpp::NodeOptions{});
 
-  ex = rclcpp::executors::SingleThreadedExecutor::make_shared();
+  ex = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
   ex->add_node(ros2_node);
 
   //* ROS1 Initialization
   ros::init(argc, argv, ros1::GameMaster_1::NODE_NAME);
+
   /*
           // Checking if another game master is launched
           vector<string> nodes; ros::master::getNodes(nodes);
@@ -66,6 +69,39 @@ void Game::load_game_propeties(const std::string &file_path) {
 }
 
 /**========================================================================
+ **                            Cycle Utils
+ *========================================================================**/
+/// @brief Return the current instance of the Game
+sptr<Game> Game::instance() {
+  if (_instance == nullptr)
+    _instance = std::make_shared<Game>();
+  return _instance;
+}
+
+bool Game::Init(int argc, char **argv) { return instance()->init(argc, argv); }
+
+/// @brief Run one cycle of the ROS nodes
+void Game::spinOnce() {
+  instance()->ex->spin_once(10ms);
+}
+
+/// @brief Send a stop signal to all ROS-related thread
+void Game::stop() {
+  stop_cmd = 1;
+  if (ros_thread.joinable())
+    ros_thread.join();
+  ros::shutdown();
+  rclcpp::shutdown();
+  clean();
+}
+
+/// @brief Cleaning procedure for erasing all left pointers that could be left
+void Game::clean() {
+  game_props.reset();
+  _instance.reset();
+}
+
+/**========================================================================
  **                            Game Thread
  *========================================================================**/
 /// @brief Main task for ros loop
@@ -80,6 +116,8 @@ void Game::ros_loop() {
 /**========================================================================
  **                            UI Management
  *========================================================================**/
+/// @brief Show the main GUI, make events binding, etc
+void Game::showUI() { instance()->show_ui(); }
 
 /// @brief Set all bindings between GUI and Game Background tasks
 void Game::_bind_ui() {

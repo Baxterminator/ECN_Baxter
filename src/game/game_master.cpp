@@ -3,12 +3,14 @@
 #include <csignal>
 #include <ecn_baxter/game/game.hpp>
 #include <memory>
+#include <iostream>
 
 using namespace ecn_baxter::game;
 
 std::shared_ptr<QApplication> app = nullptr;
 
 void shutdown_process() {
+  std::cout << "Shutdown !" << std::endl;
   app->quit();
   app.reset();
   Game::stop();
@@ -21,12 +23,16 @@ int main(int argc, char **argv) {
   // Add callback on force quit to stop everything
   signal(SIGINT, &sighandler);
 
+  app = std::make_shared<QApplication>(argc, argv);
+
   // Init the two ros nodes
-  if (!Game::Init(argc, argv))
+  if (!Game::Init(argc, argv)) {
+    app.reset();
     return -1;
+  }
 
   // Launching GUI on main thread
-  app = std::make_shared<QApplication>(argc, argv);
+
   Game::showUI();
   app->exec();
 

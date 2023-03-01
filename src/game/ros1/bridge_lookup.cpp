@@ -11,11 +11,12 @@
 
 namespace ecn_baxter::game::ros1 {
 
-BridgeLookup::BridgeLookup(sptr<ros::NodeHandle> handle) {
+void BridgeLookup::bridges_init(sptr<ros::NodeHandle> handle) {
   _check_timer =
       handle->createWallTimer(check_dur, [this](const ros::WallTimerEvent &e) {
         look_for_briges();
-        _callback(players);
+        if (_callback != nullptr)
+          _callback(players);
       });
 }
 

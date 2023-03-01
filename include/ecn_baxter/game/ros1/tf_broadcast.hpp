@@ -37,7 +37,8 @@ private:
   void broadcast_transforms() const;
 
 protected:
-  TFBroadcaster(sptr<ros::NodeHandle>);
+  explicit TFBroadcaster(){};
+  void tf_broadcast_init(sptr<ros::NodeHandle>);
 
   //* Timer
   ros::WallTimer _tf_broadcast_timer;

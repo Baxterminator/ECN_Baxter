@@ -37,7 +37,7 @@ private:
   const ros::WallDuration check_dur{0.1};
 
 protected:
-  explicit BridgeLookup(sptr<ros::NodeHandle>);
+  explicit BridgeLookup(){};
 
   PlayerList players;
   void look_for_briges();
@@ -46,6 +46,7 @@ protected:
   ros::WallTimer _check_timer;
 
 public:
+  void bridges_init(sptr<ros::NodeHandle>);
   inline void
   set_look_up_callback(std::function<void(const PlayerList &)> &callback) {
     _callback = callback;

@@ -18,7 +18,7 @@ class UIManager {
 protected:
   UIManager();
 
-  sptr<gui::MainUI> main_window;
+  sptr<gui::MainUI> main_window = nullptr;
   virtual void _bind_ui() = 0;
   void show_ui();
 

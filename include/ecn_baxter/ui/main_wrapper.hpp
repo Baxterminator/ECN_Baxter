@@ -27,7 +27,7 @@ protected:
    **                            GAME Loader
    *========================================================================**/
   sptr<FileLoaderWrapper> game_loader;
-  sptr<std::function<void(void)>> bindings;
+  std::function<void(void)> bindings;
   void setup_game_loader();
   void launch_game_loader();
 
@@ -38,7 +38,7 @@ protected:
   bool eventFilter(QObject *obj, QEvent *e) override;
 
 public:
-  explicit MainUI(sptr<std::function<void(void)>> = nullptr);
+  explicit MainUI(std::function<void(void)>);
   sptr<FileLoaderWrapper> get_game_loader() { return game_loader; }
   ~MainUI() { game_loader.reset(); }
 };

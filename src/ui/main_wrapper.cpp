@@ -14,7 +14,7 @@ namespace ecn_baxter::gui {
 /**========================================================================
  *!                           INITIALIZATION
  *========================================================================**/
-MainUI::MainUI(sptr<std::function<void(void)>> binds)
+MainUI::MainUI(std::function<void(void)> binds)
     : BaseGUI<Ui::BaxterMaster, QMainWindow>(), bindings(binds) {}
 
 /**========================================================================
@@ -41,8 +41,7 @@ bool MainUI::eventFilter(QObject *obj, QEvent *e) {
 void MainUI::setup_game_loader() {
   game_loader = std::make_shared<FileLoaderWrapper>();
   game_loader->setup_ui();
-  if (bindings != nullptr)
-    (*bindings)();
+  bindings();
 }
 
 /// @brief Launch the game selector menu

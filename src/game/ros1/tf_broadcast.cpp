@@ -13,7 +13,7 @@ namespace ecn_baxter::game::ros1 {
 
 const std::string TFBroadcaster::_tf_topic = "/tf_manual";
 
-TFBroadcaster::TFBroadcaster(sptr<ros::NodeHandle> handle) {
+void TFBroadcaster::tf_broadcast_init(sptr<ros::NodeHandle> handle) {
   _tf_broadcast_timer =
       handle->createWallTimer(dur, [this](const ros::WallTimerEvent &event) {
         broadcast_transforms();

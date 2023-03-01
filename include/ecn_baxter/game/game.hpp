@@ -29,40 +29,33 @@ using namespace std::chrono_literals;
 
 /// @brief Main class for game management and logic
 class Game : GamePropertiesLoader, UIManager {
+private:
+  /**========================================================================
+   *!                           SINGLETON PATTERN
+   *========================================================================**/
+  static sptr<Game> _instance;
+  static sptr<Game> instance();
+
 public:
   /**========================================================================
    **                            Cycle Utils
    *========================================================================**/
-  inline static bool Init(int argc, char **argv) {
-    return instance()->init(argc, argv);
-  }
-  /// @brief Run one cycle of the ROS nodes
-  inline static void spinOnce() {
-    instance()->ex->spin_once(10ms);
-    ros::spinOnce();
-  }
+  static bool Init(int argc, char **argv);
+  static void spinOnce();
+  static void stop();
+  static void clean();
 
-  /// @brief Send a stop signal to all ROS-related thread
-  inline static void stop() {
-    stop_cmd = 1;
-    if (ros_thread.joinable())
-      ros_thread.join();
-    ros::shutdown();
-    rclcpp::shutdown();
-    clean();
-  }
-
-  /// @brief Cleaning procedure for erasing all left pointers that could be left
-  inline static void clean() {
-    game_props.reset();
-    _instance.reset();
+  Game();
+  ~Game() {
+    ros1_node.reset();
+    ros2_node.reset();
+    ex.reset();
   }
 
   /**========================================================================
   **                            UI Management
   *========================================================================**/
-  /// @brief Show the main GUI, make events binding, etc
-  inline static void showUI() { instance()->show_ui(); };
+  static void showUI();
 
 protected:
   /**========================================================================
@@ -90,23 +83,6 @@ protected:
   static sig_atomic_t stop_cmd;
 
   bool init(int argc, char **argv);
-  inline static sptr<Game> instance() {
-    if (_instance == nullptr)
-      _instance = std::make_shared<Game>();
-    return _instance;
-  }
-
-private:
-  /**========================================================================
-   *!                           SINGLETON PATTERN
-   *========================================================================**/
-  Game();
-  static sptr<Game> _instance;
-  ~Game() {
-    ros1_node.reset();
-    ros2_node.reset();
-    ex.reset();
-  }
 };
 } // namespace ecn_baxter::game
 
