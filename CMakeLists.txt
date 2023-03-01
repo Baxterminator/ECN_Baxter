@@ -102,8 +102,7 @@ endforeach()
 ## Gripper management
 ament_auto_add_executable(gripper_node src/components/gripper_node.cpp)
 target_include_directories(gripper_node PRIVATE
-        include/ecn_baxter
-        include/rapidjson
+        include
 )
 add_message(gripper_node)
 
