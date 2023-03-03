@@ -7,6 +7,7 @@
  * @description    :  GUI Wrapper for the Game Choosing QDialog
  *========================================================================**/
 #include "ui_game_loader.h"
+#include <ecn_baxter/game/data/local_games.hpp>
 #include <ecn_baxter/ui/file_loader_wrapper.hpp>
 #include <qfiledialog.h>
 
@@ -34,10 +35,11 @@ FileLoaderWrapper::get_install_file_path(QMouseEvent *ev = nullptr) {
     auto share = get_package_share_directory("ecn_baxter");
     auto idx = gui->list_files->indexAt(ev->pos());
     if (idx.isValid()) {
-      install_path = share;
-      install_path += "/games/";
-      install_path += idx.data().toString().toStdString();
-      install_path += ".bgame";
+      auto game_list = game::data::GameUtils::get_local_games();
+      if (auto found = game_list.find(idx.data().toString().toStdString());
+          found != game_list.end()) {
+        install_path = found->second;
+      };
     }
   }
 
@@ -90,8 +92,16 @@ void FileLoaderWrapper::setup_internal_callbacks() {
 void FileLoaderWrapper::setup_list() {
   model = new QStringListModel(this);
   QStringList l;
-  l << "test1"
-    << "Test 2";
+
+  // Getting local games (inside the package)
+  auto data = game::data::GameUtils::get_local_games();
+  auto it = data.begin();
+  while (it != data.end()) {
+    l << it->first.c_str();
+    it++;
+  }
+
+  // Sending it to the GUI
   model->setStringList(l);
 
   gui->list_files->setModel(model);

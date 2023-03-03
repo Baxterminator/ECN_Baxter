@@ -1,4 +1,7 @@
+#include "ecn_baxter/game/data/arm_side.hpp"
 #include <ecn_baxter/game/setup_node.hpp>
+#include <functional>
+#include <thread>
 
 namespace ecn_baxter {
 SetupNode::SetupNode(rclcpp::NodeOptions opts)
@@ -37,18 +40,18 @@ GoalResponse SetupNode::handle_goal(const GoalUUID &uuid,
 }
 void SetupNode::handle_accepted(const sptr<PtnHandle> goal_handle) {
   auto th = std::thread{[&]() { ptn_setup_exec(goal_handle); }};
-  RCLCPP_INFO(get_logger(), "Launching setup action on thread [%d]",
-              th.get_id());
+  RCLCPP_INFO(get_logger(), "Launching setup action on thread");
   th.detach();
 }
 
-void convertSides(const std::vector<bool> &ori, std::vector<Side> &dest) {
+void convertSides(const std::vector<bool> &ori,
+                  std::vector<game::data::ArmSide> &dest) {
   dest.resize(0);
   for (auto b : ori) {
     if (b == PointsSetup::Goal::LEFT) {
-      dest.push_back(Side::LEFT);
+      dest.push_back(game::data::ArmSide::LEFT_ARM);
     } else if (b == PointsSetup::Goal::RIGHT) {
-      dest.push_back(Side::RIGHT);
+      dest.push_back(game::data::ArmSide::RIGHT_ARM);
     }
   }
 }
@@ -116,7 +119,8 @@ void SetupNode::navigator_callback(NavigatorStates::SharedPtr &states) {
 void SetupNode::savePose() {
   const std::string base = "base";
   const std::string gripper =
-      (sides[current_step] == Side::RIGHT) ? "right_gripper" : "left_gripper";
+      (sides[current_step] == game::data::ArmSide::RIGHT_ARM) ? "right_gripper"
+                                                              : "left_gripper";
   if (!tf_buffer.canTransform(gripper, base, tf2::TimePointZero,
                               tf2::durationFromSec(1.0))) {
     RCLCPP_FATAL(get_logger(), "Can't find corresponding frame");

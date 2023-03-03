@@ -9,7 +9,7 @@
 #include <ecn_baxter/game/properties_loader.hpp>
 
 namespace ecn_baxter::game {
-sptr<GameProperties> GamePropertiesLoader::game_props;
+sptr<data::GameProperties> GamePropertiesLoader::game_props;
 
 const char *GamePropertiesLoader::NAME_TAG = "name";
 const char *GamePropertiesLoader::SETUP_TAG = "setup";
@@ -17,7 +17,7 @@ const char *GamePropertiesLoader::POINTS_TAG = "points";
 const char *GamePropertiesLoader::SIDE_TAG = "side";
 const char *GamePropertiesLoader::ANGLES_TAG = "angles";
 
-sptr<GameProperties> GamePropertiesLoader::get_game_props() {
+sptr<data::GameProperties> GamePropertiesLoader::get_game_props() {
   return game_props;
 }
 
@@ -36,7 +36,7 @@ void GamePropertiesLoader::load_file(const std::string &path) {
 
     //* Decode JSON
     Document d;
-    game_props = std::make_shared<GameProperties>();
+    game_props = std::make_shared<data::GameProperties>();
     game_props->filename = path;
     d.Parse(ss.str().c_str());
     load(d);
@@ -79,9 +79,9 @@ void GamePropertiesLoader::load_setup_points(const Document &d) {
   for (auto itr = pts.Begin(); itr != pts.End(); ++itr) {
     const Value &pt = *itr;
 
-    GPoint gp;
+    data::GPoint gp;
     gp.name = pt[NAME_TAG].GetString();
-    gp.arm_side = bool2side(pt[SIDE_TAG].GetBool());
+    gp.arm_side = data::bool2side(pt[SIDE_TAG].GetBool());
     gp.w_angles = pt[ANGLES_TAG].GetBool();
     game_props->setup.needed_points.push_back(gp);
   }

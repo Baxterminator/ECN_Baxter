@@ -5,6 +5,7 @@
 #include <baxter_core_msgs/msg/navigator_states.hpp>
 #include <chrono>
 #include <ecn_baxter/action/points_setup.hpp>
+#include <ecn_baxter/game/data/arm_side.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <memory>
@@ -34,8 +35,6 @@ using namespace std::chrono_literals;
 
 using Step = unsigned int;
 
-enum class Side { RIGHT, LEFT };
-
 class SetupNode : public rclcpp::Node {
 public:
   explicit SetupNode(NodeOptions opts);
@@ -43,7 +42,7 @@ public:
 protected:
   Step current_step = 0;
   std::vector<std::string> names;
-  std::vector<Side> sides;
+  std::vector<game::data::ArmSide> sides;
   bool pushed = false, publish = false;
   Point last_point;
 

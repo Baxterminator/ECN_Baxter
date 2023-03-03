@@ -11,6 +11,7 @@
 #define MAIN_WRAPPER_H
 
 #include "ui_main.h"
+#include <ecn_baxter/game/data/game_players.hpp>
 #include <ecn_baxter/ui/base_gui.hpp>
 #include <ecn_baxter/ui/file_loader_wrapper.hpp>
 #include <ecn_baxter/utils.hpp>
@@ -24,7 +25,7 @@ namespace ecn_baxter::gui {
 class MainUI : public BaseGUI<Ui::BaxterMaster, QMainWindow> {
 protected:
   /**========================================================================
-   **                            GAME Loader
+   **                            Game Loader
    *========================================================================**/
   sptr<FileLoaderWrapper> game_loader;
   std::function<void(void)> bindings;
@@ -32,7 +33,7 @@ protected:
   void launch_game_loader();
 
   /**========================================================================
-   **                            EVENT Callbacks
+   **                            Event Callbacks
    *========================================================================**/
   void setup_internal_callbacks() override;
   bool eventFilter(QObject *obj, QEvent *e) override;
@@ -41,6 +42,11 @@ public:
   explicit MainUI(std::function<void(void)>);
   sptr<FileLoaderWrapper> get_game_loader() { return game_loader; }
   ~MainUI() { game_loader.reset(); }
+
+  /**========================================================================
+   **                           External Callbacks
+   *========================================================================**/
+  void refresh_player_list(game::data::PlayerList &);
 };
 } // namespace ecn_baxter::gui
 

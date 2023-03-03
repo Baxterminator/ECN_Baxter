@@ -11,7 +11,7 @@
 #define SETUP_PTN_CLIENT_HPP
 
 #include <ecn_baxter/action/points_setup.hpp>
-#include <ecn_baxter/game/game_properties.hpp>
+#include <ecn_baxter/game/data/game_properties.hpp>
 #include <ecn_baxter/utils.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_action/rclcpp_action.hpp>
@@ -29,7 +29,7 @@ public:
   explicit SetupPointsClient(rclcpp::Logger ros2_logger)
       : logger(ros2_logger) {}
 
-  void launch_point_setup(const sptr<game::GameProperties>);
+  void launch_point_setup(const sptr<game::data::GameProperties>);
 
 protected:
   rclcpp::Logger logger;

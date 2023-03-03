@@ -6,8 +6,11 @@
  * @createdOn      :  19/02/2023
  * @description    :  GUI Wrapper for the main GUI
  *========================================================================**/
+#include "ecn_baxter/game/data/arm_side.hpp"
 #include "ui_main.h"
 #include <ecn_baxter/ui/main_wrapper.hpp>
+#include <qtablewidget.h>
+#include <sstream>
 
 namespace ecn_baxter::gui {
 
@@ -18,7 +21,7 @@ MainUI::MainUI(std::function<void(void)> binds)
     : BaseGUI<Ui::BaxterMaster, QMainWindow>(), bindings(binds) {}
 
 /**========================================================================
- **                            EVENT Callbacks
+ **                            Event Callbacks
  *========================================================================**/
 void MainUI::setup_internal_callbacks() {
   gui->load_game->installEventFilter(this);
@@ -35,7 +38,47 @@ bool MainUI::eventFilter(QObject *obj, QEvent *e) {
 }
 
 /**========================================================================
- **                            GAME Loader
+ **                           External Callbacks
+ *========================================================================**/
+/// @brief Refresh the player list with the given
+void MainUI::refresh_player_list(game::data::PlayerList &list) {
+  // Check if GUI has been made
+  if (gui == nullptr)
+    return;
+
+  // Show player list
+  int connected = 0;
+  for (auto &player : list) {
+    if (player.new_discovered) {
+      player.new_discovered = false;
+      player.row_id = gui->users->rowCount();
+      gui->users->insertRow(player.row_id);
+      gui->users->setItem(player.row_id, 0,
+                          new QTableWidgetItem(player.name.c_str()));
+    }
+
+    // Update what need to be updated
+    if (player.connected)
+      connected++;
+    gui->users->setItem(player.row_id, 1,
+                        new QTableWidgetItem((player.connected)
+                                                 ? "Connected"
+                                                 : "Not connected"));
+    gui->users->setItem(
+        player.row_id, 2,
+        new QTableWidgetItem(game::data::side2str(player.side).c_str()));
+  }
+
+  // Update number of connected people
+  std::stringstream ss;
+  ss << connected;
+  ss << "/";
+  ss << list.size();
+  gui->n_co->setText(ss.str().c_str());
+}
+
+/**========================================================================
+ **                            Game Loader
  *========================================================================**/
 /// @brief Setup the mgame selector menu
 void MainUI::setup_game_loader() {

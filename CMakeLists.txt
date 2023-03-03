@@ -113,6 +113,12 @@ target_include_directories(setup_node PRIVATE
 )
 add_message(setup_node)
 
+ament_auto_add_library(game_properties 
+    src/game/data/local_games.cpp
+    src/game/data/game_properties.cpp
+)
+target_include_directories(game_properties PRIVATE include)
+
 ## Main Game Master executable
 set(legacy_files_gm
     "setup/setup_client.cpp"
@@ -138,7 +144,7 @@ target_include_directories(game_master PRIVATE
         include
         ${ROS1_ROOT}/include
 )
-target_link_libraries(game_master ${ROS1_LIBS} Qt5::Core Qt5::Widgets Qt5::WebKit Qt5::WebKitWidgets)
+target_link_libraries(game_master ${game_propeties} ${ROS1_LIBS} Qt5::Core Qt5::Widgets Qt5::WebKit Qt5::WebKitWidgets )
 add_message(game_master)
 
 # =================================================================

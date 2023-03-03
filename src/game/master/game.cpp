@@ -6,6 +6,7 @@
  * @createdOn      :  19/02/2023
  * @description    :  Main class for game management and logic
  *========================================================================**/
+#include "ecn_baxter/game/data/game_players.hpp"
 #include <ecn_baxter/game/game.hpp>
 #include <iostream>
 #include <thread>
@@ -81,9 +82,7 @@ sptr<Game> Game::instance() {
 bool Game::Init(int argc, char **argv) { return instance()->init(argc, argv); }
 
 /// @brief Run one cycle of the ROS nodes
-void Game::spinOnce() {
-  instance()->ex->spin_once(10ms);
-}
+void Game::spinOnce() { instance()->ex->spin_once(10ms); }
 
 /// @brief Send a stop signal to all ROS-related thread
 void Game::stop() {
@@ -117,7 +116,12 @@ void Game::ros_loop() {
  **                            UI Management
  *========================================================================**/
 /// @brief Show the main GUI, make events binding, etc
-void Game::showUI() { instance()->show_ui(); }
+void Game::showUI() {
+  instance()->show_ui();
+  instance()->ros1_node->set_look_up_callback([&](data::PlayerList &list) {
+    instance()->main_window->refresh_player_list(list);
+  });
+}
 
 /// @brief Set all bindings between GUI and Game Background tasks
 void Game::_bind_ui() {

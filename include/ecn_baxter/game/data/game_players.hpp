@@ -10,18 +10,20 @@
 #ifndef GAME_PLAYER
 #define GAME_PLAYER
 
-#include <ecn_baxter/game/structures/arm_side.hpp>
+#include <ecn_baxter/game/data/arm_side.hpp>
 #include <vector>
 
-namespace ecn_baxter::game::structure {
+namespace ecn_baxter::game::data {
 
 struct GamePlayer {
   std::string name, bridge_name;
   bool connected = false;
+  bool new_discovered = true;
   ArmSide side = ArmSide::NONE;
+  unsigned int row_id = 0;
 };
 
 typedef std::vector<GamePlayer> PlayerList;
-} // namespace ecn_baxter::game::structure
+} // namespace ecn_baxter::game::data
 
 #endif

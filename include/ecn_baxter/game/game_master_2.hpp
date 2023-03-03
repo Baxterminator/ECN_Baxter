@@ -11,7 +11,6 @@
 #define GAME_MASTER_2_HPP
 
 #include <ecn_baxter/action/points_setup.hpp>
-#include <ecn_baxter/game/game_properties.hpp>
 #include <ecn_baxter/setup/client_points.hpp>
 #include <rclcpp/rclcpp.hpp>
 

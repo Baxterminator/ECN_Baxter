@@ -1,0 +1,17 @@
+{
+  "name": "Bonjour je suis un autre test",
+  "setup": {
+    "nd_pts": [
+      {
+        "name": "source_r",
+        "side": false,
+        "angles": false
+      },
+      {
+        "name": "source_g",
+        "side": true,
+        "angles": false
+      }
+    ]
+  }
+}

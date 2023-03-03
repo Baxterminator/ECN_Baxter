@@ -14,7 +14,8 @@ namespace ecn_baxter::setup {
 /// @brief Launch the call to the action for point setuping
 /// @deprecated This function is only for legacy ROS2 version support (foxy,
 /// galactic, ...).
-void SetupPointsClient::launch_point_setup(const sptr<game::GameProperties> props) {
+void SetupPointsClient::launch_point_setup(
+    const sptr<game::data::GameProperties> props) {
   using namespace std::placeholders;
   RCLCPP_INFO(logger, "Launching setup phase !");
 
@@ -27,7 +28,7 @@ void SetupPointsClient::launch_point_setup(const sptr<game::GameProperties> prop
               props->setup.needed_points.size());
   for (auto point : props->setup.needed_points) {
     setup_msg.ptns_name.push_back(point.name);
-    setup_msg.sides.push_back(game::side2bool(point.arm_side));
+    setup_msg.sides.push_back(game::data::side2bool(point.arm_side));
   }
 
   auto goal_options = Client<PointsSetup>::SendGoalOptions();

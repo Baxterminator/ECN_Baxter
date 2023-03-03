@@ -93,6 +93,24 @@
        </item>
        <item>
         <widget class="QLabel" name="game_name">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
+         </property>
          <property name="font">
           <font>
            <weight>75</weight>
@@ -105,6 +123,12 @@
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::NoTextInteraction</set>
          </property>
         </widget>
        </item>
@@ -343,6 +367,39 @@
             <string>Has Token</string>
            </property>
           </column>
+         </widget>
+        </item>
+        <item>
+         <widget class="QWidget" name="widget_3" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>20</height>
+           </size>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QPushButton" name="left_arm_token">
+             <property name="text">
+              <string>Token Left Arm</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="none_token">
+             <property name="text">
+              <string>Remove Token</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="right_arm_token">
+             <property name="text">
+              <string>Token Right Arm</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </item>
        </layout>

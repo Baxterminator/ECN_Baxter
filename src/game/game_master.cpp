@@ -1,9 +1,10 @@
 #include "QtWebKit"
 #include "ros/init.h"
 #include <csignal>
+#include <ecn_baxter/game/data/local_games.hpp>
 #include <ecn_baxter/game/game.hpp>
-#include <memory>
 #include <iostream>
+#include <memory>
 
 using namespace ecn_baxter::game;
 

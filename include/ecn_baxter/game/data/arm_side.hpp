@@ -12,13 +12,13 @@
 
 #include <string>
 
-namespace ecn_baxter::game::structure {
+namespace ecn_baxter::game::data {
 enum class ArmSide { NONE, RIGHT_ARM, LEFT_ARM };
 
 inline std::string side2str(ArmSide s) {
   switch (s) {
   case ArmSide::NONE:
-    return "none";
+    return "";
   case ArmSide::RIGHT_ARM:
     return "right_arm";
   case ArmSide::LEFT_ARM:
@@ -41,6 +41,6 @@ inline ArmSide bool2side(bool b) {
   return (b) ? ArmSide::LEFT_ARM : ArmSide::RIGHT_ARM;
 }
 
-} // namespace ecn_baxter::game::structure
+} // namespace ecn_baxter::game::data
 
 #endif

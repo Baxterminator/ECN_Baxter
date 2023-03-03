@@ -14,7 +14,6 @@
 #include <chrono>
 #include <cstdlib>
 #include <ecn_baxter/game/game_master_2.hpp>
-#include <ecn_baxter/game/game_properties.hpp>
 #include <ecn_baxter/game/master/gui_management.hpp>
 #include <ecn_baxter/game/properties_loader.hpp>
 #include <ecn_baxter/game/ros1/game_master_1.hpp>

@@ -11,19 +11,34 @@
 
 namespace ecn_baxter::game::ros1 {
 
-void BridgeLookup::bridges_init(sptr<ros::NodeHandle> handle) {
+/**========================================================================
+ *!                           Initialization
+ *========================================================================**/
+void BridgesManager::bridges_init(sptr<ros::NodeHandle> handle) {
   _check_timer =
-      handle->createWallTimer(check_dur, [this](const ros::WallTimerEvent &e) {
+      handle->createWallTimer(check_dur, [this](const ros::WallTimerEvent &) {
         look_for_briges();
         if (_callback != nullptr)
           _callback(players);
       });
 }
 
+/**========================================================================
+ **                             Utils
+ *========================================================================**/
+std::string BridgesManager::extract_name(const std::string &full_name) const {
+  int i = full_name.length() - 1;
+  for (; i >= 0; i--) {
+    if ((char)full_name[i] == '/')
+      break;
+  }
+  return full_name.substr(i + 1);
+}
+
 /// @brief Check if the node name start as a bridge should and set the user name
 /// parameter accordingly
-bool BridgeLookup::is_bridge(const std::string &node_name,
-                             std::string &user) const {
+bool BridgesManager::is_bridge(const std::string &node_name,
+                               std::string &user) const {
   user = "";
   // If the name is too short to be a bridge, directly return false
   if (strlen(node_name.c_str()) < strlen(bridge_name))
@@ -31,7 +46,7 @@ bool BridgeLookup::is_bridge(const std::string &node_name,
 
   // Else
   std::stringstream ss;
-  for (int i = 0; i < strlen(node_name.c_str()); i++) {
+  for (unsigned long i = 0; i < strlen(node_name.c_str()); i++) {
     //* Check if is a bridge
     if (i < strlen(bridge_name) && node_name[i] != bridge_name[i])
       return false;
@@ -45,17 +60,21 @@ bool BridgeLookup::is_bridge(const std::string &node_name,
   return true;
 }
 
+/**========================================================================
+ **                            Bridge Lookup
+ *========================================================================**/
 /// @brief Look out for bridges on the network and save them for later purpose
-void BridgeLookup::look_for_briges() {
+void BridgesManager::look_for_briges() {
   std::vector<std::string> current_nodes, current_users;
   ros::master::getNodes(current_nodes);
 
   auto it = current_nodes.begin();
   std::string user;
   while (it != current_nodes.end()) {
-    auto n = it->data();
-    if (is_bridge(n, user))
+    auto n = extract_name(it->data());
+    if (is_bridge(n, user)) {
       current_users.push_back(user);
+    }
     it++;
   }
 
@@ -64,13 +83,13 @@ void BridgeLookup::look_for_briges() {
 }
 
 /// @brief Reset all players "connected" state to false
-void BridgeLookup::reset_players_state() {
+void BridgesManager::reset_players_state() {
   for (auto &p : players)
     p.connected = false;
 }
 
 /// @brief Update local players list to last look out
-void BridgeLookup::update_connected_players(
+void BridgesManager::update_connected_players(
     const std::vector<std::string> &to_add) {
   bool found;
   for (auto &p_name : to_add) {

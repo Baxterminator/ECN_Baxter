@@ -17,7 +17,7 @@
 
 namespace ecn_baxter::game::ros1 {
 
-class GameMaster_1 : public BridgeLookup, public TFBroadcaster {
+class GameMaster_1 : public BridgesManager, public TFBroadcaster {
 public:
   GameMaster_1();
   static const std::string NODE_NAME;
