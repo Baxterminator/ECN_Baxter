@@ -11,6 +11,8 @@
 #ifndef BRIDGE_LOOKUP
 #define BRIDGE_LOOKUP
 
+#include "baxter_core_msgs/BridgePublishersForce.h"
+#include "ros/service_client.h"
 #include <ecn_baxter/game/data/game_players.hpp>
 #include <ecn_baxter/utils.hpp>
 #include <ros/duration.h>
@@ -29,6 +31,7 @@ using namespace ecn_baxter::game::data;
 class BridgesManager {
 private:
   static constexpr auto bridge_name{"baxter_ros1_bridge_"};
+  static constexpr auto slave_service{"/bridge_force"};
 
   /**========================================================================
    **                             Utils
@@ -44,6 +47,13 @@ private:
   std::function<void(PlayerList &)> _callback;
   void update_connected_players(const std::vector<std::string> &);
   void reset_players_state();
+
+  /**========================================================================
+   **                            Slave mode
+   *========================================================================**/
+  ros::ServiceClient _slave_client;
+  baxter_core_msgs::BridgePublishersForce _slave_req;
+  bool send_slave_request();
 
 protected:
   /**========================================================================
@@ -65,6 +75,12 @@ public:
   inline void set_look_up_callback(std::function<void(PlayerList &)> callback) {
     _callback = callback;
   }
+
+  /**========================================================================
+   **                            Slave mode
+   *========================================================================**/
+  void slave_on();
+  void slave_off();
 };
 } // namespace ecn_baxter::game::ros1
 

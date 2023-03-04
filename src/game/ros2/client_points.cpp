@@ -6,9 +6,9 @@
  * @createdOn      :  19/02/2023
  * @description    :  ROS 2 Node part for point setuping
  *========================================================================**/
-#include <ecn_baxter/setup/client_points.hpp>
+#include <ecn_baxter/game/ros2/client_points.hpp>
 
-namespace ecn_baxter::setup {
+namespace ecn_baxter::game::ros2 {
 /// @brief Callback of the acceptance of the action call
 /// @param handle the handle to the call to the action
 void SetupPointsClient::ptn_setup_goal(
@@ -24,14 +24,16 @@ void SetupPointsClient::ptn_setup_goal(
 void SetupPointsClient::ptn_setup_result(
     const PtnSetupHandler::WrappedResult &result) {
   switch (result.code) {
-  case ResultCode::ABORTED:
+  case rclcpp_action::ResultCode::ABORTED:
     RCLCPP_ERROR(logger, "Setup aborted !");
     break;
-  case ResultCode::CANCELED:
+  case rclcpp_action::ResultCode::CANCELED:
     RCLCPP_ERROR(logger, "Setup canceled !");
     break;
-  case ResultCode::UNKNOWN:
+  case rclcpp_action::ResultCode::UNKNOWN:
     RCLCPP_ERROR(logger, "Unknown result code :/");
+    break;
+  case rclcpp_action::ResultCode::SUCCEEDED:
     break;
   }
   RCLCPP_INFO(logger, "Setup done with result %d", result.result->success);
@@ -41,7 +43,7 @@ void SetupPointsClient::ptn_setup_result(
 /// @param handle the handle to the call to the action
 /// @param feedback the position and name of the next POI
 void SetupPointsClient::ptn_setup_feedback(
-    PtnSetupHandler::SharedPtr &handle,
+    [[maybe_unused]] PtnSetupHandler::SharedPtr &handle,
     const sptr<const PointsSetup::Feedback> feedback) {
   auto p_name = feedback->ptn_name;
   auto p = feedback->ptn;
@@ -49,4 +51,4 @@ void SetupPointsClient::ptn_setup_feedback(
               p.x, p.y, p.z);
 }
 
-} // namespace ecn_baxter::setup
+} // namespace ecn_baxter::game::ros2

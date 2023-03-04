@@ -1,5 +1,5 @@
 #include "ecn_baxter/game/data/arm_side.hpp"
-#include <ecn_baxter/game/setup_node.hpp>
+#include <ecn_baxter/setup/setup_node.hpp>
 #include <functional>
 #include <thread>
 
@@ -32,8 +32,9 @@ CancelResponse SetupNode::handle_cancel(const sptr<PtnHandle> goal_handle) {
   (void)goal_handle;
   return CancelResponse::ACCEPT;
 }
-GoalResponse SetupNode::handle_goal(const GoalUUID &uuid,
-                                    sptr<const PointsSetup::Goal> goal) {
+GoalResponse
+SetupNode::handle_goal(const GoalUUID &uuid,
+                       [[maybe_unused]] sptr<const PointsSetup::Goal> goal) {
   RCLCPP_INFO(this->get_logger(), "Received goal request");
   (void)uuid;
   return GoalResponse::ACCEPT_AND_EXECUTE;

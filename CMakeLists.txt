@@ -28,6 +28,9 @@ if(EXISTS ${ROS1_ROOT})
     endforeach()
 endif()
 
+# Baxters ROS1 message
+set(BAXTER1_ROOT "/opt/ecn/ROS1/install")
+
 # =================================================================
 #             LEGACY CODE (FOXY, GALACTIC COMPATIBILITY)
 # =================================================================
@@ -107,7 +110,7 @@ target_include_directories(gripper_node PRIVATE
 add_message(gripper_node)
 
 ## Setup Node
-ament_auto_add_executable(setup_node src/game/setup_node.cpp)
+ament_auto_add_executable(setup_node src/setup/setup_node.cpp)
 target_include_directories(setup_node PRIVATE
         include
 )
@@ -121,7 +124,7 @@ target_include_directories(game_properties PRIVATE include)
 
 ## Main Game Master executable
 set(legacy_files_gm
-    "setup/setup_client.cpp"
+    "game/ros2/setup_client.cpp"
 )
 legacy_cpp(legacy_files_gm legacy_gm)
 ament_auto_add_executable(game_master
@@ -129,9 +132,9 @@ ament_auto_add_executable(game_master
         src/game/ros1/game_master_1.cpp
         src/game/ros1/bridge_lookup.cpp
         src/game/ros1/tf_broadcast.cpp
-        src/game/game_master_2.cpp
+        src/game/ros2/game_master_2.cpp
         src/game/properties_loader.cpp
-        src/setup/client_points.cpp
+        src/game/ros2/client_points.cpp
         src/game/master/game.cpp
         src/game/master/gui_management.cpp
         src/ui/main_wrapper.cpp
@@ -143,6 +146,7 @@ ament_auto_add_executable(game_master
 target_include_directories(game_master PRIVATE
         include
         ${ROS1_ROOT}/include
+        ${BAXTER1_ROOT}/include
 )
 target_link_libraries(game_master ${game_propeties} ${ROS1_LIBS} Qt5::Core Qt5::Widgets Qt5::WebKit Qt5::WebKitWidgets )
 add_message(game_master)

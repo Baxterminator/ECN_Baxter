@@ -16,10 +16,9 @@
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_action/rclcpp_action.hpp>
 
-namespace ecn_baxter::setup {
+namespace ecn_baxter::game::ros2 {
 using ecn_baxter::action::PointsSetup;
 using rclcpp_action::Client;
-using rclcpp_action::ResultCode;
 using PtnSetupHandler = rclcpp_action::ClientGoalHandle<PointsSetup>;
 
 /// @brief ROS 2 Node part for point setuping
@@ -50,5 +49,5 @@ protected:
   void ptn_setup_result(const PtnSetupHandler::WrappedResult &result);
 };
 
-} // namespace ecn_baxter::setup
+} // namespace ecn_baxter::game::ros2
 #endif

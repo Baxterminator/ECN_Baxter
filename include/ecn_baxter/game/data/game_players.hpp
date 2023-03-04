@@ -24,6 +24,9 @@ struct GamePlayer {
 };
 
 typedef std::vector<GamePlayer> PlayerList;
+
+constexpr auto block_player{"fsjgfdsojlgnwdkjhgsioegj"};
+constexpr auto free_player{""};
 } // namespace ecn_baxter::game::data
 
 #endif

@@ -2,7 +2,7 @@
 #include "ros/init.h"
 #include <csignal>
 #include <ecn_baxter/game/data/local_games.hpp>
-#include <ecn_baxter/game/game.hpp>
+#include <ecn_baxter/game/master/game.hpp>
 #include <iostream>
 #include <memory>
 
@@ -17,7 +17,7 @@ void shutdown_process() {
   Game::stop();
 }
 
-void sighandler(int s) { shutdown_process(); }
+void sighandler([[maybe_unused]] int s) { shutdown_process(); }
 
 int main(int argc, char **argv) {
 

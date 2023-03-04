@@ -24,6 +24,7 @@ inline std::string side2str(ArmSide s) {
   case ArmSide::LEFT_ARM:
     return "left_arm";
   }
+  return "";
 }
 
 inline bool side2bool(ArmSide s) {

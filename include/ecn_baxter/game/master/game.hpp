@@ -13,10 +13,10 @@
 #include "ros/init.h"
 #include <chrono>
 #include <cstdlib>
-#include <ecn_baxter/game/game_master_2.hpp>
 #include <ecn_baxter/game/master/gui_management.hpp>
 #include <ecn_baxter/game/properties_loader.hpp>
 #include <ecn_baxter/game/ros1/game_master_1.hpp>
+#include <ecn_baxter/game/ros2/game_master_2.hpp>
 #include <ecn_baxter/utils.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/utilities.hpp>
@@ -62,7 +62,7 @@ protected:
    *========================================================================**/
   sptr<ros1::GameMaster_1> ros1_node;
   sptr<rclcpp::executors::SingleThreadedExecutor> ex;
-  sptr<GameMaster_2> ros2_node;
+  sptr<ros2::GameMaster_2> ros2_node;
 
   /**========================================================================
    *?                           Game Management

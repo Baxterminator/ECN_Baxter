@@ -7,7 +7,7 @@
  * @description    :  Main class for game management and logic
  *========================================================================**/
 #include "ecn_baxter/game/data/game_players.hpp"
-#include <ecn_baxter/game/game.hpp>
+#include <ecn_baxter/game/master/game.hpp>
 #include <iostream>
 #include <thread>
 
@@ -27,7 +27,7 @@ bool Game::init(int argc, char **argv) {
 
   //* ROS2 Initialization
   rclcpp::init(argc, argv);
-  ros2_node = std::make_shared<GameMaster_2>(rclcpp::NodeOptions{});
+  ros2_node = std::make_shared<ros2::GameMaster_2>(rclcpp::NodeOptions{});
 
   ex = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
   ex->add_node(ros2_node);

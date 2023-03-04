@@ -5,15 +5,12 @@
  * @repo           :  https://github.com/Baxterminator/ecn_baxter/
  * @createdOn      :  19/02/2023
  * @description    :  ROS 2 Node part for point setuping
- * @deprecated     :  These functions are only for legacy ROS2 version support
- *(foxy, galactic, ...).
  *========================================================================**/
-#include <ecn_baxter/setup/client_points.hpp>
+#include <ecn_baxter/game/ros2/client_points.hpp>
 
-namespace ecn_baxter::setup {
+namespace ecn_baxter::game::ros2 {
+
 /// @brief Launch the call to the action for point setuping
-/// @deprecated This function is only for legacy ROS2 version support (foxy,
-/// galactic, ...).
 void SetupPointsClient::launch_point_setup(
     const sptr<game::data::GameProperties> props) {
   using namespace std::placeholders;
@@ -33,9 +30,7 @@ void SetupPointsClient::launch_point_setup(
 
   auto goal_options = Client<PointsSetup>::SendGoalOptions();
   goal_options.goal_response_callback =
-      [&](std::shared_future<PtnSetupHandler::SharedPtr> future) {
-        ptn_setup_goal(future);
-      };
+      [&](const PtnSetupHandler::SharedPtr &handle) { ptn_setup_goal(handle); };
   goal_options.feedback_callback =
       [&](PtnSetupHandler::SharedPtr handle,
           const sptr<const PointsSetup::Feedback> feedback) {
@@ -49,4 +44,4 @@ void SetupPointsClient::launch_point_setup(
   RCLCPP_INFO(logger, "Calling action server");
   ptn_setup->async_send_goal(setup_msg, goal_options);
 }
-} // namespace ecn_baxter::setup
+} // namespace ecn_baxter::game::ros2

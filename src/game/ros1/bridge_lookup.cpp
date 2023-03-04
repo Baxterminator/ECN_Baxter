@@ -7,6 +7,7 @@
  * @description    :  Sub-part of the ROS1 game master for checking connected
  *                    players
  *========================================================================**/
+#include "ecn_baxter/game/data/arm_side.hpp"
 #include <ecn_baxter/game/ros1/bridge_lookup.hpp>
 
 namespace ecn_baxter::game::ros1 {
@@ -21,6 +22,9 @@ void BridgesManager::bridges_init(sptr<ros::NodeHandle> handle) {
         if (_callback != nullptr)
           _callback(players);
       });
+  _slave_client =
+      handle->serviceClient<baxter_core_msgs::BridgePublishersForce>(
+          slave_service);
 }
 
 /**========================================================================
@@ -109,5 +113,39 @@ void BridgesManager::update_connected_players(
     if (!found)
       players.push_back(GamePlayer{p_name, bridge_name + p_name, true});
   }
+}
+
+/**========================================================================
+ **                            Slave mode
+ *========================================================================**/
+/// @brief Active the slave mode for the bridges
+void BridgesManager::slave_on() {
+  // Reset slave players configuration
+  _slave_req.request.right_user = block_player;
+  _slave_req.request.left_user = block_player;
+
+  // Set players token to send to the server
+  for (auto &player : players) {
+    if (player.side == ArmSide::RIGHT_ARM)
+      _slave_req.request.right_user = player.name;
+    if (player.side == ArmSide::LEFT_ARM)
+      _slave_req.request.left_user = player.name;
+  }
+  send_slave_request();
+}
+
+/// @brief Deactivate the slave mode
+void BridgesManager::slave_off() {
+  _slave_req.request.right_user = free_player;
+  _slave_req.request.left_user = free_player;
+
+  send_slave_request();
+}
+
+/// @brief Send the slave state to the server
+bool BridgesManager::send_slave_request() {
+  if (_slave_client != nullptr)
+    return _slave_client.call(_slave_req);
+  return false;
 }
 } // namespace ecn_baxter::game::ros1
