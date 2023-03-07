@@ -32,11 +32,6 @@ protected:
   static void load_file(const std::string &);
 
 private:
-  const static char *NAME_TAG;
-  const static char *SETUP_TAG;
-  const static char *POINTS_TAG;
-  const static char *SIDE_TAG;
-  const static char *ANGLES_TAG;
 
   static void load(const Document &);
   static void load_game_name(const Document &);
