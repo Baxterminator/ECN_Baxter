@@ -10,14 +10,14 @@
 #define POINT_SERVER
 
 #include <ecn_baxter/action/points_setup.hpp>
-#include <ecn_baxter/setup/base_server.hpp>
+#include <ecn_baxter/base/base_server.hpp>
 #include <rclcpp_action/server.hpp>
 #include <rclcpp_action/server_goal_handle.hpp>
 
 namespace ecn_baxter::setup {
 using PointHandle = ra::ServerGoalHandle<action::PointsSetup>;
 
-class PointServer : public BaseServer<action::PointsSetup> {
+class PointServer : public base::BaseServer<action::PointsSetup> {
 protected:
   ra::CancelResponse
   handle_cancel([[maybe_unused]] const sptr<PointHandle> handle) override;

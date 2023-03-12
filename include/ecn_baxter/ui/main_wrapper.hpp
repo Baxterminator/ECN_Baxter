@@ -11,8 +11,8 @@
 #define MAIN_WRAPPER_H
 
 #include "ui_main.h"
+#include <ecn_baxter/base/base_gui.hpp>
 #include <ecn_baxter/game/data/game_players.hpp>
-#include <ecn_baxter/ui/base_gui.hpp>
 #include <ecn_baxter/ui/file_loader_wrapper.hpp>
 #include <ecn_baxter/utils.hpp>
 #include <functional>
@@ -22,7 +22,7 @@
 #include <qpushbutton.h>
 
 namespace ecn_baxter::gui {
-class MainUI : public BaseGUI<Ui::BaxterMaster, QMainWindow> {
+class MainUI : public base::BaseGUI<Ui::BaxterMaster, QMainWindow> {
 protected:
   /**========================================================================
    **                            Game Loader

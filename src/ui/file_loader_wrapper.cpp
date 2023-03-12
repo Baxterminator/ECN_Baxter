@@ -13,7 +13,8 @@
 
 namespace ecn_baxter::gui {
 
-FileLoaderWrapper::FileLoaderWrapper() : BaseGUI<Ui::game_loader, QDialog>() {
+FileLoaderWrapper::FileLoaderWrapper()
+    : base::BaseGUI<Ui::game_loader, QDialog>() {
 
   //  setup_file_browser();
 }

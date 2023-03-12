@@ -12,7 +12,7 @@
 
 #include "ui_game_loader.h"
 #include <ament_index_cpp/get_package_share_directory.hpp>
-#include <ecn_baxter/ui/base_gui.hpp>
+#include <ecn_baxter/base/base_gui.hpp>
 #include <ecn_baxter/utils.hpp>
 #include <map>
 #include <qdialog.h>
@@ -27,7 +27,7 @@
 using namespace ament_index_cpp;
 
 namespace ecn_baxter::gui {
-class FileLoaderWrapper : public BaseGUI<Ui::game_loader, QDialog> {
+class FileLoaderWrapper : public base::BaseGUI<Ui::game_loader, QDialog> {
 protected:
   /**========================================================================
    **                            Components

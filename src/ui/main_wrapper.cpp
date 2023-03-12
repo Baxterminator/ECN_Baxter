@@ -20,7 +20,7 @@ namespace ecn_baxter::gui {
  *!                           INITIALIZATION
  *========================================================================**/
 MainUI::MainUI(std::function<void(void)> binds)
-    : BaseGUI<Ui::BaxterMaster, QMainWindow>(), bindings(binds) {}
+    : base::BaseGUI<Ui::BaxterMaster, QMainWindow>(), bindings(binds) {}
 
 /**========================================================================
  **                            Event Callbacks

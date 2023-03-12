@@ -111,7 +111,7 @@ add_message(gripper_node)
 
 ## Setup Server
 ament_auto_add_executable(setup_server 
-    include/ecn_baxter/setup/base_server.hpp
+    include/ecn_baxter/base/base_server.hpp
     src/setup/point_server.cpp
     src/setup/setup_server.cpp
 )

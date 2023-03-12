@@ -6,7 +6,6 @@
  * @createdOn      :  08/03/2023
  * @description    :  Setup server part (POINT SETUPING)
  *========================================================================**/
-#include "ecn_baxter/setup/base_server.hpp"
 #include <ecn_baxter/setup/point_server.hpp>
 #include <rclcpp/node.hpp>
 

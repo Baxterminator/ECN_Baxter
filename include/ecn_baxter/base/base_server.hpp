@@ -16,7 +16,7 @@
 
 namespace ra = rclcpp_action;
 
-namespace ecn_baxter::setup {
+namespace ecn_baxter::base {
 
 template <typename ActionT> using ActionHandle = ra::ServerGoalHandle<ActionT>;
 
@@ -54,5 +54,5 @@ public:
   virtual ~BaseServer() { server.reset(); };
   inline void stop_server() { stop_cmd = 1; };
 };
-} // namespace ecn_baxter::setup
+} // namespace ecn_baxter::base
 #endif

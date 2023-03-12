@@ -5,7 +5,7 @@
 #include <iostream>
 #include <memory>
 
-namespace ecn_baxter::gui {
+namespace ecn_baxter::base {
 /**
  *@brief Base class for GUI Making defining parent container widget and show
  *method
@@ -30,6 +30,6 @@ public:
 
   inline sptr<UI> get_ui() const { return gui; }
 };
-} // namespace ecn_baxter::gui
+} // namespace ecn_baxter::base
 
 #endif
