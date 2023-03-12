@@ -9,6 +9,7 @@
 #include "ecn_baxter/game/data/game_players.hpp"
 #include <ecn_baxter/game/master/game.hpp>
 #include <iostream>
+#include <qpushbutton.h>
 #include <thread>
 
 namespace ecn_baxter::game {
@@ -125,6 +126,7 @@ void Game::showUI() {
 
 /// @brief Set all bindings between GUI and Game Background tasks
 void Game::_bind_ui() {
+  //* Game Loader bindings
   QObject::connect(main_window->get_game_loader()->get_ui()->select_buttons,
                    &QDialogButtonBox::accepted, [&]() {
                      load_game_propeties(
@@ -132,5 +134,14 @@ void Game::_bind_ui() {
                    });
   QObject::connect(main_window->get_ui()->setup, &QPushButton::clicked,
                    [&]() { ros2_node->launch_point_setup(game_props); });
+
+  //* Slave mode bindings
+  QObject::connect(main_window->get_ui()->left_arm_token, &QPushButton::clicked,
+                   [&]() {
+                     main_window->get_ui()->slave->setEnabled(false);
+                     main_window->get_ui()->slave_on->setText(
+                         (ros1_node->slave_toggle()) ? "ON" : "OFF");
+                     main_window->get_ui()->slave->setEnabled(true);
+                   });
 }
 } // namespace ecn_baxter::game

@@ -53,6 +53,7 @@ private:
    *========================================================================**/
   ros::ServiceClient _slave_client;
   baxter_core_msgs::BridgePublishersForce _slave_req;
+  bool slaving = false;
   bool send_slave_request();
 
 protected:
@@ -79,8 +80,9 @@ public:
   /**========================================================================
    **                            Slave mode
    *========================================================================**/
-  void slave_on();
-  void slave_off();
+  bool slave_toggle();
+  bool slave_on();
+  bool slave_off();
 };
 } // namespace ecn_baxter::game::ros1
 

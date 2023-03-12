@@ -109,18 +109,23 @@ target_include_directories(gripper_node PRIVATE
 )
 add_message(gripper_node)
 
-## Setup Node
-ament_auto_add_executable(setup_node src/setup/setup_node.cpp)
-target_include_directories(setup_node PRIVATE
+## Setup Server
+ament_auto_add_executable(setup_server 
+    include/ecn_baxter/setup/base_server.hpp
+    src/setup/point_server.cpp
+    src/setup/setup_server.cpp
+)
+target_include_directories(setup_server PRIVATE
         include
 )
-add_message(setup_node)
+add_message(setup_server)
 
-ament_auto_add_library(game_properties 
+## Game Properties
+ament_auto_add_library(game_utils
     src/game/data/local_games.cpp
     src/game/data/game_properties.cpp
 )
-target_include_directories(game_properties PRIVATE include)
+target_include_directories(game_utils PRIVATE include)
 
 ## Main Game Master executable
 set(legacy_files_gm
@@ -148,7 +153,7 @@ target_include_directories(game_master PRIVATE
         ${ROS1_ROOT}/include
         ${BAXTER1_ROOT}/include
 )
-target_link_libraries(game_master ${game_propeties} ${ROS1_LIBS} Qt5::Core Qt5::Widgets Qt5::WebKit Qt5::WebKitWidgets )
+target_link_libraries(game_master ${game_utils} ${ROS1_LIBS} Qt5::Core Qt5::Widgets Qt5::WebKit Qt5::WebKitWidgets )
 add_message(game_master)
 
 # =================================================================

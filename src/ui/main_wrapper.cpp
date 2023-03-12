@@ -9,6 +9,8 @@
 #include "ecn_baxter/game/data/arm_side.hpp"
 #include "ui_main.h"
 #include <ecn_baxter/ui/main_wrapper.hpp>
+#include <qcoreevent.h>
+#include <qevent.h>
 #include <qtablewidget.h>
 #include <sstream>
 
@@ -31,6 +33,7 @@ void MainUI::setup_internal_callbacks() {
 /// @brief Get all events and process internal events
 bool MainUI::eventFilter(QObject *obj, QEvent *e) {
   if (obj == gui->load_game && e->type() == QEvent::MouseButtonRelease) {
+    QMouseEvent *mevent = static_cast<QMouseEvent *>(e);
     launch_game_loader();
     return true;
   }

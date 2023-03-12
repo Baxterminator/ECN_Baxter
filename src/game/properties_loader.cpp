@@ -6,17 +6,11 @@
  * @createdOn      :  19/02/2023
  * @description    :  OS 2 Node part for loading game properties
  *========================================================================**/
+#include "ecn_baxter/game/data/game_properties.hpp"
 #include <ecn_baxter/game/properties_loader.hpp>
 
 namespace ecn_baxter::game {
 sptr<data::GameProperties> GamePropertiesLoader::game_props;
-
-const char *GamePropertiesLoader::NAME_TAG = "name";
-const char *GamePropertiesLoader::SETUP_TAG = "setup";
-const char *GamePropertiesLoader::POINTS_TAG = "points";
-const char *GamePropertiesLoader::SIDE_TAG = "side";
-const char *GamePropertiesLoader::ANGLES_TAG = "angles";
-
 sptr<data::GameProperties> GamePropertiesLoader::get_game_props() {
   return game_props;
 }
@@ -52,16 +46,17 @@ void GamePropertiesLoader::load(const Document &d) {
 }
 
 void GamePropertiesLoader::load_game_name(const Document &d) {
-  if (!d[NAME_TAG].IsString()) {
-    std::cout << "[WARN] Can't find \"" << NAME_TAG << "\" tag for this game !";
+  if (!d[data::GameProperties::NAME_TAG].IsString()) {
+    std::cout << "[WARN] Can't find \"" << data::GameProperties::NAME_TAG
+              << "\" tag for this game !";
     return;
   }
   game_props->game_name = d["name"].GetString();
 }
 
 void GamePropertiesLoader::load_setup(const Document &d) {
-  if (!d[SETUP_TAG].IsObject()) {
-    std::cout << "[WARN] Can't find \"" << SETUP_TAG
+  if (!d[data::GameProperties::SETUP_TAG].IsObject()) {
+    std::cout << "[WARN] Can't find \"" << data::GameProperties::SETUP_TAG
               << "\" tag for this game !";
     return;
   }
@@ -69,20 +64,24 @@ void GamePropertiesLoader::load_setup(const Document &d) {
 }
 
 void GamePropertiesLoader::load_setup_points(const Document &d) {
-  if (!d[SETUP_TAG][POINTS_TAG].IsArray()) {
-    std::cout << "[WARN] Can't find \"" << POINTS_TAG
+  if (!d[data::GameProperties::SETUP_TAG]
+        [data::SetupRequirements::NEEDED_PTS_TAG]
+            .IsArray()) {
+    std::cout << "[WARN] Can't find \""
+              << data::SetupRequirements::NEEDED_PTS_TAG
               << "\" tag for this game !";
     return;
   }
   // Iterate over the points to add
-  const Value &pts = d[SETUP_TAG][POINTS_TAG];
+  const Value &pts = d[data::GameProperties::SETUP_TAG]
+                      [data::SetupRequirements::NEEDED_PTS_TAG];
   for (auto itr = pts.Begin(); itr != pts.End(); ++itr) {
     const Value &pt = *itr;
 
     data::GPoint gp;
-    gp.name = pt[NAME_TAG].GetString();
-    gp.arm_side = data::bool2side(pt[SIDE_TAG].GetBool());
-    gp.w_angles = pt[ANGLES_TAG].GetBool();
+    gp.name = pt[data::GPoint::NAME_TAG].GetString();
+    gp.arm_side = data::bool2side(pt[data::GPoint::ARM_TAG].GetBool());
+    gp.w_angles = pt[data::GPoint::ANGLES_TAG].GetBool();
     game_props->setup.needed_points.push_back(gp);
   }
 }

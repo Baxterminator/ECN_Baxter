@@ -118,8 +118,23 @@ void BridgesManager::update_connected_players(
 /**========================================================================
  **                            Slave mode
  *========================================================================**/
+/// @brief Toggle the slave mode
+/// @return true if slave is on
+/// @return false if slave is off
+bool BridgesManager::slave_toggle() {
+  if (slaving) {
+    if (slave_off())
+      slaving = false;
+  } else {
+    if (slave_on())
+      slaving = true;
+  }
+  return slaving;
+}
+
 /// @brief Active the slave mode for the bridges
-void BridgesManager::slave_on() {
+/// @return return true if the change was successful, false either case
+bool BridgesManager::slave_on() {
   // Reset slave players configuration
   _slave_req.request.right_user = block_player;
   _slave_req.request.left_user = block_player;
@@ -131,15 +146,16 @@ void BridgesManager::slave_on() {
     if (player.side == ArmSide::LEFT_ARM)
       _slave_req.request.left_user = player.name;
   }
-  send_slave_request();
+  return send_slave_request();
 }
 
 /// @brief Deactivate the slave mode
-void BridgesManager::slave_off() {
+/// @return return true if the change was successful, false either case
+bool BridgesManager::slave_off() {
   _slave_req.request.right_user = free_player;
   _slave_req.request.left_user = free_player;
 
-  send_slave_request();
+  return send_slave_request();
 }
 
 /// @brief Send the slave state to the server
