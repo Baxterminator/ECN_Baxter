@@ -68,6 +68,10 @@ void Game::load_game_propeties(const std::string &file_path) {
     main_window->get_ui()->setup->setEnabled(true);
     main_window->get_ui()->launch->setEnabled(false);
   }
+
+  // Update game properties pointers
+  ros1_node->update_game_props(game_props);
+  ros2_node->update_ptn_setup_client(game_props);
 }
 
 /**========================================================================
@@ -133,7 +137,7 @@ void Game::_bind_ui() {
                          main_window->get_game_loader()->get_file_to_load());
                    });
   QObject::connect(main_window->get_ui()->setup, &QPushButton::clicked,
-                   [&]() { ros2_node->launch_point_setup(game_props); });
+                   [&]() { ros2_node->launch_point_setup(); });
 
   //* Slave mode bindings
   QObject::connect(main_window->get_ui()->left_arm_token, &QPushButton::clicked,

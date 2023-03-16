@@ -28,7 +28,11 @@ public:
   explicit SetupPointsClient(rclcpp::Logger ros2_logger)
       : logger(ros2_logger) {}
 
-  void launch_point_setup(const sptr<game::data::GameProperties>);
+  void launch_point_setup();
+
+  void update_ptn_setup_client(std::weak_ptr<data::GameProperties> gprop) {
+    game_props = gprop;
+  }
 
 protected:
   rclcpp::Logger logger;
@@ -47,6 +51,9 @@ protected:
   void ptn_setup_feedback(PtnSetupHandler::SharedPtr &handle,
                           const sptr<const PointsSetup::Feedback> feedback);
   void ptn_setup_result(const PtnSetupHandler::WrappedResult &result);
+
+private:
+  std::weak_ptr<data::GameProperties> game_props;
 };
 
 } // namespace ecn_baxter::game::ros2

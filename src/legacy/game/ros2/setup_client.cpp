@@ -14,9 +14,17 @@ namespace ecn_baxter::game::ros2 {
 /// @brief Launch the call to the action for point setuping
 /// @deprecated This function is only for legacy ROS2 version support (foxy,
 /// galactic, ...).
-void SetupPointsClient::launch_point_setup(
-    const sptr<game::data::GameProperties> props) {
+void SetupPointsClient::launch_point_setup() {
   using namespace std::placeholders;
+
+  // Verifying that the game props are still existent
+  if (game_props.expired()) {
+    RCLCPP_WARN(logger, "Game Properties ptr is expired !");
+    return;
+  }
+
+  auto props = game_props.lock();
+
   RCLCPP_INFO(logger, "Launching setup phase !");
 
   // Setup MSG

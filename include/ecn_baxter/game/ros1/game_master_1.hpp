@@ -10,9 +10,11 @@
 #ifndef GAME_MASTER_1_HPP
 #define GAME_MASTER_1_HPP
 
+#include "ecn_baxter/game/data/game_properties.hpp"
 #include "ecn_baxter/game/ros1/tf_broadcast.hpp"
 #include <ecn_baxter/game/ros1/bridge_lookup.hpp>
 #include <ecn_baxter/utils.hpp>
+#include <memory>
 #include <ros/node_handle.h>
 
 namespace ecn_baxter::game::ros1 {

@@ -6,7 +6,10 @@
  * @createdOn      :  19/02/2023
  * @description    :  ROS 2 Node part for point setuping
  *========================================================================**/
+#include <algorithm>
 #include <ecn_baxter/game/ros2/client_points.hpp>
+#include <geometry_msgs/TransformStamped.h>
+#include <tf2/LinearMath/Quaternion.h>
 
 namespace ecn_baxter::game::ros2 {
 /// @brief Callback of the acceptance of the action call
@@ -49,6 +52,28 @@ void SetupPointsClient::ptn_setup_feedback(
   auto p = feedback->ptn;
   RCLCPP_INFO(logger, "Receiving marker %s at (%f, %f, %f)", p_name.c_str(),
               p.x, p.y, p.z);
+
+  // Saving it to the game properties
+  if (!game_props.expired()) {
+    auto s_props = game_props.lock();
+
+    geometry_msgs::TransformStamped ptn_transform;
+    ptn_transform.child_frame_id = feedback->ptn_name;
+    ptn_transform.transform.translation.x = feedback->ptn.x;
+    ptn_transform.transform.translation.y = feedback->ptn.y;
+    ptn_transform.transform.translation.z = feedback->ptn.z;
+
+    tf2::Quaternion q;
+    q.setRPY(0, 0, 0);
+
+    ptn_transform.transform.rotation.w = q.w();
+    ptn_transform.transform.rotation.x = q.x();
+    ptn_transform.transform.rotation.y = q.y();
+    ptn_transform.transform.rotation.z = q.z();
+    ptn_transform.header.frame_id = "base";
+
+    s_props->setup.ptn_msgs.transforms.push_back(ptn_transform);
+  }
 }
 
 } // namespace ecn_baxter::game::ros2

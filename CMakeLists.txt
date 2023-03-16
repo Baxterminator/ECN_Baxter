@@ -29,7 +29,7 @@ if(EXISTS ${ROS1_ROOT})
 endif()
 
 # Baxters ROS1 message
-set(BAXTER1_ROOT "/user/eleves/gcote2021/ros/install")
+#set(BAXTER1_ROOT "/user/eleves/gcote2021/ros/install")
 
 # =================================================================
 #             LEGACY CODE (FOXY, GALACTIC COMPATIBILITY)
@@ -125,7 +125,7 @@ ament_auto_add_library(game_utils
     src/game/data/local_games.cpp
     src/game/data/game_properties.cpp
 )
-target_include_directories(game_utils PRIVATE include)
+target_include_directories(game_utils PRIVATE include ${ROS1_ROOT}/include)
 
 ## Main Game Master executable
 set(legacy_files_gm

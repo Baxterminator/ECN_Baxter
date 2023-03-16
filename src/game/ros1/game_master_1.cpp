@@ -6,6 +6,7 @@
  * @createdOn      :  19/02/2023
  * @description    :  ROS1 part of the GameMaster
  *========================================================================**/
+#include "ecn_baxter/game/data/game_properties.hpp"
 #include "ros/node_handle.h"
 #include <ecn_baxter/game/ros1/game_master_1.hpp>
 #include <memory>

@@ -13,9 +13,13 @@
 #include <ecn_baxter/game/data/arm_side.hpp>
 #include <ostream>
 #include <string>
+#include <tf2_msgs/TFMessage.h>
 #include <vector>
 
 namespace ecn_baxter::game::data {
+
+using tf2_msgs::TFMessage;
+
 /**========================================================================
  **                       GAME PROPERTIES STRUCTS
  *========================================================================**/
@@ -34,6 +38,7 @@ struct GPoint {
 struct SetupRequirements {
   constexpr static auto NEEDED_PTS_TAG{"nd_pts"};
   std::vector<GPoint> needed_points = std::vector<GPoint>(0);
+  TFMessage ptn_msgs;
   inline bool is_skippable() { return needed_points.empty(); }
 
   // Printing
