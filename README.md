@@ -7,8 +7,6 @@ This package was made by the student team **Baxterminator** :
 
 - **_Geoffrey CÔTE_**: main maintainer (especially component-related nodes and game nodes)
 - **_Thimothée Corroëne_**: maintainer of the vision part
-- **_Chira De-Saint-Giniez_** : maintainer of the simulation
-
 
 ## Robot effectors
 
