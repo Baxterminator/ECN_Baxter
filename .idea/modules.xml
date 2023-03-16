@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/baxter_utils.iml" filepath="$PROJECT_DIR$/.idea/baxter_utils.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/ecn_baxter.iml" filepath="$PROJECT_DIR$/.idea/ecn_baxter.iml" />
     </modules>
   </component>
 </project>

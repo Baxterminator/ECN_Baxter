@@ -1,14 +1,10 @@
-//
-// Created by gcote2021 on 01/02/23.
-//
-
 #ifndef BUILD_STEP_NODE_HPP
 #define BUILD_STEP_NODE_HPP
 
 #include "rclcpp/rclcpp.hpp"
 #include <chrono>
 
-namespace ECNBaxter {
+namespace ecn_baxter {
 
     using namespace rclcpp;
     using namespace std::chrono_literals;

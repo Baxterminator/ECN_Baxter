@@ -1,0 +1,27 @@
+{
+  "name": "Lab Tricolor",
+  "setup": {
+    "nd_pts": [
+      {
+        "name": "source_right",
+        "side": false,
+        "angles": false
+      },
+      {
+        "name": "dest_right",
+        "side": false,
+        "angles": false
+      },
+      {
+        "name": "source_left",
+        "side": false,
+        "angles": false
+      },
+      {
+        "name": "dest_left",
+        "side": true,
+        "angles": false
+      }
+    ]
+  }
+}

@@ -1,8 +1,3 @@
-//
-// Created by Geoffrey Côte on 05/01/23.
-// Gripper Node utils
-//
-
 #ifndef ECN_BAXTER_GRIPPER_NODE_H
 #define ECN_BAXTER_GRIPPER_NODE_H
 
@@ -17,7 +12,7 @@
 #include <chrono>
 #include <thread>
 
-namespace ECNBaxter {
+namespace ecn_baxter {
     using baxter_core_msgs::msg::EndEffectorCommand;
     using baxter_core_msgs::msg::EndEffectorState;
     using ecn_baxter::msg::BaxterAction;
