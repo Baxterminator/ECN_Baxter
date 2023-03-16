@@ -64,7 +64,7 @@ PointServer::handle_cancel([[maybe_unused]] const sptr<PointHandle> handle) {
 ra::GoalResponse PointServer::handle_goal(
     [[maybe_unused]] const ra::GoalUUID &uuid,
     [[maybe_unused]] sptr<const action::PointsSetup::Goal> goal) {
-  std::cout << "Request to setup" << goal->ptns_name.size() << "points !"
+  std::cout << "☎ Request to setup " << goal->ptns_name.size() << " points !"
             << std::endl;
   stop = 0;
   return ra::GoalResponse::ACCEPT_AND_EXECUTE;
@@ -81,21 +81,25 @@ void PointServer::exec(const sptr<PointHandle> handle) {
        i++) {
     ArmSide side = bool2side(goal->sides[i]);
 
-    while (!stop) {
+    //? LOGGING
+    std::cout << "\t✎ Making point #" << i + 1
+              << ((side == ArmSide::RIGHT_ARM) ? "R " : "L ") << "("
+              << goal->ptns_name[i] << ") : ";
+
+    volatile bool made = false;
+    while (!stop && !made) {
       if ((side == ArmSide::RIGHT_ARM)
               ? (right_button.pressed && !right_button.used)
               : (left_button.pressed && !left_button.used)) {
+
+        std::cout << "✔" << std::endl;
+        made = true;
 
         // Set buttons as used
         if (side == ArmSide::RIGHT_ARM)
           right_button.used = true;
         else
           left_button.used = true;
-
-        //? LOGGING
-        std::cout << "\t✎ Making point #" << i + 1
-                  << ((side == ArmSide::RIGHT_ARM) ? "R " : "L ") << "("
-                  << goal->ptns_name[i] << ")" << std::endl;
 
         feedback->ptn_name = goal->ptns_name[i];
         feedback->step = i + 1;
@@ -117,6 +121,7 @@ void PointServer::exec(const sptr<PointHandle> handle) {
           feedback->ptn.z = trans.transform.translation.z;
         }
         handle->publish_feedback(feedback);
+        std::this_thread::sleep_for(20ms);
       }
     }
   }

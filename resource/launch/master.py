@@ -7,7 +7,7 @@ def generate_launch_description():
     with sl.group(ns="baxter"):
         # Launch setup part
         with sl.group(ns="setup"):
-            sl.node("ecn_baxter", "setup_node")
+            sl.node("ecn_baxter", "setup_server")
 
         # Launch Game Master Node
         with sl.group(ns="game_master"):

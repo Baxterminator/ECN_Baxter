@@ -29,7 +29,7 @@ if(EXISTS ${ROS1_ROOT})
 endif()
 
 # Baxters ROS1 message
-set(BAXTER1_ROOT "/opt/ecn/ROS1/install")
+set(BAXTER1_ROOT "/user/eleves/gcote2021/ros/install")
 
 # =================================================================
 #             LEGACY CODE (FOXY, GALACTIC COMPATIBILITY)
