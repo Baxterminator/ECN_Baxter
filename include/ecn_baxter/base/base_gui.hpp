@@ -1,7 +1,6 @@
 #ifndef BASE_GUI_HPP
 #define BASE_GUI_HPP
 
-#include <ecn_baxter/utils.hpp>
 #include <iostream>
 #include <memory>
 
@@ -15,7 +14,7 @@ namespace ecn_baxter::base {
  */
 template <class UI, class Parent> class BaseGUI : public Parent {
 protected:
-  sptr<UI> gui;
+  std::shared_ptr<UI> gui;
   virtual void setup_internal_callbacks() = 0;
 
 public:
@@ -28,7 +27,7 @@ public:
   }
   ~BaseGUI() { gui.reset(); }
 
-  inline sptr<UI> get_ui() const { return gui; }
+  inline std::shared_ptr<UI> get_ui() const { return gui; }
 };
 } // namespace ecn_baxter::base
 
