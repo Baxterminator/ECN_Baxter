@@ -1,0 +1,5 @@
+float64[7] position
+bool inverse false
+bool ee_frame false
+---
+float64[42] jacobian
