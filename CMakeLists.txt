@@ -11,7 +11,12 @@ endif()
 
 find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
+
 find_package(Qt5 COMPONENTS Core Widgets WebKit WebKitWidgets REQUIRED)
+
+find_package(Eigen3 REQUIRED)
+include_directories(${EIGEN3_INCLUDE_DIRS})
+add_definitions(${EIGEN3_DEFINITIONS})
 
 # =================================================================
 #                           ROS 1
@@ -27,9 +32,6 @@ if(EXISTS ${ROS1_ROOT})
         set_property(TARGET ${ROS1_LIB} PROPERTY IMPORTED_LOCATION "${ROS1_ROOT}/lib/lib${ROS1_LIB}.so")
     endforeach()
 endif()
-
-# Baxters ROS1 message
-#set(BAXTER1_ROOT "/user/eleves/gcote2021/ros/install")
 
 # =================================================================
 #             LEGACY CODE (FOXY, GALACTIC COMPATIBILITY)
@@ -102,32 +104,33 @@ endforeach()
 # =================================================================
 #                              OUTPUT
 # =================================================================
-## Gripper management
+############################### Gripper ################################
 ament_auto_add_executable(gripper_node src/components/gripper_node.cpp)
-target_include_directories(gripper_node PRIVATE
-        include
-)
+target_include_directories(gripper_node PRIVATE include)
 add_message(gripper_node)
 
-## Setup Server
+############################### Jacobian ###############################
+ament_auto_add_executable(jacobian src/utils/jacobian.cpp)
+target_include_directories(jacobian PRIVATE include)
+add_message(jacobian)
+
+############################# Setup Server #############################
 ament_auto_add_executable(setup_server 
     include/ecn_baxter/base/base_server.hpp
     src/setup/point_server.cpp
     src/setup/setup_server.cpp
 )
-target_include_directories(setup_server PRIVATE
-        include
-)
+target_include_directories(setup_server PRIVATE include)
 add_message(setup_server)
 
-## Game Properties
+############################# Game Library #############################
 ament_auto_add_library(game_utils
     src/game/data/local_games.cpp
     src/game/data/game_properties.cpp
 )
 target_include_directories(game_utils PRIVATE include ${ROS1_ROOT}/include)
 
-## Main Game Master executable
+############################# Game Master #############################
 set(legacy_files_gm
     "game/ros2/setup_client.cpp"
 )
@@ -148,16 +151,12 @@ ament_auto_add_executable(game_master
         resource/ui/game_loader.ui
         ${legacy_gm}
 )
-target_include_directories(game_master PRIVATE
-        include
-        ${ROS1_ROOT}/include
-        ${BAXTER1_ROOT}/include
-)
+target_include_directories(game_master PRIVATE include ${ROS1_ROOT}/include)
 target_link_libraries(game_master ${game_utils} ${ROS1_LIBS} Qt5::Core Qt5::Widgets Qt5::WebKit Qt5::WebKitWidgets )
 add_message(game_master)
 
 # =================================================================
-#                        EXPORT OTHERS
+#                           EXPORT OTHERS
 # =================================================================
 install(DIRECTORY 
         resource/launch

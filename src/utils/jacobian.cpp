@@ -57,13 +57,6 @@ std::unique_ptr<urdf::Model> initRSP() {
     pclose(stream);
   }
 
-  // override rsp's options
-  auto rsp_arg{rclcpp::NodeOptions().arguments(
-      {"--ros-args", "-r", "__ns:=/robot", "-p", "robot_description:=" + xml})};
-  // rsp =
-  // std::make_shared<robot_state_publisher::RobotStatePublisher>(rsp_arg);
-  // robot state publisher : needed for sim, not for work on real robot ?
-
   auto model{std::make_unique<urdf::Model>()};
   model->initString(xml);
   return model;
@@ -128,8 +121,7 @@ private:
 
 int main(int argc, char **argv) {
   rclcpp::init(argc, argv);
-  // rclcpp::spin(std::make_shared<lab_tricolor::Jacobian_node>(rclcpp::NodeOptions{}));
-  std::shared_ptr<rclcpp::Node> node =
+  auto node =
       std::make_shared<ecn_baxter::utils::JacobianNode>(rclcpp::NodeOptions{});
   rclcpp::spin(node);
   rclcpp::shutdown();
