@@ -6,9 +6,9 @@
  * @createdOn      :  19/02/2023
  * @description    :  GUI Wrapper for the Game Choosing QDialog
  *========================================================================**/
+#include "ecn_baxter/game/ui/file_loader_wrapper.hpp"
+#include "ecn_baxter/game/data/local_games.hpp"
 #include "ui_game_loader.h"
-#include <ecn_baxter/game/data/local_games.hpp>
-#include <ecn_baxter/ui/file_loader_wrapper.hpp>
 #include <qfiledialog.h>
 
 namespace ecn_baxter::gui {
