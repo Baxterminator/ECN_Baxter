@@ -7,8 +7,12 @@
  * @description    :  Sub-part of the ROS1 game master for checking connected
  *                    players
  *========================================================================**/
+#include "ecn_baxter/game/ros1/bridge_lookup.hpp"
 #include "ecn_baxter/game/data/arm_side.hpp"
-#include <ecn_baxter/game/ros1/bridge_lookup.hpp>
+#include "ecn_baxter/game/events/bridges_update_events.hpp"
+#include "ecn_baxter/game/events/event_target.hpp"
+#include <qapplication.h>
+#include <qobject.h>
 
 namespace ecn_baxter::game::ros1 {
 
@@ -19,6 +23,8 @@ void BridgesManager::bridges_init(sptr<ros::NodeHandle> handle) {
   _check_timer =
       handle->createWallTimer(check_dur, [this](const ros::WallTimerEvent &) {
         look_for_briges();
+        events::BridgesUpdate ev(players);
+        QApplication::sendEvent(events::EventTarget::instance(), &ev);
         if (_callback != nullptr)
           _callback(players);
       });

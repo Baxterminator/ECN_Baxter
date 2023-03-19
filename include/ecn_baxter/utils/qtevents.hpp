@@ -17,7 +17,7 @@
 
 namespace ecn_baxter::utils::qt {
 
-std::string get_qtevent_name(QEvent *ev) {
+inline std::string get_qtevent_name(QEvent *ev) {
   switch (ev->type()) {
   case QEvent::None:
     return "QEvent::None";
@@ -359,6 +359,8 @@ std::string get_qtevent_name(QEvent *ev) {
     return "QEvent::User";
   case QEvent::MaxUser:
     return "QEvent::MaxUser";
+  default:
+    return "Unknown";
   }
 };
 

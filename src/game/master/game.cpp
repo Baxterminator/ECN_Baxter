@@ -8,11 +8,14 @@
  *========================================================================**/
 #include "ecn_baxter/game/master/game.hpp"
 #include "ecn_baxter/game/data/game_players.hpp"
+#include "ecn_baxter/game/events/bridges_update_events.hpp"
+#include "ecn_baxter/game/events/event_target.hpp"
 #include "ecn_baxter/utils/qtevents.hpp"
 #include <iostream>
 #include <qcoreevent.h>
 #include <qglobal.h>
 #include <qpushbutton.h>
+#include <rclcpp/logging.hpp>
 #include <rclcpp/node_options.hpp>
 
 namespace ecn_baxter::game {
@@ -115,15 +118,35 @@ void Game::show_ui() {
 
 /// @brief Logic between UI & Game works
 bool Game::notify(QObject *receiver, QEvent *ev) {
+  using namespace events;
   // sQ_UNUSED(receiver);
 
   /*std::cout << "Get event " << utils::qt::get_qtevent_name(ev) << " for "
             << ((receiver == nullptr) ? "null"
                                       : receiver->objectName().toStdString())
-            << std::endl;*/
+  << std::endl;*/
 
+  //!----------------- Non-UI components callbacks -----------------*/
+  if (ev->type() != QEvent::Create && receiver == EventTarget::instance()) {
+    //*================== BRIDGE LIST =================*/
+    if (ev->type() == BridgesUpdate::type()) {
+      BridgesUpdate *bridge_event = static_cast<BridgesUpdate *>(ev);
+      RCLCPP_DEBUG(ros2_node->get_logger(),
+                   "Updating bridges list (%zu registered bridges).",
+                   bridge_event->get_player_list().size());
+      main_ui->refresh_player_list(bridge_event->get_player_list());
+    }
+    //*==================    ELSE (Without useless warnings) =================*/
+    else if (ev->type() != QEvent::Polish &&
+             ev->type() != QEvent::PolishRequest)
+      RCLCPP_WARN(ros2_node->get_logger(),
+                  "Unknown custom callback from non UI component (%s) !",
+                  utils::qt::get_qtevent_name(ev).c_str());
+  }
+
+  //!------------------------- UI callbacks -------------------------*/
   if (main_ui != nullptr && main_ui->is_made()) {
-    /*================== SLAVE MODE =================*/
+    //*================== SLAVE MODE =================*/
     if (receiver == main_ui->get_ui()->slave &&
         ev->type() == QEvent::MouseButtonRelease) {
       //? ON / OFF callbacks
@@ -133,13 +156,13 @@ bool Game::notify(QObject *receiver, QEvent *ev) {
                                                                        : "OFF");
       main_ui->get_ui()->slave->setEnabled(true);
     }
-    /*================== SETUP PHASE =================*/
+    //*================== SETUP PHASE =================*/
     else if (receiver == main_ui->get_ui()->setup &&
              ev->type() == QEvent::MouseButtonRelease) {
       //? Setup launching
       ros2_node->launch_point_setup();
     }
-    /*================== GAME LOADING =================*/
+    //*================== GAME LOADING =================*/
     else if (main_ui->get_game_loader() != nullptr &&
              main_ui->get_game_loader()->is_made() &&
              receiver == main_ui->get_game_loader()

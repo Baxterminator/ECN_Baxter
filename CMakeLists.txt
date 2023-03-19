@@ -136,19 +136,20 @@ set(legacy_files_gm
 )
 legacy_cpp(legacy_files_gm legacy_gm)
 ament_auto_add_executable(game_master
-        src/game/game_master.cpp
-        src/game/ros1/game_master_1.cpp
-        src/game/ros1/bridge_lookup.cpp
-        src/game/ros1/tf_broadcast.cpp
-        src/game/ros2/game_master_2.cpp
-        src/game/properties_loader.cpp
-        src/game/ros2/client_points.cpp
-        src/game/master/game.cpp
-        src/game/ui/main_wrapper.cpp
-        src/game/ui/file_loader_wrapper.cpp
-        resource/ui/main.ui
-        resource/ui/game_loader.ui
-        ${legacy_gm}
+    src/game/events/register_events.cpp
+    src/game/game_master.cpp
+    src/game/ros1/game_master_1.cpp
+    src/game/ros1/bridge_lookup.cpp
+    src/game/ros1/tf_broadcast.cpp
+    src/game/ros2/game_master_2.cpp
+    src/game/properties_loader.cpp
+    src/game/ros2/client_points.cpp
+    src/game/master/game.cpp
+    src/game/ui/main_wrapper.cpp
+    src/game/ui/file_loader_wrapper.cpp
+    resource/ui/main.ui
+    resource/ui/game_loader.ui
+    ${legacy_gm}
 )
 target_include_directories(game_master PRIVATE include ${ROS1_ROOT}/include)
 target_link_libraries(game_master ${game_utils} ${ROS1_LIBS} Qt5::Core Qt5::Widgets Qt5::WebKit Qt5::WebKitWidgets )
