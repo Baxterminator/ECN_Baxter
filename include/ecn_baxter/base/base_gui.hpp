@@ -16,6 +16,7 @@ template <class UI, class Parent> class BaseGUI : public Parent {
 protected:
   std::shared_ptr<UI> gui;
   virtual void setup_internal_callbacks() = 0;
+  bool made = false;
 
 public:
   BaseGUI() : Parent() {}
@@ -24,10 +25,12 @@ public:
       gui = std::make_shared<UI>();
     gui->setupUi(this);
     setup_internal_callbacks();
+    made = true;
   }
-  ~BaseGUI() { gui.reset(); }
 
-  inline std::shared_ptr<UI> get_ui() const { return gui; }
+  bool is_made() { return made; }
+
+  inline UI *get_ui() const { return gui.get(); }
 };
 } // namespace ecn_baxter::base
 

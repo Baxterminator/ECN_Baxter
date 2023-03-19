@@ -8,7 +8,7 @@
  *========================================================================**/
 #include "ecn_baxter/game/data/arm_side.hpp"
 #include "ui_main.h"
-#include <ecn_baxter/ui/main_wrapper.hpp>
+#include <ecn_baxter/game/ui/main_wrapper.hpp>
 #include <qcoreevent.h>
 #include <qevent.h>
 #include <qtablewidget.h>
@@ -19,21 +19,18 @@ namespace ecn_baxter::gui {
 /**========================================================================
  *!                           INITIALIZATION
  *========================================================================**/
-MainUI::MainUI(std::function<void(void)> binds)
-    : base::BaseGUI<Ui::BaxterMaster, QMainWindow>(), bindings(binds) {}
+MainUI::MainUI() : base::BaseGUI<Ui::BaxterMaster, QMainWindow>() {}
 
 /**========================================================================
  **                            Event Callbacks
  *========================================================================**/
 void MainUI::setup_internal_callbacks() {
   gui->load_game->installEventFilter(this);
-  //  connect(setup, &QPushButton::clicked, [this]() { launch_game_loader(); });
 }
 
 /// @brief Get all events and process internal events
 bool MainUI::eventFilter(QObject *obj, QEvent *e) {
   if (obj == gui->load_game && e->type() == QEvent::MouseButtonRelease) {
-    QMouseEvent *mevent = static_cast<QMouseEvent *>(e);
     launch_game_loader();
     return true;
   }
@@ -87,7 +84,6 @@ void MainUI::refresh_player_list(game::data::PlayerList &list) {
 void MainUI::setup_game_loader() {
   game_loader = std::make_shared<FileLoaderWrapper>();
   game_loader->setup_ui();
-  bindings();
 }
 
 /// @brief Launch the game selector menu

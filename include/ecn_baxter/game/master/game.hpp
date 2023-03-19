@@ -4,20 +4,22 @@
  * @email          :  geoffrey.cote@centraliens-nantes.org
  * @repo           :  https://github.com/Baxterminator/ecn_baxter/
  * @createdOn      :  19/02/2023
- * @description    :  Main class for game management and logic
+ * @description    :  Main wrapper managing ROS threads as well as UIs
  *========================================================================**/
 
 #ifndef GAME_HPP
 #define GAME_HPP
 
+#include "ecn_baxter/game/properties_loader.hpp"
+#include "ecn_baxter/game/ros1/game_master_1.hpp"
+#include "ecn_baxter/game/ros2/game_master_2.hpp"
+#include "ecn_baxter/game/ui/main_wrapper.hpp"
+#include "ecn_baxter/utils.hpp"
 #include "ros/init.h"
 #include <chrono>
 #include <cstdlib>
-#include <ecn_baxter/game/master/gui_management.hpp>
-#include <ecn_baxter/game/properties_loader.hpp>
-#include <ecn_baxter/game/ros1/game_master_1.hpp>
-#include <ecn_baxter/game/ros2/game_master_2.hpp>
-#include <ecn_baxter/utils.hpp>
+#include <memory>
+#include <qapplication.h>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/utilities.hpp>
 #include <ros/master.h>
@@ -27,42 +29,34 @@ namespace ecn_baxter::game {
 using namespace std::chrono_literals;
 
 /// @brief Main class for game management and logic
-class Game : GamePropertiesLoader, UIManager {
-private:
-  /**========================================================================
-   *!                           SINGLETON PATTERN
-   *========================================================================**/
-  static sptr<Game> _instance;
-  static sptr<Game> instance();
-
+class Game : public QApplication, GamePropertiesLoader {
 public:
   /**========================================================================
    **                            Cycle Utils
    *========================================================================**/
-  static bool Init(int argc, char **argv);
-  static void spinOnce();
-  static void stop();
-  static void clean();
-
-  Game();
-  ~Game() {
-    ros1_node.reset();
-    ros2_node.reset();
-    ex.reset();
-  }
+  Game(int argc, char **argv);
+  bool is_initialized() { return _initialized; }
+  void stop();
 
   /**========================================================================
   **                            UI Management
   *========================================================================**/
-  static void showUI();
+  void show_ui();
 
-protected:
+private:
+  bool _initialized = false;
+
   /**========================================================================
-   *?                            ROS Node
+   *?                            ROSX Game Thread
    *========================================================================**/
-  sptr<ros1::GameMaster_1> ros1_node;
-  sptr<rclcpp::executors::SingleThreadedExecutor> ex;
-  sptr<ros2::GameMaster_2> ros2_node;
+  std::unique_ptr<ros1::GameMaster_1> ros1_node;
+  std::unique_ptr<rclcpp::executors::SingleThreadedExecutor> ex;
+  std::shared_ptr<ros2::GameMaster_2> ros2_node;
+  std::thread ros_thread;
+
+  static sig_atomic_t stop_cmd;
+
+  void ros_loop() const;
 
   /**========================================================================
    *?                           Game Management
@@ -70,18 +64,12 @@ protected:
   void load_game_propeties(const std::string &);
 
   /**========================================================================
-   **                            UI Management
+   **                              UI Section
    *========================================================================**/
-  void _bind_ui() override;
+  std::unique_ptr<gui::MainUI> main_ui = nullptr;
+  void _bind_ui();
 
-  /**========================================================================
-   **                            Game Thread
-   *========================================================================**/
-  static std::thread ros_thread;
-  static void ros_loop();
-  static sig_atomic_t stop_cmd;
-
-  bool init(int argc, char **argv);
+  bool notify(QObject *, QEvent *) override;
 };
 } // namespace ecn_baxter::game
 

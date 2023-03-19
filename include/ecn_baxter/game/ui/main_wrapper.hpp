@@ -13,9 +13,10 @@
 #include "ui_main.h"
 #include <ecn_baxter/base/base_gui.hpp>
 #include <ecn_baxter/game/data/game_players.hpp>
-#include <ecn_baxter/ui/file_loader_wrapper.hpp>
+#include <ecn_baxter/game/ui/file_loader_wrapper.hpp>
 #include <ecn_baxter/utils.hpp>
 #include <functional>
+#include <memory>
 #include <qcoreevent.h>
 #include <qmainwindow.h>
 #include <qobject.h>
@@ -27,8 +28,7 @@ protected:
   /**========================================================================
    **                            Game Loader
    *========================================================================**/
-  sptr<FileLoaderWrapper> game_loader;
-  std::function<void(void)> bindings;
+  std::shared_ptr<FileLoaderWrapper> game_loader = nullptr;
   void setup_game_loader();
   void launch_game_loader();
 
@@ -39,9 +39,8 @@ protected:
   bool eventFilter(QObject *obj, QEvent *e) override;
 
 public:
-  explicit MainUI(std::function<void(void)>);
-  sptr<FileLoaderWrapper> get_game_loader() { return game_loader; }
-  ~MainUI() { game_loader.reset(); }
+  explicit MainUI();
+  FileLoaderWrapper *get_game_loader() { return game_loader.get(); }
 
   /**========================================================================
    **                           External Callbacks
