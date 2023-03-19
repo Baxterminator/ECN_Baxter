@@ -8,9 +8,12 @@
  *========================================================================**/
 #include "ecn_baxter/game/master/game.hpp"
 #include "ecn_baxter/game/data/game_players.hpp"
+#include "ecn_baxter/utils/qtevents.hpp"
+#include <iostream>
 #include <qcoreevent.h>
 #include <qglobal.h>
 #include <qpushbutton.h>
+#include <rclcpp/node_options.hpp>
 
 namespace ecn_baxter::game {
 sig_atomic_t Game::stop_cmd;
@@ -103,6 +106,7 @@ void Game::show_ui() {
     return;
 
   main_ui = std::make_unique<gui::MainUI>();
+  main_ui->setup_ui();
   main_ui->show();
 
   ros1_node->set_look_up_callback(
@@ -111,35 +115,40 @@ void Game::show_ui() {
 
 /// @brief Logic between UI & Game works
 bool Game::notify(QObject *receiver, QEvent *ev) {
-  Q_UNUSED(receiver);
+  // sQ_UNUSED(receiver);
 
-  RCLCPP_INFO(ros2_node->get_logger(), "Get event %u for %s", ev->type(),
-              receiver->objectName().toStdString().c_str());
+  /*std::cout << "Get event " << utils::qt::get_qtevent_name(ev) << " for "
+            << ((receiver == nullptr) ? "null"
+                                      : receiver->objectName().toStdString())
+            << std::endl;*/
 
-  /*================== SLAVE MODE =================*/
-  if (receiver == main_ui->get_ui()->slave &&
-      ev->type() == QEvent::MouseButtonRelease) {
-    //? ON / OFF callbacks
-    // Prevent fast-clicking on the button
-    main_ui->get_ui()->slave->setEnabled(false);
-    main_ui->get_ui()->slave_on->setText((ros1_node->slave_toggle()) ? "ON"
-                                                                     : "OFF");
-    main_ui->get_ui()->slave->setEnabled(true);
-  }
-  /*================== SETUP PHASE =================*/
-  else if (receiver == main_ui->get_ui()->setup &&
-           ev->type() == QEvent::MouseButtonRelease) {
-    //? Setup launching
-    ros2_node->launch_point_setup();
-  }
-  /*================== GAME LOADING =================*/
-  else if (main_ui->get_game_loader() != nullptr &&
-           receiver == main_ui->get_game_loader()
-                           ->get_ui()
-                           ->select_buttons->buttons()
-                           .at(0) &&
-           ev->type() == QEvent::MouseButtonRelease) {
-    load_game_propeties(main_ui->get_game_loader()->get_file_to_load());
+  if (main_ui != nullptr && main_ui->is_made()) {
+    /*================== SLAVE MODE =================*/
+    if (receiver == main_ui->get_ui()->slave &&
+        ev->type() == QEvent::MouseButtonRelease) {
+      //? ON / OFF callbacks
+      // Prevent fast-clicking on the button
+      main_ui->get_ui()->slave->setEnabled(false);
+      main_ui->get_ui()->slave_on->setText((ros1_node->slave_toggle()) ? "ON"
+                                                                       : "OFF");
+      main_ui->get_ui()->slave->setEnabled(true);
+    }
+    /*================== SETUP PHASE =================*/
+    else if (receiver == main_ui->get_ui()->setup &&
+             ev->type() == QEvent::MouseButtonRelease) {
+      //? Setup launching
+      ros2_node->launch_point_setup();
+    }
+    /*================== GAME LOADING =================*/
+    else if (main_ui->get_game_loader() != nullptr &&
+             main_ui->get_game_loader()->is_made() &&
+             receiver == main_ui->get_game_loader()
+                             ->get_ui()
+                             ->select_buttons->buttons()
+                             .at(0) &&
+             ev->type() == QEvent::MouseButtonRelease) {
+      load_game_propeties(main_ui->get_game_loader()->get_file_to_load());
+    }
   }
 
   return QApplication::notify(receiver, ev);

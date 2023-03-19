@@ -16,6 +16,7 @@
 #include <ecn_baxter/game/ui/file_loader_wrapper.hpp>
 #include <ecn_baxter/utils.hpp>
 #include <functional>
+#include <memory>
 #include <qcoreevent.h>
 #include <qmainwindow.h>
 #include <qobject.h>
@@ -27,7 +28,7 @@ protected:
   /**========================================================================
    **                            Game Loader
    *========================================================================**/
-  sptr<FileLoaderWrapper> game_loader;
+  std::shared_ptr<FileLoaderWrapper> game_loader = nullptr;
   void setup_game_loader();
   void launch_game_loader();
 
@@ -39,8 +40,7 @@ protected:
 
 public:
   explicit MainUI();
-  sptr<FileLoaderWrapper> get_game_loader() { return game_loader; }
-  ~MainUI() { game_loader.reset(); }
+  FileLoaderWrapper *get_game_loader() { return game_loader.get(); }
 
   /**========================================================================
    **                           External Callbacks

@@ -26,13 +26,11 @@ MainUI::MainUI() : base::BaseGUI<Ui::BaxterMaster, QMainWindow>() {}
  *========================================================================**/
 void MainUI::setup_internal_callbacks() {
   gui->load_game->installEventFilter(this);
-  //  connect(setup, &QPushButton::clicked, [this]() { launch_game_loader(); });
 }
 
 /// @brief Get all events and process internal events
 bool MainUI::eventFilter(QObject *obj, QEvent *e) {
   if (obj == gui->load_game && e->type() == QEvent::MouseButtonRelease) {
-    [[maybe_unused]] QMouseEvent *mevent = static_cast<QMouseEvent *>(e);
     launch_game_loader();
     return true;
   }

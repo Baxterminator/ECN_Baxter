@@ -47,7 +47,6 @@ protected:
 public:
   FileLoaderWrapper();
   std::string get_file_to_load();
-  ~FileLoaderWrapper() {}
 };
 } // namespace ecn_baxter::gui
 #endif // FILE_LOADER_WRAPPER_H
