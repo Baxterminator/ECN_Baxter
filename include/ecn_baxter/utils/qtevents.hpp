@@ -1,11 +1,12 @@
-/**========================================================================
+/**════════════════════════════════════════════════════════════════════════
  * ?                                ABOUT
  * @author         :  Geoffrey Côte
  * @email          :  geoffrey.cote@centraliens-nantes.org
  * @repo           :  https://github.com/Baxterminator/ecn_baxter/
  * @createdOn      :  19/03/2023
  * @description    :  QTEvent utils functions
- *========================================================================**/
+ * @version        :  rev 23w12.1
+ * ════════════════════════════════════════════════════════════════════════**/
 #ifndef ECN_BAXTER_UTILS_QTEVENTS
 #define ECN_BAXTER_UTILS_QTEVENTS
 
@@ -13,11 +14,10 @@
 #include <qcoreevent.h>
 #include <string>
 
-#define stringify(name) #name
-
 namespace ecn_baxter::utils::qt {
 
-std::string get_qtevent_name(QEvent *ev) {
+/// @brief Return a string equivalent of the event type
+inline std::string get_qtevent_name(QEvent *ev) {
   switch (ev->type()) {
   case QEvent::None:
     return "QEvent::None";
@@ -359,6 +359,8 @@ std::string get_qtevent_name(QEvent *ev) {
     return "QEvent::User";
   case QEvent::MaxUser:
     return "QEvent::MaxUser";
+  default:
+    return "Unknown";
   }
 };
 

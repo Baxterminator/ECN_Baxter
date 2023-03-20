@@ -1,11 +1,12 @@
-/**========================================================================
+/**════════════════════════════════════════════════════════════════════════
  * ?                                ABOUT
  * @author         :  Geoffrey Côte
  * @email          :  geoffrey.cote@centraliens-nantes.org
  * @repo           :  https://github.com/Baxterminator/ecn_baxter/
  * @createdOn      :  19/02/2023
- * @description    :  GUI Wrapper for the Game Choosing QDialog
- *========================================================================**/
+ * @description    :  UI Wrapper for the game choosing dialog
+ * @version        :  rev 23w12.1
+ * ════════════════════════════════════════════════════════════════════════**/
 #include "ecn_baxter/game/ui/file_loader_wrapper.hpp"
 #include "ecn_baxter/game/data/local_games.hpp"
 #include "ui_game_loader.h"
@@ -14,21 +15,15 @@
 namespace ecn_baxter::gui {
 
 FileLoaderWrapper::FileLoaderWrapper()
-    : base::BaseGUI<Ui::game_loader, QDialog>() {
+    : ecn::base::BaseGUI<Ui::game_loader, QDialog>() {}
 
-  //  setup_file_browser();
-}
+/**═════════════════════════════════════════════════════════════════════════
+ *?                            Components
+ * ═════════════════════════════════════════════════════════════════════════**/
 
-/**========================================================================
- **                            Components
- *========================================================================**/
-
-/**
- * @brief Return the path to the pre-installed selected description file
- *
- * @param ev the mouse event on click to set a new path
- * @return std::string the absolute path to the file
- */
+/// @brief Return the path to the pre-installed selected description file
+/// @param ev the mouse event on click to set a new path
+/// @return std::string the absolute path to the file * /
 std::string
 FileLoaderWrapper::get_install_file_path(QMouseEvent *ev = nullptr) {
   // if event isn't a nullptr, update the install path to the new selected game
@@ -46,11 +41,9 @@ FileLoaderWrapper::get_install_file_path(QMouseEvent *ev = nullptr) {
 
   return install_path;
 }
-/**
- * @brief Return the path to the custom selected description file
- *
- * @return std::string the absolute path to the file
- */
+
+/// @brief Return the path to the custom selected description file
+/// @return std::string the absolute path to the file
 std::string FileLoaderWrapper::get_custom_file_path(bool set = false) {
   if (set) {
     QFileDialog file_browser(this);
@@ -66,20 +59,18 @@ std::string FileLoaderWrapper::get_custom_file_path(bool set = false) {
 
   return custom_path;
 }
-/**
- * @brief Return the path to the game_properties.game file to load
- *
- * @return std::string the absolute path to the file
- */
+
+/// @brief Return the path to the game_properties.game file to load
+/// @return std::string the absolute path to the file
 std::string FileLoaderWrapper::get_file_to_load() {
   if (gui->install_game->isChecked())
     return get_install_file_path();
   return get_custom_file_path();
 }
 
-/**========================================================================
+/**═════════════════════════════════════════════════════════════════════════
  **                            Setuping GUI
- *========================================================================**/
+ * ═════════════════════════════════════════════════════════════════════════**/
 
 void FileLoaderWrapper::setup_internal_callbacks() {
   setup_list();
@@ -87,9 +78,7 @@ void FileLoaderWrapper::setup_internal_callbacks() {
   gui->browse_file->installEventFilter(this);
 }
 
-/**
- * @brief Setup the file list with the pre-installed files
- */
+/// @brief Setup the file list with the pre-installed files
 void FileLoaderWrapper::setup_list() {
   model = new QStringListModel(this);
   QStringList l;
@@ -110,15 +99,13 @@ void FileLoaderWrapper::setup_list() {
       QAbstractItemView::EditTrigger::NoEditTriggers);
 }
 
-/**========================================================================
+/**═════════════════════════════════════════════════════════════════════════
  **                            Events Managment
- *========================================================================**/
-/**
- * @brief Managing all the internal events of the GUI
- *
- * @param obj the object launching the event
- * @param event the launched event
- */
+ * ═════════════════════════════════════════════════════════════════════════**/
+
+/// @brief Managing all the internal events of the GUI
+/// @param obj the object launching the event
+/// @param event the launched event
 bool FileLoaderWrapper::eventFilter(QObject *obj, QEvent *event) {
   if (obj == gui->list_files->viewport() &&
       event->type() == QEvent::MouseButtonPress) {

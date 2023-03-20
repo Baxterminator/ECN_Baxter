@@ -10,9 +10,9 @@
 #include <ecn_baxter/game/properties_loader.hpp>
 
 namespace ecn_baxter::game {
-sptr<data::GameProperties> GamePropertiesLoader::game_props;
+std::shared_ptr<data::GameProperties> GamePropertiesLoader::game_props;
 
-sptr<data::GameProperties> GamePropertiesLoader::get_game_props() {
+std::shared_ptr<data::GameProperties> GamePropertiesLoader::get_game_props() {
   return game_props;
 }
 
@@ -82,7 +82,7 @@ void GamePropertiesLoader::load_setup_points(const Document &d) {
     data::GPoint gp;
     gp.name = pt[data::GPoint::NAME_TAG].GetString();
     gp.arm_side = data::bool2side(pt[data::GPoint::ARM_TAG].GetBool());
-    gp.w_angles = pt[data::GPoint::ANGLES_TAG].GetBool();
+    gp.with_angles = pt[data::GPoint::ANGLES_TAG].GetBool();
     game_props->setup.needed_points.push_back(gp);
   }
 }

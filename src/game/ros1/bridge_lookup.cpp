@@ -1,4 +1,4 @@
-/**========================================================================
+/**════════════════════════════════════════════════════════════════════════
  * ?                                ABOUT
  * @author         :  Geoffrey Côte
  * @email          :  geoffrey.cote@centraliens-nantes.org
@@ -6,30 +6,40 @@
  * @createdOn      :  19/02/2023
  * @description    :  Sub-part of the ROS1 game master for checking connected
  *                    players
- *========================================================================**/
+ * @version        :  rev 23w12.1
+ * ════════════════════════════════════════════════════════════════════════**/
+#include "ecn_baxter/game/ros1/bridge_lookup.hpp"
 #include "ecn_baxter/game/data/arm_side.hpp"
-#include <ecn_baxter/game/ros1/bridge_lookup.hpp>
+#include "ecn_baxter/game/events/bridges_update_events.hpp"
+#include "ecn_baxter/game/events/event_target.hpp"
+#include <qapplication.h>
 
 namespace ecn_baxter::game::ros1 {
 
-/**========================================================================
+/**════════════════════════════════════════════════════════════════════════
  *!                           Initialization
- *========================================================================**/
-void BridgesManager::bridges_init(sptr<ros::NodeHandle> handle) {
+ * ════════════════════════════════════════════════════════════════════════**/
+
+/// @brief Initialize the periodic bridge lookup related objects
+void BridgesManager::bridges_init(std::shared_ptr<ros::NodeHandle> handle) {
   _check_timer =
       handle->createWallTimer(check_dur, [this](const ros::WallTimerEvent &) {
         look_for_briges();
-        if (_callback != nullptr)
-          _callback(players);
+        events::BridgesUpdate ev(players);
+        QApplication::sendEvent(events::EventTarget::instance(), &ev);
       });
+
   _slave_client =
       handle->serviceClient<baxter_core_msgs::BridgePublishersForce>(
           slave_service);
 }
 
-/**========================================================================
- **                             Utils
- *========================================================================**/
+/**════════════════════════════════════════════════════════════════════════
+ **                                Utils
+ * ════════════════════════════════════════════════════════════════════════**/
+
+/// @brief Extract the user name from a bridge name, if it doesn't match with a
+/// bridge, it return ""
 std::string BridgesManager::extract_name(const std::string &full_name) const {
   int i = full_name.length() - 1;
   for (; i >= 0; i--) {
@@ -64,9 +74,10 @@ bool BridgesManager::is_bridge(const std::string &node_name,
   return true;
 }
 
-/**========================================================================
- **                            Bridge Lookup
- *========================================================================**/
+/**════════════════════════════════════════════════════════════════════════
+ *?                            Bridge Lookup
+ * ════════════════════════════════════════════════════════════════════════**/
+
 /// @brief Look out for bridges on the network and save them for later purpose
 void BridgesManager::look_for_briges() {
   std::vector<std::string> current_nodes, current_users;
@@ -115,9 +126,10 @@ void BridgesManager::update_connected_players(
   }
 }
 
-/**========================================================================
- **                            Slave mode
- *========================================================================**/
+/**════════════════════════════════════════════════════════════════════════
+ *?                            Slave mode
+ * ════════════════════════════════════════════════════════════════════════**/
+
 /// @brief Toggle the slave mode
 /// @return true if slave is on
 /// @return false if slave is off
@@ -146,7 +158,11 @@ bool BridgesManager::slave_on() {
     if (player.side == ArmSide::LEFT_ARM)
       _slave_req.request.left_user = player.name;
   }
-  return send_slave_request();
+
+  // Send service request
+  if (send_slave_request())
+    slaving = true;
+  return slaving;
 }
 
 /// @brief Deactivate the slave mode
@@ -155,7 +171,11 @@ bool BridgesManager::slave_off() {
   _slave_req.request.right_user = free_player;
   _slave_req.request.left_user = free_player;
 
-  return send_slave_request();
+  // Send service request
+  if (send_slave_request())
+    slaving = false;
+
+  return slaving;
 }
 
 /// @brief Send the slave state to the server
@@ -164,4 +184,5 @@ bool BridgesManager::send_slave_request() {
     return _slave_client.call(_slave_req);
   return false;
 }
+
 } // namespace ecn_baxter::game::ros1

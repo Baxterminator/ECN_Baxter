@@ -3,30 +3,30 @@
  * @author         :  Geoffrey Côte
  * @email          :  geoffrey.cote@centraliens-nantes.org
  * @repo           :  https://github.com/Baxterminator/ecn_baxter/
- * @createdOn      :  19/02/2023
- * @description    :  ROS1 part of the GameMaster
+ * @createdOn      :  19/03/2023
+ * @description    :  QObject Target for custom events that don't have a real
+ *                    QObject specific target
  * @version        :  rev 23w12.1
  * ════════════════════════════════════════════════════════════════════════**/
-#ifndef ECN_BAXTER_GAME_MASTER_1_HPP
-#define ECN_BAXTER_GAME_MASTER_1_HPP
+#ifndef ECN_BAXTER_EVENT_TARGET
+#define ECN_BAXTER_EVENT_TARGET
 
-#include "ecn_baxter/game/data/game_properties.hpp"
-#include "ecn_baxter/game/ros1/bridge_lookup.hpp"
-#include "ecn_baxter/game/ros1/tf_broadcast.hpp"
 #include <memory>
-#include <ros/node_handle.h>
+#include <qwidget.h>
 
-namespace ecn_baxter::game::ros1 {
+namespace ecn_baxter::game::events {
 
-/// @brief ROS1 Part of the game master
-class GameMaster_1 : public BridgesManager, public TFBroadcaster {
+class EventTarget : public QWidget {
 public:
-  GameMaster_1();
-  static constexpr auto NODE_NAME{"game_master_1"};
+  EventTarget() : QWidget() {}
 
-private:
-  std::shared_ptr<ros::NodeHandle> _handle;
+  static EventTarget *instance() {
+    static std::unique_ptr<EventTarget> _instance_obj =
+        std::make_unique<EventTarget>();
+    return _instance_obj.get();
+  }
 };
-}; // namespace ecn_baxter::game::ros1
+
+} // namespace ecn_baxter::game::events
 
 #endif

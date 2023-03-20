@@ -1,37 +1,31 @@
-/**========================================================================
+/**════════════════════════════════════════════════════════════════════════
  * ?                                ABOUT
  * @author         :  Geoffrey Côte
  * @email          :  geoffrey.cote@centraliens-nantes.org
  * @repo           :  https://github.com/Baxterminator/ecn_baxter/
  * @createdOn      :  19/02/2023
- * @description    :  GUI Wrapper for the Game Choosing QDialog
- *========================================================================**/
+ * @description    :  UI Wrapper for the game choosing dialog
+ * @version        :  rev 23w12.1
+ * ════════════════════════════════════════════════════════════════════════**/
+#ifndef ECN_BAXTER_FILE_LOADER_WRAPPER_H
+#define ECN_BAXTER_FILE_LOADER_WRAPPER_H
 
-#ifndef FILE_LOADER_WRAPPER_H
-#define FILE_LOADER_WRAPPER_H
-
+#include "ecn_baxter/base/base_gui.hpp"
 #include "ui_game_loader.h"
 #include <ament_index_cpp/get_package_share_directory.hpp>
-#include <ecn_baxter/base/base_gui.hpp>
-#include <ecn_baxter/utils.hpp>
-#include <map>
 #include <qdialog.h>
-#include <qdialogbuttonbox.h>
 #include <qevent.h>
-#include <qfiledialog.h>
-#include <qpushbutton.h>
-#include <qt5/QtCore/QStringList>
 #include <qt5/QtCore/QStringListModel>
-#include <qt5/QtWidgets/QDialog>
 
 using namespace ament_index_cpp;
 
 namespace ecn_baxter::gui {
-class FileLoaderWrapper : public base::BaseGUI<Ui::game_loader, QDialog> {
+class FileLoaderWrapper : public ecn::base::BaseGUI<Ui::game_loader, QDialog> {
 protected:
-  /**========================================================================
-   **                            Components
-   *========================================================================**/
+  /**═════════════════════════════════════════════════════════════════════════
+   *?                            Components
+   * ═════════════════════════════════════════════════════════════════════════**/
+
   void setup_list();
   // void setup_file_browser();
 
@@ -49,4 +43,4 @@ public:
   std::string get_file_to_load();
 };
 } // namespace ecn_baxter::gui
-#endif // FILE_LOADER_WRAPPER_H
+#endif

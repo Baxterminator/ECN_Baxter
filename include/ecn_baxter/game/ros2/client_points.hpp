@@ -1,18 +1,17 @@
-/**========================================================================
+/**════════════════════════════════════════════════════════════════════════
  * ?                                ABOUT
  * @author         :  Geoffrey Côte
  * @email          :  geoffrey.cote@centraliens-nantes.org
  * @repo           :  https://github.com/Baxterminator/ecn_baxter/
  * @createdOn      :  19/02/2023
  * @description    :  ROS 2 Node part for point setuping
- *========================================================================**/
+ * @version        :  rev 23w12.1
+ * ════════════════════════════════════════════════════════════════════════**/
+#ifndef ECN_BAXTER_SETUP_PTN_CLIENT_HPP
+#define ECN_BAXTER_SETUP_PTN_CLIENT_HPP
 
-#ifndef SETUP_PTN_CLIENT_HPP
-#define SETUP_PTN_CLIENT_HPP
-
-#include <ecn_baxter/action/points_setup.hpp>
-#include <ecn_baxter/game/data/game_properties.hpp>
-#include <ecn_baxter/utils.hpp>
+#include "ecn_baxter/action/points_setup.hpp"
+#include "ecn_baxter/game/data/game_properties.hpp"
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_action/rclcpp_action.hpp>
 
@@ -22,7 +21,6 @@ using rclcpp_action::Client;
 using PtnSetupHandler = rclcpp_action::ClientGoalHandle<PointsSetup>;
 
 /// @brief ROS 2 Node part for point setuping
-
 class SetupPointsClient {
 public:
   explicit SetupPointsClient(rclcpp::Logger ros2_logger)
@@ -48,8 +46,9 @@ protected:
     ptn_setup_goal(handle);
   }
   void ptn_setup_goal(const PtnSetupHandler::SharedPtr &handle);
-  void ptn_setup_feedback(PtnSetupHandler::SharedPtr &handle,
-                          const sptr<const PointsSetup::Feedback> feedback);
+  void ptn_setup_feedback(
+      PtnSetupHandler::SharedPtr &handle,
+      const std::shared_ptr<const PointsSetup::Feedback> feedback);
   void ptn_setup_result(const PtnSetupHandler::WrappedResult &result);
 
 private:

@@ -1,21 +1,23 @@
-/**========================================================================
+/**════════════════════════════════════════════════════════════════════════
  * ?                                ABOUT
  * @author         :  Geoffrey Côte
  * @email          :  geoffrey.cote@centraliens-nantes.org
  * @repo           :  https://github.com/Baxterminator/ecn_baxter/
  * @createdOn      :  19/02/2023
- * @description    :  Properties definitions of the games
- *========================================================================**/
+ * @description    :  Game Properties definition
+ * @version        :  rev 23w12.1
+ * ════════════════════════════════════════════════════════════════════════**/
 #include <ecn_baxter/game/data/game_properties.hpp>
 
 namespace ecn_baxter::game::data {
 
-/**========================================================================
- **                       GAME PROPERTIES PRINTING
- *========================================================================**/
+/**════════════════════════════════════════════════════════════════════════
+ *?                       GAME PROPERTIES PRINTING
+ * ════════════════════════════════════════════════════════════════════════**/
+ 
 std::ostream &operator<<(std::ostream &Str, GPoint const &s) {
   Str << s.name << "(" << side2str(s.arm_side) << ")"
-      << "{ angles: " << s.w_angles << "}" << std::endl;
+      << "{ angles: " << s.with_angles << "}" << std::endl;
   return Str;
 }
 

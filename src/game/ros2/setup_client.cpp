@@ -1,12 +1,13 @@
-/**========================================================================
+/**════════════════════════════════════════════════════════════════════════
  * ?                                ABOUT
  * @author         :  Geoffrey Côte
  * @email          :  geoffrey.cote@centraliens-nantes.org
  * @repo           :  https://github.com/Baxterminator/ecn_baxter/
  * @createdOn      :  19/02/2023
  * @description    :  ROS 2 Node part for point setuping
- *========================================================================**/
-#include <ecn_baxter/game/ros2/client_points.hpp>
+ * @version        :  rev 23w12.1
+ * ════════════════════════════════════════════════════════════════════════**/
+#include "ecn_baxter/game/ros2/client_points.hpp"
 
 namespace ecn_baxter::game::ros2 {
 
@@ -41,7 +42,7 @@ void SetupPointsClient::launch_point_setup() {
       [&](const PtnSetupHandler::SharedPtr &handle) { ptn_setup_goal(handle); };
   goal_options.feedback_callback =
       [&](PtnSetupHandler::SharedPtr handle,
-          const sptr<const PointsSetup::Feedback> feedback) {
+          const std::shared_ptr<const PointsSetup::Feedback> feedback) {
         ptn_setup_feedback(handle, feedback);
       };
   goal_options.result_callback =

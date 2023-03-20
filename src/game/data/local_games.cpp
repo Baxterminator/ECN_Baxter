@@ -1,14 +1,14 @@
-/**========================================================================
+/**════════════════════════════════════════════════════════════════════════
  * ?                                ABOUT
  * @author         :  Geoffrey Côte
  * @email          :  geoffrey.cote@centraliens-nantes.org
  * @repo           :  https://github.com/Baxterminator/ecn_baxter/
  * @createdOn      :  01/03/2023
- * @description    :  Games util class
- *========================================================================**/
-#include "ecn_baxter/game/data/game_properties.hpp"
-#include <ecn_baxter/game/data/local_games.hpp>
-#include <ecn_baxter/package_data.hpp>
+ * @description    :  Game utils class for game loading
+ * @version        :  rev 23w12.1
+ * ════════════════════════════════════════════════════════════════════════**/
+#include "ecn_baxter/game/data/local_games.hpp"
+#include "ecn_baxter/package_data.hpp"
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -17,11 +17,11 @@
 namespace ecn_baxter::game::data {
 namespace fs = std::filesystem;
 using rapidjson::Document;
-const char *GAME_EXTENSION = ".bgame";
 
-/**========================================================================
+/**════════════════════════════════════════════════════════════════════════
  *!                           FILE MANAGEMENT
- *========================================================================**/
+ * ════════════════════════════════════════════════════════════════════════**/
+
 /// @brief get the real path of a file (to remove symlink)
 std::string GameUtils::get_real_path(const std::string &path) {
   return (fs::is_symlink(path)) ? (std::string)fs::read_symlink(path) : path;
@@ -47,9 +47,10 @@ std::string GameUtils::read_file(const std::string &path) {
   }
 }
 
-/**========================================================================
+/**════════════════════════════════════════════════════════════════════════
  *!                           GAME PROPERTIES
- *========================================================================**/
+ * ════════════════════════════════════════════════════════════════════════**/
+ 
 /// @brief test if a file a .bgame file
 bool GameUtils::is_game(const std::string &path) {
   // Check if file exist
@@ -93,4 +94,5 @@ GameList GameUtils::get_local_games() {
 
   return list;
 };
+
 } // namespace ecn_baxter::game::data
