@@ -11,6 +11,7 @@
 #include "ecn_baxter/game/data/game_players.hpp"
 #include "ecn_baxter/game/events/bridges_update_events.hpp"
 #include "ecn_baxter/game/events/event_target.hpp"
+#include "ecn_baxter/game/events/setup_ended.hpp"
 #include "ecn_baxter/utils/qtevents.hpp"
 #include <qcoreevent.h>
 #include <qglobal.h>
@@ -106,7 +107,7 @@ void Game::load_game_propeties(const std::string &file_path) {
 /**═════════════════════════════════════════════════════════════════════════
  **                            UI Management
  * ═════════════════════════════════════════════════════════════════════════*/
- 
+
 /// @brief Show the main GUI, make events binding, etc
 void Game::show_ui() {
   if (main_ui != nullptr)
@@ -142,6 +143,10 @@ bool Game::notify(QObject *receiver, QEvent *ev) {
                    bridge_event->get_player_list().size());
       main_ui->refresh_player_list(bridge_event->get_player_list());
     }
+    //*═══════════════════════════  SETUP ENDED ═══════════════════════════*/
+    else if (event_is(SetupEnded::type())) {
+      main_ui->get_ui()->launch->setEnabled(true);
+    }
     //*══════════════════ ELSE (Without useless warnings) ═════════════════*/
     else if (!event_is(QEvent::Polish) && !event_is(QEvent::PolishRequest))
       RCLCPP_WARN(ros2_node->get_logger(),
@@ -165,6 +170,7 @@ bool Game::notify(QObject *receiver, QEvent *ev) {
              event_is(QEvent::MouseButtonRelease)) {
       //? Setup launching
       ros2_node->launch_point_setup();
+      main_ui->get_ui()->setup->setEnabled(false);
     }
     //*══════════════════════════  GAME LOADING ═══════════════════════════*/
     else if (!is_null(main_ui->get_game_loader()) &&

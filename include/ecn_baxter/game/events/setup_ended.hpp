@@ -4,21 +4,26 @@
  * @email          :  geoffrey.cote@centraliens-nantes.org
  * @repo           :  https://github.com/Baxterminator/ecn_baxter/
  * @createdOn      :  19/03/2023
- * @description    :  Register all the custom events types
+ * @description    :  Event launched when the setup phase has ended
  * @version        :  rev 23w12.1
  * ════════════════════════════════════════════════════════════════════════**/
-#include "ecn_baxter/game/events/bridges_update_events.hpp"
-#include "ecn_baxter/game/events/setup_ended.hpp"
-#include "ecn_baxter/utils/qtevents.hpp"
+#ifndef ECN_BAXTER_SETUP_ENDED
+#define ECN_BAXTER_SETUP_ENDED
+
 #include <qcoreevent.h>
 
 namespace ecn_baxter::game::events {
 
-using Type = QEvent::Type;
-#define new_type() static_cast<Type>(QEvent::registerEventType())
+class SetupEnded : public QEvent {
+public:
+  SetupEnded() : QEvent(custom_type) {}
 
-// Define the custom events here
-const Type BridgesUpdate::custom_type = new_type();
-const Type SetupEnded::custom_type = new_type();
+  static QEvent::Type type() { return custom_type; }
+
+private:
+  const static QEvent::Type custom_type;
+};
 
 } // namespace ecn_baxter::game::events
+
+#endif
