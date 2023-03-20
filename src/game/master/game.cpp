@@ -1,17 +1,17 @@
-/**========================================================================
+/**════════════════════════════════════════════════════════════════════════
  * ?                                ABOUT
  * @author         :  Geoffrey Côte
  * @email          :  geoffrey.cote@centraliens-nantes.org
  * @repo           :  https://github.com/Baxterminator/ecn_baxter/
  * @createdOn      :  19/02/2023
  * @description    :  Main wrapper managing ROS threads as well as UIs
- *========================================================================**/
+ * @version        :  rev 23w11.3
+ * ════════════════════════════════════════════════════════════════════════**/
 #include "ecn_baxter/game/master/game.hpp"
 #include "ecn_baxter/game/data/game_players.hpp"
 #include "ecn_baxter/game/events/bridges_update_events.hpp"
 #include "ecn_baxter/game/events/event_target.hpp"
 #include "ecn_baxter/utils/qtevents.hpp"
-#include <iostream>
 #include <qcoreevent.h>
 #include <qglobal.h>
 #include <qpushbutton.h>
@@ -21,9 +21,10 @@
 namespace ecn_baxter::game {
 sig_atomic_t Game::stop_cmd;
 
-/**========================================================================
+/**═════════════════════════════════════════════════════════════════════════
  *!                           INITIALIZATION
- *========================================================================**/
+ * ═════════════════════════════════════════════════════════════════════════*/
+
 /// @brief Initialize the application and every ROS / GUI components
 Game::Game(int argc, char **argv)
     : QApplication(argc, argv), GamePropertiesLoader() {
@@ -57,9 +58,10 @@ Game::Game(int argc, char **argv)
   _initialized = true;
 }
 
-/**========================================================================
+/**═════════════════════════════════════════════════════════════════════════
  *!                            Game Thread
- *========================================================================**/
+ * ═════════════════════════════════════════════════════════════════════════*/
+
 /// @brief Main task for ROS1/ROS2 loop
 void Game::ros_loop() const {
   ros::AsyncSpinner async(1);
@@ -78,9 +80,10 @@ void Game::stop() {
   rclcpp::shutdown();
 }
 
-/**========================================================================
+/**═════════════════════════════════════════════════════════════════════════
  *?                           Game Management
- *========================================================================**/
+ * ═════════════════════════════════════════════════════════════════════════*/
+
 /// @brief Load the game parameters from a JSON file
 /// @param file_path the path to the configuration file
 void Game::load_game_propeties(const std::string &file_path) {
@@ -100,9 +103,10 @@ void Game::load_game_propeties(const std::string &file_path) {
   ros2_node->update_ptn_setup_client(game_props);
 }
 
-/**========================================================================
+/**═════════════════════════════════════════════════════════════════════════
  **                            UI Management
- *========================================================================**/
+ * ═════════════════════════════════════════════════════════════════════════*/
+ 
 /// @brief Show the main GUI, make events binding, etc
 void Game::show_ui() {
   if (main_ui != nullptr)
@@ -111,65 +115,65 @@ void Game::show_ui() {
   main_ui = std::make_unique<gui::MainUI>();
   main_ui->setup_ui();
   main_ui->show();
-
-  ros1_node->set_look_up_callback(
-      [&](data::PlayerList &list) { main_ui->refresh_player_list(list); });
 }
 
 /// @brief Logic between UI & Game works
 bool Game::notify(QObject *receiver, QEvent *ev) {
   using namespace events;
-  // sQ_UNUSED(receiver);
 
   /*std::cout << "Get event " << utils::qt::get_qtevent_name(ev) << " for "
             << ((receiver == nullptr) ? "null"
                                       : receiver->objectName().toStdString())
   << std::endl;*/
 
-  //!----------------- Non-UI components callbacks -----------------*/
+  // Preprocessor directives for easier reading and writings
+#define event_is(t) (ev->type() == t)
+#define is_null(t) (t == nullptr)
+#define receiver_is(t) (receiver == t)
+
+  //! ━━━━━━━━━━━━━━━━━━━━ Non-UI components callbacks ━━━━━━━━━━━━━━━━━━━━━*/
   if (ev->type() != QEvent::Create && receiver == EventTarget::instance()) {
-    //*================== BRIDGE LIST =================*/
-    if (ev->type() == BridgesUpdate::type()) {
+    //*═══════════════════════════  BRIDGE LIST ═══════════════════════════*/
+    /// if (ev->type() == BridgesUpdate::type()) {
+    if (event_is(BridgesUpdate::type())) {
       BridgesUpdate *bridge_event = static_cast<BridgesUpdate *>(ev);
       RCLCPP_DEBUG(ros2_node->get_logger(),
                    "Updating bridges list (%zu registered bridges).",
                    bridge_event->get_player_list().size());
       main_ui->refresh_player_list(bridge_event->get_player_list());
     }
-    //*==================    ELSE (Without useless warnings) =================*/
-    else if (ev->type() != QEvent::Polish &&
-             ev->type() != QEvent::PolishRequest)
+    //*══════════════════ ELSE (Without useless warnings) ═════════════════*/
+    else if (!event_is(QEvent::Polish) && !event_is(QEvent::PolishRequest))
       RCLCPP_WARN(ros2_node->get_logger(),
                   "Unknown custom callback from non UI component (%s) !",
                   utils::qt::get_qtevent_name(ev).c_str());
   }
 
-  //!------------------------- UI callbacks -------------------------*/
-  if (main_ui != nullptr && main_ui->is_made()) {
-    //*================== SLAVE MODE =================*/
-    if (receiver == main_ui->get_ui()->slave &&
-        ev->type() == QEvent::MouseButtonRelease) {
+  //! ━━━━━━━━━━━━━━━━━━━━━━━━━━━━ UI callbacks ━━━━━━━━━━━━━━━━━━━━━━━━━━━━*/
+  if (!is_null(main_ui) && main_ui->is_made()) {
+    //*═══════════════════════════ SLAVE MODE ═════════════════════════════*/
+    if (receiver_is(main_ui->get_ui()->slave) &&
+        event_is(QEvent::MouseButtonRelease)) {
       //? ON / OFF callbacks
-      // Prevent fast-clicking on the button
       main_ui->get_ui()->slave->setEnabled(false);
       main_ui->get_ui()->slave_on->setText((ros1_node->slave_toggle()) ? "ON"
                                                                        : "OFF");
       main_ui->get_ui()->slave->setEnabled(true);
     }
-    //*================== SETUP PHASE =================*/
-    else if (receiver == main_ui->get_ui()->setup &&
-             ev->type() == QEvent::MouseButtonRelease) {
+    //*══════════════════════════  SETUP PHASE ════════════════════════════*/
+    else if (receiver_is(main_ui->get_ui()->setup) &&
+             event_is(QEvent::MouseButtonRelease)) {
       //? Setup launching
       ros2_node->launch_point_setup();
     }
-    //*================== GAME LOADING =================*/
-    else if (main_ui->get_game_loader() != nullptr &&
+    //*══════════════════════════  GAME LOADING ═══════════════════════════*/
+    else if (!is_null(main_ui->get_game_loader()) &&
              main_ui->get_game_loader()->is_made() &&
-             receiver == main_ui->get_game_loader()
+             receiver_is(main_ui->get_game_loader()
                              ->get_ui()
                              ->select_buttons->buttons()
-                             .at(0) &&
-             ev->type() == QEvent::MouseButtonRelease) {
+                             .at(0)) &&
+             event_is(QEvent::MouseButtonRelease)) {
       load_game_propeties(main_ui->get_game_loader()->get_file_to_load());
     }
   }

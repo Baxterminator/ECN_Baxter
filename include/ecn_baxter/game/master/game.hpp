@@ -1,54 +1,52 @@
-/**========================================================================
+/**════════════════════════════════════════════════════════════════════════
  * ?                                ABOUT
  * @author         :  Geoffrey Côte
  * @email          :  geoffrey.cote@centraliens-nantes.org
  * @repo           :  https://github.com/Baxterminator/ecn_baxter/
  * @createdOn      :  19/02/2023
- * @description    :  Main wrapper managing ROS threads as well as UIs
- *========================================================================**/
-
-#ifndef GAME_HPP
-#define GAME_HPP
+ * @description    :  Main wrapper managing ROS threads as well as UIs logic
+ * @version        :  rev 23w12.1
+ * ════════════════════════════════════════════════════════════════════════**/
+#ifndef ECN_BAXTER_GAME_HPP
+#define ECN_BAXTER_GAME_HPP
 
 #include "ecn_baxter/game/properties_loader.hpp"
 #include "ecn_baxter/game/ros1/game_master_1.hpp"
 #include "ecn_baxter/game/ros2/game_master_2.hpp"
 #include "ecn_baxter/game/ui/main_wrapper.hpp"
-#include "ecn_baxter/utils.hpp"
-#include "ros/init.h"
 #include <chrono>
-#include <cstdlib>
 #include <memory>
 #include <qapplication.h>
-#include <rclcpp/rclcpp.hpp>
-#include <rclcpp/utilities.hpp>
-#include <ros/master.h>
+#include <rclcpp/executors.hpp>
 #include <thread>
 
 namespace ecn_baxter::game {
 using namespace std::chrono_literals;
 
-/// @brief Main class for game management and logic
+/// @brief Main wrapper managing ROS threads as well as UIs logic
 class Game : public QApplication, GamePropertiesLoader {
 public:
-  /**========================================================================
-   **                            Cycle Utils
-   *========================================================================**/
+  /**═════════════════════════════════════════════════════════════════════════
+   *!                              Cycle Utils
+   * ═════════════════════════════════════════════════════════════════════════*/
+
   Game(int argc, char **argv);
-  bool is_initialized() { return _initialized; }
+  inline bool is_initialized() { return _initialized; }
   void stop();
 
-  /**========================================================================
-  **                            UI Management
-  *========================================================================**/
+  /**═════════════════════════════════════════════════════════════════════════
+  **                                UI Section
+  * ═════════════════════════════════════════════════════════════════════════*/
+
   void show_ui();
 
 private:
   bool _initialized = false;
 
-  /**========================================================================
+  /**═════════════════════════════════════════════════════════════════════════
    *?                            ROSX Game Thread
-   *========================================================================**/
+   * ═════════════════════════════════════════════════════════════════════════*/
+
   std::unique_ptr<ros1::GameMaster_1> ros1_node;
   std::unique_ptr<rclcpp::executors::SingleThreadedExecutor> ex;
   std::shared_ptr<ros2::GameMaster_2> ros2_node;
@@ -58,19 +56,19 @@ private:
 
   void ros_loop() const;
 
-  /**========================================================================
+  /**═════════════════════════════════════════════════════════════════════════
    *?                           Game Management
-   *========================================================================**/
+   * ═════════════════════════════════════════════════════════════════════════*/
+
   void load_game_propeties(const std::string &);
 
-  /**========================================================================
+  /**═════════════════════════════════════════════════════════════════════════
    **                              UI Section
-   *========================================================================**/
-  std::unique_ptr<gui::MainUI> main_ui = nullptr;
-  void _bind_ui();
+   * ═════════════════════════════════════════════════════════════════════════*/
 
+  std::unique_ptr<gui::MainUI> main_ui = nullptr;
   bool notify(QObject *, QEvent *) override;
 };
 } // namespace ecn_baxter::game
 
-#endif // GAME_HPP
+#endif

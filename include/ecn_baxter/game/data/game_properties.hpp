@@ -1,16 +1,16 @@
-/**========================================================================
+/**════════════════════════════════════════════════════════════════════════
  * ?                                ABOUT
  * @author         :  Geoffrey Côte
  * @email          :  geoffrey.cote@centraliens-nantes.org
  * @repo           :  https://github.com/Baxterminator/ecn_baxter/
  * @createdOn      :  19/02/2023
- * @description    :  Properties definitions of the games
- *========================================================================**/
+ * @description    :  Game Properties definition
+ * @version        :  rev 23w12.1
+ * ════════════════════════════════════════════════════════════════════════**/
+#ifndef ECN_BAXTER_GAME_PROPERTIES_HPP
+#define ECN_BAXTER_GAME_PROPERTIES_HPP
 
-#ifndef GAME_PROPERTIES_HPP
-#define GAME_PROPERTIES_HPP
-
-#include <ecn_baxter/game/data/arm_side.hpp>
+#include "ecn_baxter/game/data/arm_side.hpp"
 #include <ostream>
 #include <string>
 #include <tf2_msgs/TFMessage.h>
@@ -20,16 +20,13 @@ namespace ecn_baxter::game::data {
 
 using tf2_msgs::TFMessage;
 
-/**========================================================================
- **                       GAME PROPERTIES STRUCTS
- *========================================================================**/
 struct GPoint {
   constexpr static auto NAME_TAG{"name"};
   std::string name;
   constexpr static auto ARM_TAG{"side"};
   ArmSide arm_side;
   constexpr static auto ANGLES_TAG{"angles"};
-  bool w_angles = false;
+  bool with_angles = false;
 
   // Printing
   friend std::ostream &operator<<(std::ostream &, GPoint const &);
@@ -59,4 +56,4 @@ struct GameProperties {
 
 } // namespace ecn_baxter::game::data
 
-#endif // GAME_PROPERTIES_HPP
+#endif

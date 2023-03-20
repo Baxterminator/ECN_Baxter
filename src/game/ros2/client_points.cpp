@@ -1,13 +1,14 @@
-/**========================================================================
+/**════════════════════════════════════════════════════════════════════════
  * ?                                ABOUT
  * @author         :  Geoffrey Côte
  * @email          :  geoffrey.cote@centraliens-nantes.org
  * @repo           :  https://github.com/Baxterminator/ecn_baxter/
  * @createdOn      :  19/02/2023
  * @description    :  ROS 2 Node part for point setuping
- *========================================================================**/
+ * @version        :  rev 23w12.1
+ * ════════════════════════════════════════════════════════════════════════**/
+#include "ecn_baxter/game/ros2/client_points.hpp"
 #include <algorithm>
-#include <ecn_baxter/game/ros2/client_points.hpp>
 #include <geometry_msgs/TransformStamped.h>
 #include <tf2/LinearMath/Quaternion.h>
 
@@ -47,7 +48,7 @@ void SetupPointsClient::ptn_setup_result(
 /// @param feedback the position and name of the next POI
 void SetupPointsClient::ptn_setup_feedback(
     [[maybe_unused]] PtnSetupHandler::SharedPtr &handle,
-    const sptr<const PointsSetup::Feedback> feedback) {
+    const std::shared_ptr<const PointsSetup::Feedback> feedback) {
   auto p_name = feedback->ptn_name;
   auto p = feedback->ptn;
   RCLCPP_INFO(logger, "Receiving marker %s at (%f, %f, %f)", p_name.c_str(),

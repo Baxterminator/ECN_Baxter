@@ -1,8 +1,12 @@
-//
-// Created by tcorroenne2021 on 08/02/23.
-// Modified by B on 08/03/23.
-//  <depend>kdl_parser</depend>
-
+/**════════════════════════════════════════════════════════════════════════
+ * ?                                ABOUT
+ * @maintainer     :  Timothée Corroënne
+ * @email          :  timothee.corroenne@centraliens-nantes.org
+ * @repo           :  https://github.com/Baxterminator/ecn_baxter/
+ * @createdOn      :  08/02/2023
+ * @description    :  Jacobian service for the baxter robot
+ * @version        :  rev 23w12.1
+ * ════════════════════════════════════════════════════════════════════════**/
 #include "rclcpp/rclcpp.hpp"
 #include <Eigen/QR>
 #include <ament_index_cpp/get_package_share_directory.hpp>

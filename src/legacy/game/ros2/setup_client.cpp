@@ -1,4 +1,4 @@
-/**========================================================================
+/**════════════════════════════════════════════════════════════════════════
  * ?                                ABOUT
  * @author         :  Geoffrey Côte
  * @email          :  geoffrey.cote@centraliens-nantes.org
@@ -6,8 +6,9 @@
  * @createdOn      :  19/02/2023
  * @description    :  ROS 2 Node part for point setuping
  * @deprecated     :  These functions are only for legacy ROS2 version support
- *(foxy, galactic, ...).
- *========================================================================**/
+ *                    (foxy, galactic, ...).
+ * @version        :  rev 23w12.1
+ * ════════════════════════════════════════════════════════════════════════**/
 #include <ecn_baxter/game/ros2/client_points.hpp>
 
 namespace ecn_baxter::game::ros2 {

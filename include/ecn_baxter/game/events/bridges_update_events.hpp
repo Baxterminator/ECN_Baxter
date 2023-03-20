@@ -1,11 +1,12 @@
-/**========================================================================
+/**════════════════════════════════════════════════════════════════════════
  * ?                                ABOUT
  * @author         :  Geoffrey Côte
  * @email          :  geoffrey.cote@centraliens-nantes.org
  * @repo           :  https://github.com/Baxterminator/ecn_baxter/
  * @createdOn      :  19/03/2023
  * @description    :  Event launched whenever the bridges list has been updated
- *========================================================================**/
+ * @version        :  rev 23w12.1
+ * ════════════════════════════════════════════════════════════════════════**/
 #ifndef ECN_BAXTER_BRIDGES_EVENT
 #define ECN_BAXTER_BRIDGES_EVENT
 
@@ -19,7 +20,7 @@ public:
   BridgesUpdate(const data::PlayerList &list)
       : QEvent(custom_type), player_list(list) {}
 
-  constexpr static QEvent::Type type() { return custom_type; }
+  static QEvent::Type type() { return custom_type; }
 
   data::PlayerList &get_player_list() { return player_list; }
 

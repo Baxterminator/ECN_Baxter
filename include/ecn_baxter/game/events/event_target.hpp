@@ -1,4 +1,4 @@
-/**========================================================================
+/**════════════════════════════════════════════════════════════════════════
  * ?                                ABOUT
  * @author         :  Geoffrey Côte
  * @email          :  geoffrey.cote@centraliens-nantes.org
@@ -6,11 +6,11 @@
  * @createdOn      :  19/03/2023
  * @description    :  QObject Target for custom events that don't have a real
  *                    QObject specific target
- *========================================================================**/
+ * @version        :  rev 23w12.1
+ * ════════════════════════════════════════════════════════════════════════**/
 #ifndef ECN_BAXTER_EVENT_TARGET
 #define ECN_BAXTER_EVENT_TARGET
 
-#include <iostream>
 #include <memory>
 #include <qwidget.h>
 

@@ -1,11 +1,12 @@
-/**========================================================================
+/**════════════════════════════════════════════════════════════════════════
  * ?                                ABOUT
  * @author         :  Geoffrey Côte
  * @email          :  geoffrey.cote@centraliens-nantes.org
  * @repo           :  https://github.com/Baxterminator/ecn_baxter/
  * @createdOn      :  19/02/2023
- * @description    :  GUI Wrapper for the main GUI
- *========================================================================**/
+ * @description    :  UI Wrapper for the main window
+ * @version        :  rev 23w12.1
+ * ════════════════════════════════════════════════════════════════════════**/
 #include "ecn_baxter/game/data/arm_side.hpp"
 #include "ui_main.h"
 #include <ecn_baxter/game/ui/main_wrapper.hpp>
@@ -16,14 +17,15 @@
 
 namespace ecn_baxter::gui {
 
-/**========================================================================
- *!                           INITIALIZATION
- *========================================================================**/
-MainUI::MainUI() : base::BaseGUI<Ui::BaxterMaster, QMainWindow>() {}
+/**════════════════════════════════════════════════════════════════════════
+ *!                           Initialization
+ * ════════════════════════════════════════════════════════════════════════**/
+MainUI::MainUI() : ecn::base::BaseGUI<Ui::BaxterMaster, QMainWindow>() {}
 
-/**========================================================================
+/**════════════════════════════════════════════════════════════════════════
  **                            Event Callbacks
- *========================================================================**/
+ * ════════════════════════════════════════════════════════════════════════**/
+
 void MainUI::setup_internal_callbacks() {
   gui->load_game->installEventFilter(this);
 }
@@ -37,9 +39,10 @@ bool MainUI::eventFilter(QObject *obj, QEvent *e) {
   return false;
 }
 
-/**========================================================================
+/**════════════════════════════════════════════════════════════════════════
  **                           External Callbacks
- *========================================================================**/
+ * ════════════════════════════════════════════════════════════════════════**/
+
 /// @brief Refresh the player list with the given
 void MainUI::refresh_player_list(game::data::PlayerList &list) {
   // Check if GUI has been made
@@ -77,9 +80,10 @@ void MainUI::refresh_player_list(game::data::PlayerList &list) {
   gui->n_co->setText(ss.str().c_str());
 }
 
-/**========================================================================
- **                            Game Loader
- *========================================================================**/
+/**════════════════════════════════════════════════════════════════════════
+ *?                            Game Loader
+ * ════════════════════════════════════════════════════════════════════════**/
+
 /// @brief Setup the mgame selector menu
 void MainUI::setup_game_loader() {
   game_loader = std::make_shared<FileLoaderWrapper>();
