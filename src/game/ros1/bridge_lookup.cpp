@@ -129,7 +129,7 @@ void BridgesManager::update_connected_players(
 /**════════════════════════════════════════════════════════════════════════
  *?                            Slave mode
  * ════════════════════════════════════════════════════════════════════════**/
- 
+
 /// @brief Toggle the slave mode
 /// @return true if slave is on
 /// @return false if slave is off
@@ -158,7 +158,11 @@ bool BridgesManager::slave_on() {
     if (player.side == ArmSide::LEFT_ARM)
       _slave_req.request.left_user = player.name;
   }
-  return send_slave_request();
+
+  // Send service request
+  if (send_slave_request())
+    slaving = true;
+  return slaving;
 }
 
 /// @brief Deactivate the slave mode
@@ -167,7 +171,11 @@ bool BridgesManager::slave_off() {
   _slave_req.request.right_user = free_player;
   _slave_req.request.left_user = free_player;
 
-  return send_slave_request();
+  // Send service request
+  if (send_slave_request())
+    slaving = false;
+
+  return slaving;
 }
 
 /// @brief Send the slave state to the server

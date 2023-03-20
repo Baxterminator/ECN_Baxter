@@ -159,10 +159,12 @@ bool Game::notify(QObject *receiver, QEvent *ev) {
     //*═══════════════════════════ SLAVE MODE ═════════════════════════════*/
     if (receiver_is(main_ui->get_ui()->slave) &&
         event_is(QEvent::MouseButtonRelease)) {
-      //? ON / OFF callbacks
       main_ui->get_ui()->slave->setEnabled(false);
-      main_ui->get_ui()->slave_on->setText((ros1_node->slave_toggle()) ? "ON"
-                                                                       : "OFF");
+      // Set slave to ON or OFF
+      (game_launched || !ros1_node->is_slaving()) ? ros1_node->slave_on()
+                                                  : ros1_node->slave_off();
+      main_ui->get_ui()->slave_on->setText((ros1_node->is_slaving()) ? "ON"
+                                                                     : "OFF");
       main_ui->get_ui()->slave->setEnabled(true);
     }
     //*══════════════════════════  SETUP PHASE ════════════════════════════*/

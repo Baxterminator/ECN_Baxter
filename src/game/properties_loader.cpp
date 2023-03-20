@@ -10,9 +10,9 @@
 #include <ecn_baxter/game/properties_loader.hpp>
 
 namespace ecn_baxter::game {
-sptr<data::GameProperties> GamePropertiesLoader::game_props;
+std::shared_ptr<data::GameProperties> GamePropertiesLoader::game_props;
 
-sptr<data::GameProperties> GamePropertiesLoader::get_game_props() {
+std::shared_ptr<data::GameProperties> GamePropertiesLoader::get_game_props() {
   return game_props;
 }
 

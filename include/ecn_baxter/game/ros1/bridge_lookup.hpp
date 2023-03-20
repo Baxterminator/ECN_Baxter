@@ -79,6 +79,8 @@ public:
   bool slave_toggle();
   bool slave_on();
   bool slave_off();
+  /// @brief Return whether the bridges are in slave mode or not
+  inline bool is_slaving() { return slaving; };
 };
 } // namespace ecn_baxter::game::ros1
 
