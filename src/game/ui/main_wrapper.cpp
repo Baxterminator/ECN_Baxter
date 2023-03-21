@@ -5,13 +5,18 @@
  * @repo           :  https://github.com/Baxterminator/ecn_baxter/
  * @createdOn      :  19/02/2023
  * @description    :  UI Wrapper for the main window
- * @version        :  rev 23w12.1
+ * @version        :  rev 23w12.2
  * ════════════════════════════════════════════════════════════════════════**/
 #include "ecn_baxter/game/data/arm_side.hpp"
 #include "ui_main.h"
 #include <ecn_baxter/game/ui/main_wrapper.hpp>
+#include <iostream>
+#include <qaction.h>
 #include <qcoreevent.h>
 #include <qevent.h>
+#include <qheaderview.h>
+#include <qmenu.h>
+#include <qnamespace.h>
 #include <qtablewidget.h>
 #include <sstream>
 
@@ -23,20 +28,102 @@ namespace ecn_baxter::gui {
 MainUI::MainUI() : ecn::base::BaseGUI<Ui::BaxterMaster, QMainWindow>() {}
 
 /**════════════════════════════════════════════════════════════════════════
+ *?                          UI custom settings
+ * ════════════════════════════════════════════════════════════════════════**/
+
+/// @brief Set the Users QTableWidget custom style parameters
+void MainUI::set_users_view() {
+  gui->users->viewport()->setContextMenuPolicy(
+      Qt::ContextMenuPolicy::CustomContextMenu);
+
+  gui->users->setColumnWidth(0, 160);
+  gui->users->setColumnWidth(1, 130);
+  gui->users->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+  gui->users->horizontalHeader()->setStretchLastSection(true);
+  gui->users->horizontalHeader()->stretchLastSection();
+  gui->users->setHorizontalScrollBarPolicy(
+      Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
+}
+
+/**════════════════════════════════════════════════════════════════════════
  **                            Event Callbacks
  * ════════════════════════════════════════════════════════════════════════**/
 
+/// @brief Setup the internal UI callbacks between widgets
 void MainUI::setup_internal_callbacks() {
   gui->load_game->installEventFilter(this);
+  gui->users->viewport()->installEventFilter(this);
+
+  set_custom_gui_properties();
 }
 
 /// @brief Get all events and process internal events
 bool MainUI::eventFilter(QObject *obj, QEvent *e) {
-  if (obj == gui->load_game && e->type() == QEvent::MouseButtonRelease) {
-    launch_game_loader();
-    return true;
-  }
+#define event_is(t) e->type() == t
+#define obj_is(t) obj == t
+  if (obj_is(gui->load_game) && event_is(QEvent::MouseButtonRelease))
+    return launch_game_loader();
+  else if (obj_is(gui->users->viewport()) && event_is(QEvent::ContextMenu))
+    return make_context_menu(e);
   return false;
+}
+
+/// @brief Make a context menu over an item
+bool MainUI::make_context_menu(QEvent *e) {
+  QContextMenuEvent *mouse_ev = static_cast<QContextMenuEvent *>(e);
+  QTableWidgetItem *child_item =
+      gui->users->item(gui->users->itemAt(mouse_ev->pos())->row(), 0);
+
+  // Check if child exist
+  if (child_item) {
+    QMenu my_menu;
+
+    QAction top, right, left, none;
+
+    top.setText("Token to add");
+    top.setSeparator(true);
+    right.setText("Right arm");
+    left.setText("Left arm");
+    none.setText("None");
+
+    my_menu.addAction(&top);
+    my_menu.addAction(&right);
+    my_menu.addAction(&left);
+    my_menu.addAction(&none);
+    my_menu.setFixedWidth(160);
+
+    // If the user clicked on something, process the right action
+    QAction *triggered = my_menu.exec(mouse_ev->globalPos());
+    if (triggered != nullptr && !players.expired()) {
+
+      // Getting the right player
+      auto s_players = players.lock();
+      auto player = s_players->begin();
+      while (player != s_players->end()) {
+        // Affecting arm to player (removing if he isn't the good one)
+        if (triggered == &right) {
+          player->side = (player->name == child_item->text().toStdString())
+                             ? game::data::ArmSide::RIGHT_ARM
+                             : ((player->side == game::data::ArmSide::RIGHT_ARM)
+                                    ? game::data::ArmSide::NONE
+                                    : player->side);
+        } else if (triggered == &left) {
+          player->side = (player->name == child_item->text().toStdString())
+                             ? game::data::ArmSide::LEFT_ARM
+                             : ((player->side == game::data::ArmSide::LEFT_ARM)
+                                    ? game::data::ArmSide::NONE
+                                    : player->side);
+        } else if (triggered == &none) {
+          if (player->name == child_item->text().toStdString())
+            player->side = game::data::ArmSide::NONE;
+        }
+
+        player++;
+      }
+    }
+  }
+
+  return true;
 }
 
 /**════════════════════════════════════════════════════════════════════════
@@ -44,39 +131,47 @@ bool MainUI::eventFilter(QObject *obj, QEvent *e) {
  * ════════════════════════════════════════════════════════════════════════**/
 
 /// @brief Refresh the player list with the given
-void MainUI::refresh_player_list(game::data::PlayerList &list) {
-  // Check if GUI has been made
-  if (gui == nullptr)
+void MainUI::refresh_player_list() {
+  // Check if GUI has been made and the player list has been propagated
+  if (gui == nullptr || players.expired())
     return;
+
+  auto list = players.lock();
 
   // Show player list
   int connected = 0;
-  for (auto &player : list) {
-    if (player.new_discovered) {
-      player.new_discovered = false;
-      player.row_id = gui->users->rowCount();
-      gui->users->insertRow(player.row_id);
-      gui->users->setItem(player.row_id, 0,
-                          new QTableWidgetItem(player.name.c_str()));
+  auto player = list->begin();
+  while (player != list->end()) {
+    if (player->new_discovered) {
+      player->new_discovered = false;
+      player->row_id = gui->users->rowCount();
+      gui->users->insertRow(player->row_id);
+      gui->users->setItem(player->row_id, 0,
+                          new QTableWidgetItem(player->name.c_str()));
     }
 
     // Update what need to be updated
-    if (player.connected)
+    if (player->connected)
       connected++;
-    gui->users->setItem(player.row_id, 1,
-                        new QTableWidgetItem((player.connected)
+    gui->users->setItem(player->row_id, 1,
+                        new QTableWidgetItem((player->connected)
                                                  ? "Connected"
                                                  : "Not connected"));
     gui->users->setItem(
-        player.row_id, 2,
-        new QTableWidgetItem(game::data::side2str(player.side).c_str()));
+        player->row_id, 2,
+        new QTableWidgetItem(game::data::side2str(player->side).c_str()));
+
+    player++;
   }
+
+  gui->users->horizontalHeader()->stretchLastSection();
+  /// gui->users->resizeColumnsToContents();
 
   // Update number of connected people
   std::stringstream ss;
   ss << connected;
   ss << "/";
-  ss << list.size();
+  ss << list->size();
   gui->n_co->setText(ss.str().c_str());
 }
 
@@ -91,10 +186,11 @@ void MainUI::setup_game_loader() {
 }
 
 /// @brief Launch the game selector menu
-void MainUI::launch_game_loader() {
+bool MainUI::launch_game_loader() {
   if (game_loader == nullptr)
     setup_game_loader();
   game_loader->show();
+  return true;
 }
 
 } // namespace ecn_baxter::gui

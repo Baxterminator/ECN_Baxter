@@ -5,7 +5,7 @@
  * @repo           :  https://github.com/Baxterminator/ecn_baxter/
  * @createdOn      :  19/02/2023
  * @description    :  ROS1 part of the GameMaster
- * @version        :  rev 23w12.1
+ * @version        :  rev 23w12.2
  * ════════════════════════════════════════════════════════════════════════**/
 #ifndef ECN_BAXTER_GAME_MASTER_1_HPP
 #define ECN_BAXTER_GAME_MASTER_1_HPP
@@ -21,7 +21,7 @@ namespace ecn_baxter::game::ros1 {
 /// @brief ROS1 Part of the game master
 class GameMaster_1 : public BridgesManager, public TFBroadcaster {
 public:
-  GameMaster_1();
+  GameMaster_1(std::shared_ptr<data::PlayerList>);
   static constexpr auto NODE_NAME{"game_master_1"};
 
 private:

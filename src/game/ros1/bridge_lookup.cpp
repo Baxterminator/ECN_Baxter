@@ -6,12 +6,14 @@
  * @createdOn      :  19/02/2023
  * @description    :  Sub-part of the ROS1 game master for checking connected
  *                    players
- * @version        :  rev 23w12.1
+ * @version        :  rev 23w12.2
  * ════════════════════════════════════════════════════════════════════════**/
 #include "ecn_baxter/game/ros1/bridge_lookup.hpp"
 #include "ecn_baxter/game/data/arm_side.hpp"
+#include "ecn_baxter/game/data/game_players.hpp"
 #include "ecn_baxter/game/events/bridges_update_events.hpp"
 #include "ecn_baxter/game/events/event_target.hpp"
+#include <memory>
 #include <qapplication.h>
 
 namespace ecn_baxter::game::ros1 {
@@ -21,11 +23,13 @@ namespace ecn_baxter::game::ros1 {
  * ════════════════════════════════════════════════════════════════════════**/
 
 /// @brief Initialize the periodic bridge lookup related objects
-void BridgesManager::bridges_init(std::shared_ptr<ros::NodeHandle> handle) {
+void BridgesManager::bridges_init(std::shared_ptr<ros::NodeHandle> handle,
+                                  std::shared_ptr<data::PlayerList> players) {
+  _players = players;
   _check_timer =
       handle->createWallTimer(check_dur, [this](const ros::WallTimerEvent &) {
         look_for_briges();
-        events::BridgesUpdate ev(players);
+        events::BridgesUpdate ev;
         QApplication::sendEvent(events::EventTarget::instance(), &ev);
       });
 
@@ -99,30 +103,43 @@ void BridgesManager::look_for_briges() {
 
 /// @brief Reset all players "connected" state to false
 void BridgesManager::reset_players_state() {
-  for (auto &p : players)
-    p.connected = false;
+  if (!_players.expired()) {
+    auto players = _players.lock();
+    auto i = players->begin();
+    while (i != players->end()) {
+      i->connected = false;
+      i++;
+    }
+  }
 }
 
 /// @brief Update local players list to last look out
 void BridgesManager::update_connected_players(
     const std::vector<std::string> &to_add) {
+  if (_players.expired())
+    return;
+
+  auto players = _players.lock();
+
   bool found;
   for (auto &p_name : to_add) {
 
     found = false;
 
     // If players already in list, update to "connected"
-    for (auto &p_saved : players) {
-      if (p_saved.name == p_name) {
-        p_saved.connected = true;
+    auto p_saved = players->begin();
+    while (p_saved != players->end()) {
+      if (p_saved->name == p_name) {
+        p_saved->connected = true;
         found = true;
         break;
       }
+      p_saved++;
     }
 
     // If not in list, add it
     if (!found)
-      players.push_back(GamePlayer{p_name, bridge_name + p_name, true});
+      players->push_back(GamePlayer{p_name, bridge_name + p_name, true});
   }
 }
 
@@ -152,11 +169,17 @@ bool BridgesManager::slave_on() {
   _slave_req.request.left_user = block_player;
 
   // Set players token to send to the server
-  for (auto &player : players) {
-    if (player.side == ArmSide::RIGHT_ARM)
-      _slave_req.request.right_user = player.name;
-    if (player.side == ArmSide::LEFT_ARM)
-      _slave_req.request.left_user = player.name;
+  if (_players.expired())
+    return slaving;
+  auto players = _players.lock();
+
+  auto player = players->begin();
+  while (player != players->end()) {
+    if (player->side == ArmSide::RIGHT_ARM)
+      _slave_req.request.right_user = player->name;
+    if (player->side == ArmSide::LEFT_ARM)
+      _slave_req.request.left_user = player->name;
+    player++;
   }
 
   // Send service request

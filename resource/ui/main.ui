@@ -331,6 +331,9 @@
           <attribute name="horizontalHeaderCascadingSectionResizes">
            <bool>false</bool>
           </attribute>
+          <attribute name="horizontalHeaderMinimumSectionSize">
+           <number>0</number>
+          </attribute>
           <attribute name="horizontalHeaderDefaultSectionSize">
            <number>154</number>
           </attribute>
@@ -367,39 +370,6 @@
             <string>Has Token</string>
            </property>
           </column>
-         </widget>
-        </item>
-        <item>
-         <widget class="QWidget" name="widget_3" native="true">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>20</height>
-           </size>
-          </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_3">
-           <item>
-            <widget class="QPushButton" name="left_arm_token">
-             <property name="text">
-              <string>Token Left Arm</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="none_token">
-             <property name="text">
-              <string>Remove Token</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="right_arm_token">
-             <property name="text">
-              <string>Token Right Arm</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
          </widget>
         </item>
        </layout>
