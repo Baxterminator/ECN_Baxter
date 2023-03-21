@@ -14,14 +14,16 @@
 
 namespace ecn_baxter::game::data {
 
-enum class ArmSide { NONE, RIGHT_ARM, LEFT_ARM };
+enum class ArmSide { NONE, RIGHT_ARM, LEFT_ARM, BOTH };
 
 inline std::string side2str(ArmSide s) {
   switch (s) {
   case ArmSide::RIGHT_ARM:
-    return "right_arm";
+    return "RIGHT";
   case ArmSide::LEFT_ARM:
-    return "left_arm";
+    return "LEFT";
+  case ArmSide::BOTH:
+    return "RIGHT | LEFT";
   default:
     return "";
   }

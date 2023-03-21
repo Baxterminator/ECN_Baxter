@@ -99,23 +99,38 @@ bool MainUI::make_context_menu(QEvent *e) {
       // Getting the right player
       auto s_players = players.lock();
       auto player = s_players->begin();
+      using game::data::ArmSide;
       while (player != s_players->end()) {
+
+#define is_user() (player->name == child_item->text().toStdString())
+#define R_sel() (triggered == &right)
+
         // Affecting arm to player (removing if he isn't the good one)
-        if (triggered == &right) {
-          player->side = (player->name == child_item->text().toStdString())
-                             ? game::data::ArmSide::RIGHT_ARM
-                             : ((player->side == game::data::ArmSide::RIGHT_ARM)
-                                    ? game::data::ArmSide::NONE
-                                    : player->side);
-        } else if (triggered == &left) {
-          player->side = (player->name == child_item->text().toStdString())
-                             ? game::data::ArmSide::LEFT_ARM
-                             : ((player->side == game::data::ArmSide::LEFT_ARM)
-                                    ? game::data::ArmSide::NONE
-                                    : player->side);
-        } else if (triggered == &none) {
-          if (player->name == child_item->text().toStdString())
-            player->side = game::data::ArmSide::NONE;
+        if (triggered == &none && is_user())
+          player->side = game::data::ArmSide::NONE;
+        else {
+          switch (player->side) {
+          case ArmSide::NONE:
+            player->side = (is_user()) ? ((R_sel()) ? ArmSide::RIGHT_ARM
+                                                    : ArmSide::LEFT_ARM)
+                                       : ArmSide::NONE;
+            break;
+          case ArmSide::RIGHT_ARM:
+            player->side =
+                (is_user()) ? ((R_sel()) ? ArmSide::RIGHT_ARM : ArmSide::BOTH)
+                            : ((R_sel()) ? ArmSide::NONE : ArmSide::RIGHT_ARM);
+            break;
+          case ArmSide::LEFT_ARM:
+            player->side =
+                (is_user()) ? ((R_sel()) ? ArmSide::BOTH : ArmSide::LEFT_ARM)
+                            : ((R_sel()) ? ArmSide::LEFT_ARM : ArmSide::NONE);
+            break;
+          case ArmSide::BOTH:
+            player->side = (is_user()) ? ArmSide::BOTH
+                                       : ((R_sel()) ? ArmSide::LEFT_ARM
+                                                    : ArmSide::RIGHT_ARM);
+            break;
+          }
         }
 
         player++;
@@ -160,12 +175,11 @@ void MainUI::refresh_player_list() {
     gui->users->setItem(
         player->row_id, 2,
         new QTableWidgetItem(game::data::side2str(player->side).c_str()));
+    gui->users->item(player->row_id, 1)->setTextAlignment(Qt::AlignCenter);
+    gui->users->item(player->row_id, 2)->setTextAlignment(Qt::AlignCenter);
 
     player++;
   }
-
-  gui->users->horizontalHeader()->stretchLastSection();
-  /// gui->users->resizeColumnsToContents();
 
   // Update number of connected people
   std::stringstream ss;
