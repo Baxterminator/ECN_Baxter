@@ -36,6 +36,7 @@ Game::Game(int argc, char **argv)
   //* ROS2 Initialization
   rclcpp::init(argc, argv);
   ros2_node = std::make_shared<ros2::GameMaster_2>(rclcpp::NodeOptions{});
+  ros2_node->set_handle(ros2_node);
 
   ex = std::make_unique<rclcpp::executors::SingleThreadedExecutor>();
   ex->add_node(ros2_node);

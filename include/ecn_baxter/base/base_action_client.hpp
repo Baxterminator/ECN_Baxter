@@ -29,18 +29,17 @@ using ActionGoalOpts = typename ra::Client<ActionT>::SendGoalOptions;
 /// @brief Base for action client
 /// @tparam ActionT the action type
 template <typename ActionT> class BaseActionClient {
-private:
+protected:
   std::weak_ptr<rclcpp::Node> node_handle;
   std::shared_ptr<ra::Client<ActionT>> client;
 
-protected:
 #ifdef LEGACY_IDL
   /// @brief Callback of the acceptance of the action call
   /// @param future the future linked to the call of the action
   /// @deprecated This function is only for legacy ROS2 version support (foxy,
   /// galactic, ...). Use PtnSetupHandler::SharedPtr from humble and onward
-  inline void
-  handle_goal(std::shared_future<PtnSetupHandler::SharedPtr> future) {
+  inline void handle_goal(
+      std::shared_future<std::shared_ptr<ActionHandle<ActionT>>> future) {
     auto handle = future.get();
     handle_goal(handle);
   }
@@ -54,11 +53,16 @@ protected:
   void launch_action(ActionGoal<ActionT> &goal) {
 
     auto goal_opts = ActionGoalOpts<ActionT>();
-
+#ifdef LEGACY_IDL
+    goal_opts.goal_response_callback =
+        [&](const std::shared_future<std::shared_ptr<ActionHandle<ActionT>>>
+                &future) { handle_goal(future); };
+#else
     goal_opts.goal_response_callback =
         [&](const std::shared_ptr<ActionHandle<ActionT>> &handle) {
           handle_goal(handle);
         };
+#endif
     goal_opts.feedback_callback =
         [&](std::shared_ptr<ActionHandle<ActionT>> handle,
             const std::shared_ptr<const ActionFeedback<ActionT>> feedback) {
@@ -75,9 +79,7 @@ protected:
 public:
   BaseActionClient(std::shared_ptr<rclcpp::Node> node,
                    const std::string &service_name)
-      : node_handle(node) {
-    client = ra::create_client<ActionT>(node, service_name);
-  }
+      : node_handle(node) {}
   virtual void make_action_call() = 0;
 };
 

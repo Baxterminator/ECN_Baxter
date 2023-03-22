@@ -14,8 +14,10 @@
 namespace ecn_baxter::game::ros2 {
 
 GameMaster_2::GameMaster_2(rclcpp::NodeOptions opts)
-    : rclcpp::Node("game_master_2", opts) {
-  points_setup = std::make_shared<SetupPointsClient>(shared_from_this());
+    : rclcpp::Node("game_master_2", opts) {}
+
+void GameMaster_2::set_handle(std::shared_ptr<rclcpp::Node> handle) {
+  points_setup = std::make_shared<SetupPointsClient>(handle);
 }
 
 } // namespace ecn_baxter::game::ros2

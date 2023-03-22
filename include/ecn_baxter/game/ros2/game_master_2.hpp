@@ -28,6 +28,8 @@ public:
     points_setup->update_ptn_setup_client(gprops);
   }
 
+  void set_handle(std::shared_ptr<rclcpp::Node>);
+
   void make_setup() { points_setup->make_action_call(); }
 
 protected:
