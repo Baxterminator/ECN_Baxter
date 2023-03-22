@@ -10,11 +10,13 @@
 #ifndef ECN_BASE_ACTION_CLIENT
 #define ECN_BASE_ACTION_CLIENT
 
+#include <chrono>
 #include <memory>
 #include <rclcpp/node.hpp>
 #include <rclcpp_action/rclcpp_action.hpp>
 
 namespace ra = rclcpp_action;
+using namespace std::chrono_literals;
 
 namespace ecn::base {
 
@@ -26,7 +28,7 @@ template <typename ActionT> using ActionGoal = typename ActionT::Goal;
 template <typename ActionT>
 using ActionGoalOpts = typename ra::Client<ActionT>::SendGoalOptions;
 
-/// @brief Base for action client
+/// @brief Abstraction class for action client
 /// @tparam ActionT the action type
 template <typename ActionT> class BaseActionClient {
 protected:
@@ -51,6 +53,15 @@ protected:
   virtual void handle_result(const ActionWrappedResult<ActionT> &) = 0;
 
   void launch_action(ActionGoal<ActionT> &goal) {
+
+    // If the server is not online, stop here
+    if (!client->wait_for_action_server(150ms)) {
+      if (!node_handle.expired()) {
+        RCLCPP_ERROR(node_handle.lock()->get_logger(),
+                     "Action server not available after waiting");
+      }
+      return;
+    }
 
     auto goal_opts = ActionGoalOpts<ActionT>();
 #ifdef LEGACY_IDL
