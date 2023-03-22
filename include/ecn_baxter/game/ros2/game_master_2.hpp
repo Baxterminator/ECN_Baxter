@@ -11,16 +11,27 @@
 #define ECN_BAXTER_GAME_MASTER_2_HPP
 
 #include "ecn_baxter/action/points_setup.hpp"
+#include "ecn_baxter/game/data/game_properties.hpp"
 #include "ecn_baxter/game/ros2/client_points.hpp"
+#include <memory>
 #include <rclcpp/rclcpp.hpp>
 
 namespace ecn_baxter::game::ros2 {
 
 using ecn_baxter::action::PointsSetup;
 
-class GameMaster_2 : public rclcpp::Node, public SetupPointsClient {
+class GameMaster_2 : public rclcpp::Node {
 public:
   explicit GameMaster_2(rclcpp::NodeOptions opts);
+
+  void update_game_props(std::shared_ptr<data::GameProperties> gprops) {
+    points_setup->update_ptn_setup_client(gprops);
+  }
+
+  void make_setup() { points_setup->make_action_call(); }
+
+protected:
+  std::shared_ptr<SetupPointsClient> points_setup = nullptr;
 };
 } // namespace ecn_baxter::game::ros2
 #endif

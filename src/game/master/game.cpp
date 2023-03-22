@@ -101,7 +101,7 @@ void Game::load_game_propeties(const std::string &file_path) {
 
   // Update game properties pointers
   ros1_node->update_game_props(game_props);
-  ros2_node->update_ptn_setup_client(game_props);
+  ros2_node->update_game_props(game_props);
 }
 
 /**═════════════════════════════════════════════════════════════════════════
@@ -171,7 +171,7 @@ bool Game::notify(QObject *receiver, QEvent *ev) {
     else if (receiver_is(main_ui->get_ui()->setup) &&
              event_is(QEvent::MouseButtonRelease)) {
       //? Setup launching
-      ros2_node->launch_point_setup();
+      ros2_node->make_setup();
       main_ui->get_ui()->setup->setEnabled(false);
     }
     //*══════════════════════════  GAME LOADING ═══════════════════════════*/

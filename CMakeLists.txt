@@ -38,22 +38,10 @@ endif()
 # =================================================================
 if("$ENV{ROS_DISTRO}" STREQUAL "galactic" OR "$ENV{ROS_DISTRO}" STREQUAL "foxy")
     set(LEGACY_IDL TRUE)
+    add_compile_definitions(LEGACY_IDL)
 else()
     set(LEGACY_IDL FALSE)
 endif()
-
-function(legacy_cpp files out_l)
-    foreach(f ${${files}})
-        if(${LEGACY_IDL})
-            string(CONCAT _out "src/legacy/" ${f})
-        else()
-            string(CONCAT _out "src/" ${f})
-        endif()
-        set(${out_l} ${${out_l}} ${_out})
-    endforeach()    
-    set(${out_l} ${${out_l}} PARENT_SCOPE)
-endfunction(legacy_cpp)
-
 
 # =================================================================
 #                           INTERFACE
@@ -130,10 +118,6 @@ ament_auto_add_library(game_utils
 target_include_directories(game_utils PRIVATE include ${ROS1_ROOT}/include)
 
 ############################# Game Master #############################
-set(legacy_files_gm
-    "game/ros2/setup_client.cpp"
-)
-legacy_cpp(legacy_files_gm legacy_gm)
 ament_auto_add_executable(game_master
     src/game/events/register_events.cpp
     src/game/game_master.cpp
@@ -148,7 +132,6 @@ ament_auto_add_executable(game_master
     src/game/ui/file_loader_wrapper.cpp
     resource/ui/main.ui
     resource/ui/game_loader.ui
-    ${legacy_gm}
 )
 target_include_directories(game_master PRIVATE include ${ROS1_ROOT}/include)
 target_link_libraries(game_master ${game_utils} ${ROS1_LIBS} Qt5::Core Qt5::Widgets Qt5::WebKit Qt5::WebKitWidgets )

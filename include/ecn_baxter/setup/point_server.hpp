@@ -11,7 +11,7 @@
 #define ECN_BAXTER_POINT_SERVER
 
 #include "ecn_baxter/action/points_setup.hpp"
-#include "ecn_baxter/base/base_server.hpp"
+#include "ecn_baxter/base/base_action_server.hpp"
 #include "ecn_baxter/game/data/arm_side.hpp"
 #include <baxter_core_msgs/msg/digital_io_state.hpp>
 #include <geometry_msgs/msg/transform_stamped.hpp>
@@ -32,7 +32,7 @@ struct ButtonState {
   bool used = false;
 };
 
-class PointServer : public ecn::base::BaseServer<action::PointsSetup> {
+class PointServer : public ecn::base::BaseActionServer<action::PointsSetup> {
 private:
   /**═════════════════════════════════════════════════════════════════════════
    *?                                 TF

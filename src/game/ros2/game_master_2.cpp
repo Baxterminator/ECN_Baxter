@@ -8,12 +8,14 @@
  * @version        :  rev 23w12.1
  * ════════════════════════════════════════════════════════════════════════**/
 #include "ecn_baxter/game/ros2/game_master_2.hpp"
+#include "ecn_baxter/action/detail/points_setup__struct.hpp"
+#include "ecn_baxter/game/ros2/client_points.hpp"
 
 namespace ecn_baxter::game::ros2 {
 
 GameMaster_2::GameMaster_2(rclcpp::NodeOptions opts)
-    : rclcpp::Node("game_master_2", opts), SetupPointsClient(get_logger()) {
-  ptn_setup = rclcpp_action::create_client<PointsSetup>(this, "server");
+    : rclcpp::Node("game_master_2", opts) {
+  points_setup = std::make_shared<SetupPointsClient>(shared_from_this());
 }
 
 } // namespace ecn_baxter::game::ros2
