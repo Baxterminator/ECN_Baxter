@@ -7,8 +7,8 @@
  * @description    :  Base action server
  * @version        :  rev 23w12.1
  * ════════════════════════════════════════════════════════════════════════**/
-#ifndef ECN_BASE_SERVER
-#define ECN_BASE_SERVER
+#ifndef ECN_BASE_ACTION_SERVER
+#define ECN_BASE_ACTION_SERVER
 
 #include <bits/types/sig_atomic_t.h>
 #include <memory>
@@ -25,7 +25,7 @@ template <typename ActionT> using ActionHandle = ra::ServerGoalHandle<ActionT>;
 
 /// @brief Base for action server
 /// @tparam ActionT the action type
-template <typename ActionT> class BaseServer {
+template <typename ActionT> class BaseActionServer {
 private:
   std::shared_ptr<ra::Server<ActionT>> server;
   sig_atomic_t stop_cmd = 0;
@@ -33,7 +33,7 @@ private:
   /// @brief Accept the action, start the thread
   void handle_accepted(const std::shared_ptr<ActionHandle<ActionT>> handle) {
     using namespace std::placeholders;
-    std::thread{std::bind(&BaseServer<ActionT>::exec, this, _1), handle}
+    std::thread{std::bind(&BaseActionServer<ActionT>::exec, this, _1), handle}
         .detach();
   }
 
@@ -52,15 +52,16 @@ protected:
   inline bool has_to_stop() { return stop_cmd == 1; }
 
 public:
-  BaseServer(std::shared_ptr<rclcpp::Node> node, const char *const name) {
+  BaseActionServer(std::shared_ptr<rclcpp::Node> node, const char *const name) {
     using namespace std::placeholders;
 
     server = ra::create_server<ActionT>(
-        node, name, std::bind(&BaseServer<ActionT>::handle_goal, this, _1, _2),
-        std::bind(&BaseServer<ActionT>::handle_cancel, this, _1),
-        std::bind(&BaseServer<ActionT>::handle_accepted, this, _1));
+        node, name,
+        std::bind(&BaseActionServer<ActionT>::handle_goal, this, _1, _2),
+        std::bind(&BaseActionServer<ActionT>::handle_cancel, this, _1),
+        std::bind(&BaseActionServer<ActionT>::handle_accepted, this, _1));
   }
-  virtual ~BaseServer() { server.reset(); };
+  virtual ~BaseActionServer() { server.reset(); };
   inline void stop_server() { stop_cmd = 1; };
 };
 } // namespace ecn::base

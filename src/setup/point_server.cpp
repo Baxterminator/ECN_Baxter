@@ -18,7 +18,7 @@ using namespace std::chrono_literals;
 namespace ecn_baxter::setup {
 
 PointServer::PointServer(std::shared_ptr<rclcpp::Node> node)
-    : BaseServer(node, SERVER_NAME), tf_buffer(node->get_clock()),
+    : BaseActionServer(node, SERVER_NAME), tf_buffer(node->get_clock()),
       tf_listener(tf_buffer) {
   left_sub = node->create_subscription<DigitalIOState>(
       BUTTON_LEFT_TOPIC, QOS, [&](const DigitalIOState::UniquePtr msg) {
