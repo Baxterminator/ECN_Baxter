@@ -71,6 +71,8 @@ bool MainUI::eventFilter(QObject *obj, QEvent *e) {
 /// @brief Make a context menu over an item
 bool MainUI::make_context_menu(QEvent *e) {
   QContextMenuEvent *mouse_ev = static_cast<QContextMenuEvent *>(e);
+  if (gui->users->itemAt(mouse_ev->pos()) == nullptr)
+    return true;
   QTableWidgetItem *child_item =
       gui->users->item(gui->users->itemAt(mouse_ev->pos())->row(), 0);
 

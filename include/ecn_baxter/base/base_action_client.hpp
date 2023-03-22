@@ -44,11 +44,11 @@ protected:
     handle_goal(handle);
   }
 #endif
-  virtual void handle_goal(const std::shared_ptr<ActionHandle<ActionT>>) = 0;
+  virtual void handle_goal(const std::shared_ptr<ActionHandle<ActionT>> &) = 0;
   virtual void
   handle_feedback(std::shared_ptr<ActionHandle<ActionT>>,
                   const std::shared_ptr<const ActionFeedback<ActionT>>) = 0;
-  virtual void handle_result(const ActionWrappedResult<ActionT>) = 0;
+  virtual void handle_result(const ActionWrappedResult<ActionT> &) = 0;
 
   void launch_action(ActionGoal<ActionT> &goal) {
 
@@ -56,7 +56,7 @@ protected:
 #ifdef LEGACY_IDL
     goal_opts.goal_response_callback =
         [&](const std::shared_future<std::shared_ptr<ActionHandle<ActionT>>>
-                &future) { handle_goal(future); };
+                future) { handle_goal(future); };
 #else
     goal_opts.goal_response_callback =
         [&](const std::shared_ptr<ActionHandle<ActionT>> &handle) {
@@ -78,8 +78,10 @@ protected:
 
 public:
   BaseActionClient(std::shared_ptr<rclcpp::Node> node,
-                   const std::string &service_name)
-      : node_handle(node) {}
+                   [[maybe_unused]] const std::string &service_name)
+      : node_handle(node) {
+    client = ra::create_client<ActionT>(node, service_name);
+  }
   virtual void make_action_call() = 0;
 };
 

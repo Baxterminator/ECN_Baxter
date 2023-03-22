@@ -24,9 +24,7 @@ using PtnSetupHandler = rclcpp_action::ClientGoalHandle<PointsSetup>;
 class SetupPointsClient : public ecn::base::BaseActionClient<PointsSetup> {
 public:
   explicit SetupPointsClient(std::shared_ptr<rclcpp::Node> node)
-      : BaseActionClient(node, "point_server"), logger(node->get_logger()) {
-    // client = ra::create_client<PointsSetup>(node, "server'");
-  }
+      : BaseActionClient(node, "point_setup"), logger(node->get_logger()) {}
 
   void update_ptn_setup_client(std::weak_ptr<data::GameProperties> gprop) {
     game_props = gprop;
@@ -37,11 +35,11 @@ public:
 protected:
   rclcpp::Logger logger;
 
-  void handle_goal(const PtnSetupHandler::SharedPtr) override;
+  void handle_goal(const PtnSetupHandler::SharedPtr &) override;
   void
   handle_feedback(PtnSetupHandler::SharedPtr,
                   const std::shared_ptr<const PointsSetup::Feedback>) override;
-  void handle_result(const PtnSetupHandler::WrappedResult) override;
+  void handle_result(const PtnSetupHandler::WrappedResult &) override;
 
 private:
   std::weak_ptr<data::GameProperties> game_props;

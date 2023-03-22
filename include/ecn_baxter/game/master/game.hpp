@@ -31,7 +31,7 @@ public:
    *!                              Cycle Utils
    * ═════════════════════════════════════════════════════════════════════════*/
 
-  Game(int argc, char **argv);
+  Game(int &argc, char **argv);
   inline bool is_initialized() { return _initialized; }
   void stop();
 

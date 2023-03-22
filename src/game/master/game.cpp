@@ -28,7 +28,7 @@ sig_atomic_t Game::stop_cmd;
  * ═════════════════════════════════════════════════════════════════════════*/
 
 /// @brief Initialize the application and every ROS / GUI components
-Game::Game(int argc, char **argv)
+Game::Game(int &argc, char **argv)
     : QApplication(argc, argv), GamePropertiesLoader() {
   stop_cmd = 0;
   players_list = std::make_shared<data::PlayerList>();
