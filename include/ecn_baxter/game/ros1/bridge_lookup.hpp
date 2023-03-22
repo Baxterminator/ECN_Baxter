@@ -6,7 +6,7 @@
  * @createdOn      :  19/02/2023
  * @description    :  Sub-part of the ROS1 game master for checking connected
  *                    players
- * @version        :  rev 23w12.1
+ * @version        :  rev 23w12.2
  * ════════════════════════════════════════════════════════════════════════**/
 #ifndef BRIDGE_LOOKUP
 #define BRIDGE_LOOKUP
@@ -14,6 +14,7 @@
 #include "baxter_core_msgs/BridgePublishersForce.h"
 #include "ros/service_client.h"
 #include <ecn_baxter/game/data/game_players.hpp>
+#include <memory>
 #include <ros/duration.h>
 #include <ros/master.h>
 #include <ros/node_handle.h>
@@ -41,7 +42,7 @@ private:
   /**════════════════════════════════════════════════════════════════════════
    *?                             Bridge Lookup
    * ════════════════════════════════════════════════════════════════════════**/
-
+  std::weak_ptr<data::PlayerList> _players;
   const ros::WallDuration check_dur{0.5};
   ros::WallTimer _check_timer;
   void update_connected_players(const std::vector<std::string> &);
@@ -62,8 +63,8 @@ protected:
    * ════════════════════════════════════════════════════════════════════════**/
 
   explicit BridgesManager(){};
-  void bridges_init(std::shared_ptr<ros::NodeHandle>);
-  PlayerList players;
+  void bridges_init(std::shared_ptr<ros::NodeHandle>,
+                    std::shared_ptr<data::PlayerList>);
 
   /**════════════════════════════════════════════════════════════════════════
    *?                              Bridge Lookup

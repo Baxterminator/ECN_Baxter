@@ -5,7 +5,7 @@
  * @repo           :  https://github.com/Baxterminator/ecn_baxter/
  * @createdOn      :  19/02/2023
  * @description    :  UI Wrapper for the main window
- * @version        :  rev 23w12.1
+ * @version        :  rev 23w12.2
  * ════════════════════════════════════════════════════════════════════════**/
 #ifndef ECN_BAXTER_MAIN_WRAPPER_H
 #define ECN_BAXTER_MAIN_WRAPPER_H
@@ -25,12 +25,21 @@ namespace ecn_baxter::gui {
 class MainUI : public ecn::base::BaseGUI<Ui::BaxterMaster, QMainWindow> {
 protected:
   /**═════════════════════════════════════════════════════════════════════════
-   *?                            Game Loader
+   *?                            Game Properties
    * ═════════════════════════════════════════════════════════════════════════**/
-
+  std::weak_ptr<game::data::PlayerList> players;
   std::shared_ptr<FileLoaderWrapper> game_loader = nullptr;
   void setup_game_loader();
-  void launch_game_loader();
+  bool launch_game_loader();
+
+  /**═════════════════════════════════════════════════════════════════════════
+   *?                            UI custom settings
+   * ═════════════════════════════════════════════════════════════════════════**/
+
+  /// @brief Set the custom properties for the UI that couldn't be done from
+  /// QT Designer
+  void set_custom_gui_properties() { set_users_view(); }
+  void set_users_view();
 
   /**═════════════════════════════════════════════════════════════════════════
    *?                            Event Callbacks
@@ -39,6 +48,8 @@ protected:
   void setup_internal_callbacks() override;
   bool eventFilter(QObject *obj, QEvent *e) override;
 
+  bool make_context_menu(QEvent *e);
+
 public:
   explicit MainUI();
   FileLoaderWrapper *get_game_loader() { return game_loader.get(); }
@@ -46,8 +57,10 @@ public:
   /**═════════════════════════════════════════════════════════════════════════
    *?                           External Callbacks
    * ═════════════════════════════════════════════════════════════════════════**/
-
-  void refresh_player_list(game::data::PlayerList &);
+  void set_player_list(std::shared_ptr<game::data::PlayerList> list) {
+    players = list;
+  }
+  void refresh_player_list();
 };
 } // namespace ecn_baxter::gui
 

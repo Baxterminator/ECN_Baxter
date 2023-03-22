@@ -5,11 +5,12 @@
  * @repo           :  https://github.com/Baxterminator/ecn_baxter/
  * @createdOn      :  19/02/2023
  * @description    :  Main wrapper managing ROS threads as well as UIs logic
- * @version        :  rev 23w12.1
+ * @version        :  rev 23w12.2
  * ════════════════════════════════════════════════════════════════════════**/
 #ifndef ECN_BAXTER_GAME_HPP
 #define ECN_BAXTER_GAME_HPP
 
+#include "ecn_baxter/game/data/game_players.hpp"
 #include "ecn_baxter/game/properties_loader.hpp"
 #include "ecn_baxter/game/ros1/game_master_1.hpp"
 #include "ecn_baxter/game/ros2/game_master_2.hpp"
@@ -61,6 +62,7 @@ private:
    * ═════════════════════════════════════════════════════════════════════════*/
 
   bool game_launched = false;
+  std::shared_ptr<data::PlayerList> players_list;
   void load_game_propeties(const std::string &);
 
   /**═════════════════════════════════════════════════════════════════════════

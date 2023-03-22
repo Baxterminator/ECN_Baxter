@@ -5,7 +5,7 @@
  * @repo           :  https://github.com/Baxterminator/ecn_baxter/
  * @createdOn      :  19/02/2023
  * @description    :  Main wrapper managing ROS threads as well as UIs
- * @version        :  rev 23w11.3
+ * @version        :  rev 23w12.2
  * ════════════════════════════════════════════════════════════════════════**/
 #include "ecn_baxter/game/master/game.hpp"
 #include "ecn_baxter/game/data/game_players.hpp"
@@ -13,6 +13,7 @@
 #include "ecn_baxter/game/events/event_target.hpp"
 #include "ecn_baxter/game/events/setup_ended.hpp"
 #include "ecn_baxter/utils/qtevents.hpp"
+#include <memory>
 #include <qcoreevent.h>
 #include <qglobal.h>
 #include <qpushbutton.h>
@@ -30,6 +31,7 @@ sig_atomic_t Game::stop_cmd;
 Game::Game(int argc, char **argv)
     : QApplication(argc, argv), GamePropertiesLoader() {
   stop_cmd = 0;
+  players_list = std::make_shared<data::PlayerList>();
 
   //* ROS2 Initialization
   rclcpp::init(argc, argv);
@@ -50,7 +52,7 @@ Game::Game(int argc, char **argv)
               RCLCPP_FATAL(ros2()->get_logger(), "Game master is already
      launched !"); return false;
           }*/
-  ros1_node = std::make_unique<ros1::GameMaster_1>();
+  ros1_node = std::make_unique<ros1::GameMaster_1>(players_list);
 
   //* Run ROS Loop
   ros_thread = std::thread([&]() { ros_loop(); });
@@ -115,6 +117,7 @@ void Game::show_ui() {
 
   main_ui = std::make_unique<gui::MainUI>();
   main_ui->setup_ui();
+  main_ui->set_player_list(players_list);
   main_ui->show();
 }
 
@@ -133,15 +136,15 @@ bool Game::notify(QObject *receiver, QEvent *ev) {
 #define receiver_is(t) (receiver == t)
 
   //! ━━━━━━━━━━━━━━━━━━━━ Non-UI components callbacks ━━━━━━━━━━━━━━━━━━━━━*/
-  if (ev->type() != QEvent::Create && receiver == EventTarget::instance()) {
+  if (!event_is(QEvent::Create) && receiver_is(EventTarget::instance())) {
     //*═══════════════════════════  BRIDGE LIST ═══════════════════════════*/
     /// if (ev->type() == BridgesUpdate::type()) {
-    if (event_is(BridgesUpdate::type())) {
-      BridgesUpdate *bridge_event = static_cast<BridgesUpdate *>(ev);
+    if (event_is(BridgesUpdate::type()) && !is_null(main_ui) &&
+        main_ui->is_made() && !is_null(ros2_node)) {
       RCLCPP_DEBUG(ros2_node->get_logger(),
                    "Updating bridges list (%zu registered bridges).",
-                   bridge_event->get_player_list().size());
-      main_ui->refresh_player_list(bridge_event->get_player_list());
+                   ((players_list != nullptr) ? players_list->size() : 0));
+      main_ui->refresh_player_list();
     }
     //*═══════════════════════════  SETUP ENDED ═══════════════════════════*/
     else if (event_is(SetupEnded::type())) {
