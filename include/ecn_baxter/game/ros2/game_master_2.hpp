@@ -30,7 +30,7 @@ public:
 
   void set_handle(std::shared_ptr<rclcpp::Node>);
 
-  void make_setup() { points_setup->make_action_call(); }
+  bool make_setup() { return points_setup->make_action_call(); }
 
 protected:
   std::shared_ptr<SetupPointsClient> points_setup = nullptr;

@@ -52,7 +52,7 @@ protected:
                   const std::shared_ptr<const ActionFeedback<ActionT>>) = 0;
   virtual void handle_result(const ActionWrappedResult<ActionT> &) = 0;
 
-  void launch_action(ActionGoal<ActionT> &goal) {
+  bool launch_action(ActionGoal<ActionT> &goal) {
 
     // If the server is not online, stop here
     if (!client->wait_for_action_server(150ms)) {
@@ -60,7 +60,7 @@ protected:
         RCLCPP_ERROR(node_handle.lock()->get_logger(),
                      "Action server not available after waiting");
       }
-      return;
+      return false;
     }
 
     auto goal_opts = ActionGoalOpts<ActionT>();
@@ -84,7 +84,8 @@ protected:
           handle_result(result);
         };
 
-    client->async_send_goal(goal, goal_opts);
+    auto h = client->async_send_goal(goal, goal_opts);
+    return true;
   }
 
 public:
@@ -93,7 +94,9 @@ public:
       : node_handle(node) {
     client = ra::create_client<ActionT>(node, service_name);
   }
-  virtual void make_action_call() = 0;
+  virtual bool make_action_call() = 0;
+
+  virtual ~BaseActionClient() { client->async_cancel_all_goals(); }
 };
 
 } // namespace ecn::base

@@ -78,12 +78,12 @@ void SetupPointsClient::handle_feedback(
 }
 
 /// @brief Launch the call to the action for point setuping
-void SetupPointsClient::make_action_call() {
+bool SetupPointsClient::make_action_call() {
 
   // Verifying that the game props are still existent
   if (game_props.expired()) {
     RCLCPP_WARN(logger, "Game Properties ptr is expired !");
-    return;
+    return false;
   }
 
   auto props = game_props.lock();
@@ -101,7 +101,7 @@ void SetupPointsClient::make_action_call() {
     setup_msg.ptns_name.push_back(point.name);
     setup_msg.sides.push_back(game::data::side2bool(point.arm_side));
   }
-  launch_action(setup_msg);
+  return launch_action(setup_msg);
 }
 
 } // namespace ecn_baxter::game::ros2

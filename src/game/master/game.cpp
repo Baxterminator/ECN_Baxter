@@ -175,8 +175,10 @@ bool Game::notify(QObject *receiver, QEvent *ev) {
     else if (receiver_is(main_ui->get_ui()->setup) &&
              event_is(QEvent::MouseButtonRelease)) {
       //? Setup launching
-      ros2_node->make_setup();
       main_ui->get_ui()->setup->setEnabled(false);
+      if (!ros2_node->make_setup())
+        main_ui->get_ui()->setup->setEnabled(true);
+
     }
     //*══════════════════════════  GAME LOADING ═══════════════════════════*/
     else if (!is_null(main_ui->get_game_loader()) &&

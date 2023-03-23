@@ -24,13 +24,13 @@ using PtnSetupHandler = rclcpp_action::ClientGoalHandle<PointsSetup>;
 class SetupPointsClient : public ecn::base::BaseActionClient<PointsSetup> {
 public:
   explicit SetupPointsClient(std::shared_ptr<rclcpp::Node> node)
-      : BaseActionClient(node, "point_setup"), logger(node->get_logger()) {}
+      : BaseActionClient(node, "points_setup"), logger(node->get_logger()) {}
 
   void update_ptn_setup_client(std::weak_ptr<data::GameProperties> gprop) {
     game_props = gprop;
   }
 
-  void make_action_call() override;
+  bool make_action_call() override;
 
 protected:
   rclcpp::Logger logger;
