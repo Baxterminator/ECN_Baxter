@@ -16,7 +16,7 @@
 namespace ecn_baxter::game::ros2 {
 /// @brief Callback of the acceptance of the action call
 /// @param handle the handle to the call to the action
-void SetupPointsClient::handle_goal(const PtnSetupHandler::SharedPtr handle) {
+void SetupPointsClient::handle_goal(const PtnSetupHandler::SharedPtr &handle) {
   if (!handle) {
     RCLCPP_ERROR(logger, "Setup rejected bu server");
   }
@@ -26,7 +26,7 @@ void SetupPointsClient::handle_goal(const PtnSetupHandler::SharedPtr handle) {
 /// @brief Callback of the last message sent by the action
 /// @param result the end result of the action call
 void SetupPointsClient::handle_result(
-    const PtnSetupHandler::WrappedResult result) {
+    const PtnSetupHandler::WrappedResult &result) {
   switch (result.code) {
   case rclcpp_action::ResultCode::ABORTED:
     RCLCPP_ERROR(logger, "Setup aborted !");
@@ -78,13 +78,12 @@ void SetupPointsClient::handle_feedback(
 }
 
 /// @brief Launch the call to the action for point setuping
-void SetupPointsClient::make_action_call() {
-  using namespace std::placeholders;
+bool SetupPointsClient::make_action_call() {
 
   // Verifying that the game props are still existent
   if (game_props.expired()) {
     RCLCPP_WARN(logger, "Game Properties ptr is expired !");
-    return;
+    return false;
   }
 
   auto props = game_props.lock();
@@ -102,7 +101,7 @@ void SetupPointsClient::make_action_call() {
     setup_msg.ptns_name.push_back(point.name);
     setup_msg.sides.push_back(game::data::side2bool(point.arm_side));
   }
-  launch_action(setup_msg);
+  return launch_action(setup_msg);
 }
 
 } // namespace ecn_baxter::game::ros2

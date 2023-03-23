@@ -28,7 +28,7 @@ sig_atomic_t Game::stop_cmd;
  * ═════════════════════════════════════════════════════════════════════════*/
 
 /// @brief Initialize the application and every ROS / GUI components
-Game::Game(int argc, char **argv)
+Game::Game(int &argc, char **argv)
     : QApplication(argc, argv), GamePropertiesLoader() {
   stop_cmd = 0;
   players_list = std::make_shared<data::PlayerList>();
@@ -36,6 +36,7 @@ Game::Game(int argc, char **argv)
   //* ROS2 Initialization
   rclcpp::init(argc, argv);
   ros2_node = std::make_shared<ros2::GameMaster_2>(rclcpp::NodeOptions{});
+  ros2_node->set_handle(ros2_node);
 
   ex = std::make_unique<rclcpp::executors::SingleThreadedExecutor>();
   ex->add_node(ros2_node);
@@ -174,8 +175,10 @@ bool Game::notify(QObject *receiver, QEvent *ev) {
     else if (receiver_is(main_ui->get_ui()->setup) &&
              event_is(QEvent::MouseButtonRelease)) {
       //? Setup launching
-      ros2_node->make_setup();
       main_ui->get_ui()->setup->setEnabled(false);
+      if (!ros2_node->make_setup())
+        main_ui->get_ui()->setup->setEnabled(true);
+
     }
     //*══════════════════════════  GAME LOADING ═══════════════════════════*/
     else if (!is_null(main_ui->get_game_loader()) &&
