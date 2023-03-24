@@ -1,6 +1,7 @@
 #include "QtWebKit"
 #include "ecn_baxter/game/data/local_games.hpp"
 #include "ecn_baxter/game/master/game.hpp"
+#include "ecn_baxter/game/utils/logger.hpp"
 #include "ros/init.h"
 #include <csignal>
 #include <iostream>
@@ -24,6 +25,11 @@ int main(int argc, char **argv) {
   signal(SIGINT, &sighandler);
 
   game_master = std::make_unique<Game>(argc, argv);
+
+  ecn_baxter::utils::Logger::initialize(game_master->ros2());
+
+  BAXTER_INFO("Test using baxter_info %f", 0.5);
+
   if (game_master->is_initialized()) {
     game_master->show_ui();
     game_master->exec();

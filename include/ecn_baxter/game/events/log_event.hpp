@@ -4,23 +4,35 @@
  * @email          :  geoffrey.cote@centraliens-nantes.org
  * @repo           :  https://github.com/Baxterminator/ecn_baxter/
  * @createdOn      :  19/03/2023
- * @description    :  Register all the custom events types
+ * @description    :  Event launched when something has to be logged
  * @version        :  rev 23w12.1
  * ════════════════════════════════════════════════════════════════════════**/
-#include "ecn_baxter/game/events/bridges_update_events.hpp"
-#include "ecn_baxter/game/events/log_event.hpp"
-#include "ecn_baxter/game/events/setup_ended.hpp"
-#include "ecn_baxter/game/utils/qtevents.hpp"
+#ifndef ECN_BAXTER_LOGGING
+#define ECN_BAXTER_LOGGING
+
 #include <qcoreevent.h>
+#include <rclcpp/logger.hpp>
 
 namespace ecn_baxter::game::events {
 
-using Type = QEvent::Type;
-#define new_type() static_cast<Type>(QEvent::registerEventType())
+using Level = rclcpp::Logger::Level;
 
-// Define the custom events here
-const Type BridgesUpdate::custom_type = new_type();
-const Type SetupEnded::custom_type = new_type();
-const Type LogEvent::custom_type = new_type();
+class LogEvent : public QEvent {
+public:
+  explicit LogEvent(Level level, const std::string &text)
+      : QEvent(custom_type), level_(level), text_(text) {}
+
+  static QEvent::Type type() { return custom_type; }
+
+  Level get_level() { return level_; }
+  const std::string &get_text() { return text_; }
+
+private:
+  const static QEvent::Type custom_type;
+  Level level_;
+  const std::string text_;
+};
 
 } // namespace ecn_baxter::game::events
+
+#endif

@@ -98,7 +98,7 @@ target_include_directories(gripper_node PRIVATE include)
 add_message(gripper_node)
 
 ############################### Jacobian ###############################
-ament_auto_add_executable(jacobian src/utils/jacobian.cpp)
+ament_auto_add_executable(jacobian src/game/utils/jacobian.cpp)
 target_include_directories(jacobian PRIVATE include)
 add_message(jacobian)
 
@@ -120,6 +120,7 @@ target_include_directories(game_utils PRIVATE include ${ROS1_ROOT}/include)
 ############################# Game Master #############################
 ament_auto_add_executable(game_master
     src/game/events/register_events.cpp
+    src/game/utils/logger.cpp
     src/game/game_master.cpp
     src/game/ros1/game_master_1.cpp
     src/game/ros1/bridge_lookup.cpp

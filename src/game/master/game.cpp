@@ -11,8 +11,10 @@
 #include "ecn_baxter/game/data/game_players.hpp"
 #include "ecn_baxter/game/events/bridges_update_events.hpp"
 #include "ecn_baxter/game/events/event_target.hpp"
+#include "ecn_baxter/game/events/log_event.hpp"
 #include "ecn_baxter/game/events/setup_ended.hpp"
-#include "ecn_baxter/utils/qtevents.hpp"
+#include "ecn_baxter/game/utils/logger.hpp"
+#include "ecn_baxter/game/utils/qtevents.hpp"
 #include <memory>
 #include <qcoreevent.h>
 #include <qglobal.h>
@@ -50,7 +52,7 @@ Game::Game(int &argc, char **argv)
           vector<string> nodes; ros::master::getNodes(nodes);
           auto it = find(nodes.begin(), nodes.end(), "game_master_1");
           if (it != nodes.end()) {
-              RCLCPP_FATAL(ros2()->get_logger(), "Game master is already
+              BAXTER_FATAL("Game master is already
      launched !"); return false;
           }*/
   ros1_node = std::make_unique<ros1::GameMaster_1>(players_list);
@@ -91,7 +93,7 @@ void Game::stop() {
 /// @brief Load the game parameters from a JSON file
 /// @param file_path the path to the configuration file
 void Game::load_game_propeties(const std::string &file_path) {
-  RCLCPP_INFO(ros2_node->get_logger(), "Loading game %s", file_path.c_str());
+  BAXTER_INFO("Loading game %s", file_path.c_str());
   load_file(file_path);
   main_ui->get_ui()->game_name->setText(game_props->game_name.c_str());
   if (game_props->is_skippable()) {
@@ -138,23 +140,23 @@ bool Game::notify(QObject *receiver, QEvent *ev) {
 
   //! ━━━━━━━━━━━━━━━━━━━━ Non-UI components callbacks ━━━━━━━━━━━━━━━━━━━━━*/
   if (!event_is(QEvent::Create) && receiver_is(EventTarget::instance())) {
-    //*═══════════════════════════  BRIDGE LIST ═══════════════════════════*/
-    /// if (ev->type() == BridgesUpdate::type()) {
+    //*═══════════════════════════ BRIDGE LIST ════════════════════════════*/
     if (event_is(BridgesUpdate::type()) && !is_null(main_ui) &&
         main_ui->is_made() && !is_null(ros2_node)) {
-      RCLCPP_DEBUG(ros2_node->get_logger(),
-                   "Updating bridges list (%zu registered bridges).",
+      BAXTER_DEBUG("Updating bridges list (%zu registered bridges).",
                    ((players_list != nullptr) ? players_list->size() : 0));
       main_ui->refresh_player_list();
     }
-    //*═══════════════════════════  SETUP ENDED ═══════════════════════════*/
+    //*═══════════════════════════ SETUP ENDED ════════════════════════════*/
     else if (event_is(SetupEnded::type())) {
       main_ui->get_ui()->launch->setEnabled(true);
     }
+    //*═════════════════════════════ LOGGING ═════════════════════════════*/
+    else if (event_is(LogEvent::type())) {
+    }
     //*══════════════════ ELSE (Without useless warnings) ═════════════════*/
     else if (!event_is(QEvent::Polish) && !event_is(QEvent::PolishRequest))
-      RCLCPP_WARN(ros2_node->get_logger(),
-                  "Unknown custom callback from non UI component (%s) !",
+      BAXTER_WARN("Unknown custom callback from non UI component (%s) !",
                   utils::qt::get_qtevent_name(ev).c_str());
   }
 

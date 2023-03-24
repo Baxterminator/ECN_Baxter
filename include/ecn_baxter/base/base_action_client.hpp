@@ -10,6 +10,7 @@
 #ifndef ECN_BASE_ACTION_CLIENT
 #define ECN_BASE_ACTION_CLIENT
 
+#include "ecn_baxter/game/utils/logger.hpp"
 #include <chrono>
 #include <memory>
 #include <rclcpp/node.hpp>
@@ -32,7 +33,6 @@ using ActionGoalOpts = typename ra::Client<ActionT>::SendGoalOptions;
 /// @tparam ActionT the action type
 template <typename ActionT> class BaseActionClient {
 protected:
-  std::weak_ptr<rclcpp::Node> node_handle;
   std::shared_ptr<ra::Client<ActionT>> client;
 
 #ifdef LEGACY_IDL
@@ -56,10 +56,7 @@ protected:
 
     // If the server is not online, stop here
     if (!client->wait_for_action_server(150ms)) {
-      if (!node_handle.expired()) {
-        RCLCPP_ERROR(node_handle.lock()->get_logger(),
-                     "Action server not available after waiting");
-      }
+      BAXTER_ERROR("Action server not available after waiting");
       return false;
     }
 
@@ -90,8 +87,7 @@ protected:
 
 public:
   BaseActionClient(std::shared_ptr<rclcpp::Node> node,
-                   [[maybe_unused]] const std::string &service_name)
-      : node_handle(node) {
+                   [[maybe_unused]] const std::string &service_name) {
     client = ra::create_client<ActionT>(node, service_name);
   }
   virtual bool make_action_call() = 0;

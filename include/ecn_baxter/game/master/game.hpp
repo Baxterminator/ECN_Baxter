@@ -41,6 +41,8 @@ public:
 
   void show_ui();
 
+  rclcpp::Node *ros2() { return ros2_node.get(); }
+
 private:
   bool _initialized = false;
 
