@@ -5,7 +5,7 @@
  * @repo           :  https://github.com/Baxterminator/ecn_baxter/
  * @createdOn      :  21/03/2023
  * @description    :  Base action client
- * @version        :  rev 23w12.3
+ * @version        :  rev 23w12.4
  * ════════════════════════════════════════════════════════════════════════**/
 #ifndef ECN_BASE_ACTION_CLIENT
 #define ECN_BASE_ACTION_CLIENT

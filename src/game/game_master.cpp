@@ -26,11 +26,8 @@ int main(int argc, char **argv) {
 
   game_master = std::make_unique<Game>(argc, argv);
 
-  ecn_baxter::utils::Logger::initialize(game_master->ros2());
-
-  BAXTER_INFO("Test using baxter_info %f", 0.5);
-
   if (game_master->is_initialized()) {
+    ecn_baxter::utils::Logger::initialize(game_master->ros2());
     game_master->show_ui();
     game_master->exec();
   }

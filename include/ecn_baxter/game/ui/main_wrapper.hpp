@@ -13,6 +13,7 @@
 #include "ecn_baxter/base/base_gui.hpp"
 #include "ecn_baxter/game/data/game_players.hpp"
 #include "ecn_baxter/game/ui/file_loader_wrapper.hpp"
+#include "ecn_baxter/game/ui/log_view.hpp"
 #include "ui_main.h"
 #include <memory>
 #include <qcoreevent.h>
@@ -42,6 +43,11 @@ protected:
   void set_users_view();
 
   /**═════════════════════════════════════════════════════════════════════════
+   *?                                Logging
+   * ═════════════════════════════════════════════════════════════════════════**/
+  std::unique_ptr<LogView> log_view = nullptr;
+
+  /**═════════════════════════════════════════════════════════════════════════
    *?                            Event Callbacks
    * ═════════════════════════════════════════════════════════════════════════**/
 
@@ -61,6 +67,13 @@ public:
     players = list;
   }
   void refresh_player_list();
+
+  void log_callback(QEvent *ev) {
+    auto log_ev = static_cast<LogEvent *>(ev);
+    if (log_view != nullptr) {
+      log_view->event_callback(log_ev);
+    }
+  }
 };
 } // namespace ecn_baxter::gui
 

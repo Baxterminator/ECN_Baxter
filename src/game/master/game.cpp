@@ -5,7 +5,7 @@
  * @repo           :  https://github.com/Baxterminator/ecn_baxter/
  * @createdOn      :  19/02/2023
  * @description    :  Main wrapper managing ROS threads as well as UIs
- * @version        :  rev 23w12.2
+ * @version        :  rev 23w12.4
  * ════════════════════════════════════════════════════════════════════════**/
 #include "ecn_baxter/game/master/game.hpp"
 #include "ecn_baxter/game/data/game_players.hpp"
@@ -153,6 +153,9 @@ bool Game::notify(QObject *receiver, QEvent *ev) {
     }
     //*═════════════════════════════ LOGGING ═════════════════════════════*/
     else if (event_is(LogEvent::type())) {
+      if (!is_null(main_ui) && main_ui->is_made())
+        main_ui->log_callback(ev);
+      return true;
     }
     //*══════════════════ ELSE (Without useless warnings) ═════════════════*/
     else if (!event_is(QEvent::Polish) && !event_is(QEvent::PolishRequest))
