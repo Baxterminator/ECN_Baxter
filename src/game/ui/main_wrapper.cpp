@@ -82,7 +82,7 @@ bool MainUI::make_context_menu(QEvent *e) {
 
     QAction top, right, left, none;
 
-    top.setText("Token to add");
+    top.setText("Token to change");
     top.setSeparator(true);
     right.setText("Right arm");
     left.setText("Left arm");
@@ -119,19 +119,17 @@ bool MainUI::make_context_menu(QEvent *e) {
             break;
           case ArmSide::RIGHT_ARM:
             player->wanted_side =
-                (is_user()) ? ((R_sel()) ? ArmSide::RIGHT_ARM : ArmSide::BOTH)
+                (is_user()) ? ((R_sel()) ? ArmSide::NONE : ArmSide::BOTH)
                             : ((R_sel()) ? ArmSide::NONE : ArmSide::RIGHT_ARM);
             break;
           case ArmSide::LEFT_ARM:
             player->wanted_side =
-                (is_user()) ? ((R_sel()) ? ArmSide::BOTH : ArmSide::LEFT_ARM)
+                (is_user()) ? ((R_sel()) ? ArmSide::BOTH : ArmSide::NONE)
                             : ((R_sel()) ? ArmSide::LEFT_ARM : ArmSide::NONE);
             break;
           case ArmSide::BOTH:
             player->wanted_side =
-                (is_user())
-                    ? ArmSide::BOTH
-                    : ((R_sel()) ? ArmSide::LEFT_ARM : ArmSide::RIGHT_ARM);
+                (R_sel()) ? ArmSide::LEFT_ARM : ArmSide::RIGHT_ARM;
             break;
           }
         }
@@ -194,6 +192,7 @@ void MainUI::refresh_player_list() {
   // Updating SLAVE MODE status
   gui->slave_on->setText((list->is_slaving()) ? "ON" : "OFF");
   gui->slave->setText((list->is_slaving()) ? "Slave OFF" : "Slave ON");
+  gui->slave->setEnabled(true);
 }
 
 /**════════════════════════════════════════════════════════════════════════

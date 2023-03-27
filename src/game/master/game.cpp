@@ -172,7 +172,6 @@ bool Game::notify(QObject *receiver, QEvent *ev) {
       (game_launched || !ros1_node->is_slaving())
           ? ros1_node->slave_on(game_launched)
           : ros1_node->slave_off();
-      main_ui->get_ui()->slave->setEnabled(true);
     }
     //*══════════════════════════  SETUP PHASE ════════════════════════════*/
     else if (receiver_is(main_ui->get_ui()->setup) &&
