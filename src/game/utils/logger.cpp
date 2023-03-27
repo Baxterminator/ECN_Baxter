@@ -6,7 +6,8 @@ rclcpp::Node *Logger::node_handle;
 
 using game::events::EventTarget;
 using game::events::LogEvent;
-using Level = rclcpp::Logger::Level;
+
+using Level = game::events::Level;
 
 /// @brief Initialize the logger
 void Logger::initialize(rclcpp::Node *node) { node_handle = node; }
