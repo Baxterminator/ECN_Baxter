@@ -9,6 +9,7 @@
  * ════════════════════════════════════════════════════════════════════════**/
 #include "ecn_baxter/game/master/game.hpp"
 #include "ecn_baxter/game/data/game_players.hpp"
+#include "ecn_baxter/game/events/auth_refresh_event.hpp"
 #include "ecn_baxter/game/events/bridges_update_events.hpp"
 #include "ecn_baxter/game/events/event_target.hpp"
 #include "ecn_baxter/game/events/log_event.hpp"
@@ -141,10 +142,11 @@ bool Game::notify(QObject *receiver, QEvent *ev) {
   //! ━━━━━━━━━━━━━━━━━━━━ Non-UI components callbacks ━━━━━━━━━━━━━━━━━━━━━*/
   if (!event_is(QEvent::Create) && receiver_is(EventTarget::instance())) {
     //*═══════════════════════════ BRIDGE LIST ════════════════════════════*/
-    if (event_is(BridgesUpdate::type()) && !is_null(main_ui) &&
-        main_ui->is_made() && !is_null(ros2_node)) {
-      BAXTER_DEBUG("Updating bridges list (%zu registered bridges).",
-                   ((players_list != nullptr) ? players_list->size() : 0));
+    if ((event_is(BridgesUpdate::type()) || event_is(AuthRefresh::type())) &&
+        !is_null(main_ui) && main_ui->is_made() && !is_null(ros2_node)) {
+      BAXTER_DEBUG(
+          "Updating bridges list (%zu registered bridges).",
+          ((players_list != nullptr) ? players_list->players.size() : 0));
       main_ui->refresh_player_list();
     }
     //*═══════════════════════════ SETUP ENDED ════════════════════════════*/
@@ -167,10 +169,9 @@ bool Game::notify(QObject *receiver, QEvent *ev) {
         event_is(QEvent::MouseButtonRelease)) {
       main_ui->get_ui()->slave->setEnabled(false);
       // Set slave to ON or OFF
-      (game_launched || !ros1_node->is_slaving()) ? ros1_node->slave_on()
-                                                  : ros1_node->slave_off();
-      main_ui->get_ui()->slave_on->setText((ros1_node->is_slaving()) ? "ON"
-                                                                     : "OFF");
+      (game_launched || !ros1_node->is_slaving())
+          ? ros1_node->slave_on(game_launched)
+          : ros1_node->slave_off();
       main_ui->get_ui()->slave->setEnabled(true);
     }
     //*══════════════════════════  SETUP PHASE ════════════════════════════*/

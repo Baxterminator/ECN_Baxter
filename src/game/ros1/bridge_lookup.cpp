@@ -11,10 +11,16 @@
 #include "ecn_baxter/game/ros1/bridge_lookup.hpp"
 #include "ecn_baxter/game/data/arm_side.hpp"
 #include "ecn_baxter/game/data/game_players.hpp"
+#include "ecn_baxter/game/events/auth_refresh_event.hpp"
 #include "ecn_baxter/game/events/bridges_update_events.hpp"
 #include "ecn_baxter/game/events/event_target.hpp"
+#include "ecn_baxter/game/utils/logger.hpp"
+#include "ros/duration.h"
+#include <chrono>
 #include <memory>
 #include <qapplication.h>
+
+using namespace std::chrono_literals;
 
 namespace ecn_baxter::game::ros1 {
 
@@ -25,17 +31,24 @@ namespace ecn_baxter::game::ros1 {
 /// @brief Initialize the periodic bridge lookup related objects
 void BridgesManager::bridges_init(std::shared_ptr<ros::NodeHandle> handle,
                                   std::shared_ptr<data::PlayerList> players) {
-  _players = players;
-  _check_timer =
+  _playerlist = players;
+
+  // Services
+  _force_client =
+      handle->serviceClient<baxter_core_msgs::BridgePublishersForce>(
+          force_service);
+  _auth_client = handle->serviceClient<baxter_core_msgs::BridgePublishersAuth>(
+      auth_service);
+
+  // Timers
+  _routine =
       handle->createWallTimer(check_dur, [this](const ros::WallTimerEvent &) {
         look_for_briges();
-        events::BridgesUpdate ev;
-        QApplication::sendEvent(events::EventTarget::instance(), &ev);
+        force_routine();
+        auth_routine();
+        QApplication::sendEvent(events::EventTarget::instance(),
+                                new events::BridgesUpdate());
       });
-
-  _slave_client =
-      handle->serviceClient<baxter_core_msgs::BridgePublishersForce>(
-          slave_service);
 }
 
 /**════════════════════════════════════════════════════════════════════════
@@ -103,10 +116,10 @@ void BridgesManager::look_for_briges() {
 
 /// @brief Reset all players "connected" state to false
 void BridgesManager::reset_players_state() {
-  if (!_players.expired()) {
-    auto players = _players.lock();
-    auto i = players->begin();
-    while (i != players->end()) {
+  if (!_playerlist.expired()) {
+    auto pl = _playerlist.lock();
+    auto i = pl->players.begin();
+    while (i != pl->players.end()) {
       i->connected = false;
       i++;
     }
@@ -116,10 +129,10 @@ void BridgesManager::reset_players_state() {
 /// @brief Update local players list to last look out
 void BridgesManager::update_connected_players(
     const std::vector<std::string> &to_add) {
-  if (_players.expired())
+  if (_playerlist.expired())
     return;
 
-  auto players = _players.lock();
+  auto pl = _playerlist.lock();
 
   bool found;
   for (auto &p_name : to_add) {
@@ -127,8 +140,8 @@ void BridgesManager::update_connected_players(
     found = false;
 
     // If players already in list, update to "connected"
-    auto p_saved = players->begin();
-    while (p_saved != players->end()) {
+    auto p_saved = pl->players.begin();
+    while (p_saved != pl->players.end()) {
       if (p_saved->name == p_name) {
         p_saved->connected = true;
         found = true;
@@ -139,7 +152,7 @@ void BridgesManager::update_connected_players(
 
     // If not in list, add it
     if (!found)
-      players->push_back(GamePlayer{p_name, bridge_name + p_name, true});
+      pl->players.push_back(GamePlayer{p_name});
   }
 }
 
@@ -147,65 +160,84 @@ void BridgesManager::update_connected_players(
  *?                            Slave mode
  * ════════════════════════════════════════════════════════════════════════**/
 
-/// @brief Toggle the slave mode
-/// @return true if slave is on
-/// @return false if slave is off
-bool BridgesManager::slave_toggle() {
-  if (slaving) {
-    if (slave_off())
-      slaving = false;
-  } else {
-    if (slave_on())
-      slaving = true;
-  }
-  return slaving;
-}
-
 /// @brief Active the slave mode for the bridges
 /// @return return true if the change was successful, false either case
-bool BridgesManager::slave_on() {
-  // Reset slave players configuration
-  _slave_req.request.right_user = block_player;
-  _slave_req.request.left_user = block_player;
-
-  // Set players token to send to the server
-  if (_players.expired())
-    return slaving;
-  auto players = _players.lock();
-
-  auto player = players->begin();
-  while (player != players->end()) {
-    if (player->side == ArmSide::RIGHT_ARM)
-      _slave_req.request.right_user = player->name;
-    if (player->side == ArmSide::LEFT_ARM)
-      _slave_req.request.left_user = player->name;
-    player++;
-  }
-
-  // Send service request
-  if (send_slave_request())
-    slaving = true;
-  return slaving;
-}
+void BridgesManager::slave_on(bool game_on) { slaving = true; }
 
 /// @brief Deactivate the slave mode
 /// @return return true if the change was successful, false either case
-bool BridgesManager::slave_off() {
-  _slave_req.request.right_user = free_player;
-  _slave_req.request.left_user = free_player;
+void BridgesManager::slave_off() { slaving = false; }
 
-  // Send service request
-  if (send_slave_request())
-    slaving = false;
+void BridgesManager::refresh_force_request() {
+  if (_playerlist.expired()) {
+    BAXTER_ERROR(PLAYER_LIST_EXPIRED);
+    return;
+  }
 
-  return slaving;
+  // Set the authorized users
+  if (slaving) {
+    _force_req.request.right_user = GamePlayer::block_player;
+    _force_req.request.left_user = GamePlayer::block_player;
+
+    auto pl = _playerlist.lock();
+
+    auto player = pl->players.begin();
+    while (player != pl->players.end()) {
+      if (player->wanted_side == ArmSide::RIGHT_ARM ||
+          player->wanted_side == ArmSide::BOTH)
+        _force_req.request.right_user = player->name;
+      if (player->wanted_side == ArmSide::LEFT_ARM ||
+          player->wanted_side == ArmSide::BOTH)
+        _force_req.request.left_user = player->name;
+      player++;
+    }
+  } else {
+    _force_req.request.right_user = GamePlayer::free_player;
+    _force_req.request.left_user = GamePlayer::free_player;
+  }
 }
 
 /// @brief Send the slave state to the server
-bool BridgesManager::send_slave_request() {
-  if (_slave_client != nullptr)
-    return _slave_client.call(_slave_req);
-  return false;
+void BridgesManager::force_routine() {
+  if (_force_client == nullptr) {
+    BAXTER_ERROR(SERVICE_ERROR, PREFIX, "force");
+    return;
+  }
+  if (!_force_client.waitForExistence(_service_timeout)) {
+    BAXTER_ERROR(MONITOR_OFFLINE, PREFIX, "force");
+    return;
+  }
+
+  refresh_force_request();
+  _force_client.call(_force_req);
+  BAXTER_DEBUG(FORCE_REQ_SENT, PREFIX);
+}
+
+/// @brief Get the actual authorized users from the monitor
+void BridgesManager::auth_routine() {
+  if (_auth_client == nullptr) {
+    BAXTER_ERROR(SERVICE_ERROR, PREFIX, "auth");
+    return;
+  }
+  if (!_auth_client.waitForExistence(_service_timeout)) {
+    BAXTER_ERROR(MONITOR_OFFLINE, PREFIX, "auth");
+    return;
+  }
+
+  _auth_client.call(_auth_req);
+
+  if (_playerlist.expired()) {
+    BAXTER_ERROR(PLAYER_LIST_EXPIRED);
+    return;
+  }
+
+  auto p_list = _playerlist.lock();
+  p_list->left_user = _auth_req.response.forced_left;
+  p_list->right_user = _auth_req.response.forced_right;
+
+  slaving = p_list->is_slaving();
+
+  BAXTER_DEBUG(AUTH_REQ_SENT, PREFIX);
 }
 
 } // namespace ecn_baxter::game::ros1
