@@ -362,7 +362,7 @@ inline std::string get_qtevent_name(QEvent *ev) {
   default:
     return "Unknown";
   }
-};
+}
 
 } // namespace ecn_baxter::utils::qt
 

@@ -44,8 +44,13 @@ void BridgesManager::bridges_init(std::shared_ptr<ros::NodeHandle> handle,
   _routine =
       handle->createWallTimer(check_dur, [this](const ros::WallTimerEvent &) {
         look_for_briges();
-        force_routine();
-        auth_routine();
+        if (!_playerlist.expired()) {
+          auto pl = _playerlist.lock();
+          if (pl->connected > 0) {
+            force_routine();
+            auth_routine();
+          }
+        }
         QApplication::sendEvent(events::EventTarget::instance(),
                                 new events::BridgesUpdate());
       });
@@ -133,6 +138,7 @@ void BridgesManager::update_connected_players(
     return;
 
   auto pl = _playerlist.lock();
+  pl->connected = 0;
 
   bool found;
   for (auto &p_name : to_add) {
@@ -144,6 +150,7 @@ void BridgesManager::update_connected_players(
     while (p_saved != pl->players.end()) {
       if (p_saved->name == p_name) {
         p_saved->connected = true;
+        pl->connected++;
         found = true;
         break;
       }
@@ -162,11 +169,11 @@ void BridgesManager::update_connected_players(
 
 /// @brief Active the slave mode for the bridges
 /// @return return true if the change was successful, false either case
-void BridgesManager::slave_on(bool game_on) { slaving = true; }
+void BridgesManager::slave_on(bool game_on) { _slaving = true; }
 
 /// @brief Deactivate the slave mode
 /// @return return true if the change was successful, false either case
-void BridgesManager::slave_off() { slaving = false; }
+void BridgesManager::slave_off() { _slaving = false; }
 
 void BridgesManager::refresh_force_request() {
   if (_playerlist.expired()) {
@@ -175,7 +182,7 @@ void BridgesManager::refresh_force_request() {
   }
 
   // Set the authorized users
-  if (slaving) {
+  if (_slaving) {
     _force_req.request.right_user = GamePlayer::block_player;
     _force_req.request.left_user = GamePlayer::block_player;
 
@@ -235,7 +242,7 @@ void BridgesManager::auth_routine() {
   p_list->left_user = _auth_req.response.forced_left;
   p_list->right_user = _auth_req.response.forced_right;
 
-  slaving = p_list->is_slaving();
+  _slaving = p_list->is_slaving();
 
   BAXTER_DEBUG(AUTH_REQ_SENT, PREFIX);
 }

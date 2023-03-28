@@ -117,6 +117,12 @@ ament_auto_add_library(game_utils
 )
 target_include_directories(game_utils PRIVATE include ${ROS1_ROOT}/include)
 
+############################# Initializer #############################
+ament_auto_add_executable(initializer
+    src/initializer.cpp
+)
+target_include_directories(initializer PRIVATE include)
+
 ############################# Game Master #############################
 ament_auto_add_executable(game_master
     src/game/events/register_events.cpp

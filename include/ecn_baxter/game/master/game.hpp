@@ -15,6 +15,7 @@
 #include "ecn_baxter/game/ros1/game_master_1.hpp"
 #include "ecn_baxter/game/ros2/game_master_2.hpp"
 #include "ecn_baxter/game/ui/main_wrapper.hpp"
+#include "ros/node_handle.h"
 #include <chrono>
 #include <memory>
 #include <qapplication.h>

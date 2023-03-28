@@ -32,6 +32,7 @@ struct GamePlayer {
 struct PlayerList {
   std::vector<GamePlayer> players = std::vector<GamePlayer>(0);
   std::string left_user, right_user;
+  int connected = 0;
 
   bool is_slaving() { return !left_user.empty() || !right_user.empty(); }
 };

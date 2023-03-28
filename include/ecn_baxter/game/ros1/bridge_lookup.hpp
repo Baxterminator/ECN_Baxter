@@ -29,6 +29,8 @@ namespace ecn_baxter::game::ros1 {
 
 using namespace ecn_baxter::game::data;
 
+enum class SlaveMode { Selected_Player, Block_All };
+
 class BridgesManager {
 private:
   static constexpr auto bridge_name{"baxter_ros1_bridge_"};
@@ -72,7 +74,8 @@ private:
   ros::ServiceClient _force_client, _auth_client;
   baxter_core_msgs::BridgePublishersForce _force_req;
   baxter_core_msgs::BridgePublishersAuth _auth_req;
-  bool slaving = false;
+  bool _slaving = false;
+  SlaveMode _slave_mode = SlaveMode::Selected_Player;
   void refresh_force_request();
   void force_routine();
   void auth_routine();
@@ -100,7 +103,9 @@ public:
   void slave_on(bool = false);
   void slave_off();
   /// @brief Return whether the bridges are in slave mode or not
-  inline bool is_slaving() { return slaving; };
+  inline bool is_slaving() { return _slaving; }
+  inline SlaveMode get_slave_mode() { return _slave_mode; }
+  inline void set_slave_mode(SlaveMode mode) { _slave_mode = mode; }
 };
 } // namespace ecn_baxter::game::ros1
 

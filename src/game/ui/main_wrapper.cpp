@@ -147,7 +147,7 @@ bool MainUI::make_context_menu(QEvent *e) {
  * ════════════════════════════════════════════════════════════════════════**/
 
 /// @brief Refresh the player list with the given
-void MainUI::refresh_player_list() {
+void MainUI::refresh_player_list(bool slaving_on, bool block_all) {
   // Check if GUI has been made and the player list has been propagated
   if (gui == nullptr || players.expired())
     return;
@@ -155,7 +155,6 @@ void MainUI::refresh_player_list() {
   auto list = players.lock();
 
   // Show player list
-  int connected = 0;
   auto player = list->players.begin();
   while (player != list->players.end()) {
     if (player->new_discovered) {
@@ -167,8 +166,6 @@ void MainUI::refresh_player_list() {
     }
 
     // Update what need to be updated
-    if (player->connected)
-      connected++;
     gui->users->setItem(player->row_id, 1,
                         new QTableWidgetItem((player->connected)
                                                  ? "Connected"
@@ -184,15 +181,19 @@ void MainUI::refresh_player_list() {
 
   // Update number of connected people
   std::stringstream ss;
-  ss << connected;
+  ss << list->connected;
   ss << "/";
   ss << list->players.size();
   gui->n_co->setText(ss.str().c_str());
 
   // Updating SLAVE MODE status
-  gui->slave_on->setText((list->is_slaving()) ? "ON" : "OFF");
-  gui->slave->setText((list->is_slaving()) ? "Slave OFF" : "Slave ON");
-  gui->slave->setEnabled(true);
+  gui->slave_on_state->setText((slaving_on) ? "ON" : "OFF");
+  gui->slave_on->setText((slaving_on) ? "Slave OFF" : "Slave ON");
+  gui->slave_on->setEnabled(true);
+  // Updating SLAVE MODE status
+  gui->slave_mode_state->setText((block_all) ? "Blocked" : "Selected");
+  gui->slave_mode->setText((block_all) ? "Block all" : "Selected users");
+  gui->slave_mode->setEnabled(true);
 }
 
 /**════════════════════════════════════════════════════════════════════════

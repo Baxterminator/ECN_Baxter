@@ -106,7 +106,7 @@
         <widget class="QWidget" name="widget" native="true">
          <layout class="QGridLayout" name="gridLayout">
           <item row="1" column="1">
-           <widget class="QLabel" name="slave_on">
+           <widget class="QLabel" name="slave_on_state">
             <property name="font">
              <font>
               <weight>75</weight>
@@ -143,7 +143,7 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QLabel" name="slave_allow">
+           <widget class="QLabel" name="slave_mode_state">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -174,14 +174,14 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="slave_mode">
          <property name="text">
           <string>Block All</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="slave">
+        <widget class="QPushButton" name="slave_on">
          <property name="enabled">
           <bool>true</bool>
          </property>
@@ -311,7 +311,10 @@
        <item>
         <widget class="QPushButton" name="game_idling">
          <property name="text">
-          <string>PushButton</string>
+          <string>Set idling</string>
+         </property>
+         <property name="enabled">
+          <bool>false</bool>
          </property>
         </widget>
        </item>

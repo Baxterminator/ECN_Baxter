@@ -14,8 +14,10 @@
 #include "ecn_baxter/game/events/event_target.hpp"
 #include "ecn_baxter/game/events/log_event.hpp"
 #include "ecn_baxter/game/events/setup_ended.hpp"
+#include "ecn_baxter/game/ros1/bridge_lookup.hpp"
 #include "ecn_baxter/game/utils/logger.hpp"
 #include "ecn_baxter/game/utils/qtevents.hpp"
+#include <baxter_bridge/monitor.h>
 #include <memory>
 #include <qcoreevent.h>
 #include <qglobal.h>
@@ -130,6 +132,9 @@ void Game::show_ui() {
 #define event_is(t) (ev->type() == t)
 #define is_null(t) (t == nullptr)
 #define receiver_is(t) (receiver == t)
+#define ui main_ui->get_ui()
+#define game_loader main_ui->get_game_loader()
+#define press_event event_is(QEvent::MouseButtonRelease)
 
 /// @brief Logic between UI & Game works
 bool Game::notify(QObject *receiver, QEvent *ev) {
@@ -138,12 +143,15 @@ bool Game::notify(QObject *receiver, QEvent *ev) {
       receiver_is(events::EventTarget::instance())) {
     if (slave_logic(receiver, ev, false) || bridge_logic(receiver, ev, false) ||
         setup_logic(receiver, ev, false) || game_logic(receiver, ev, false)) {
+      return false;
+    } else if (event_is(events::LogEvent::type())) {
       return true;
     }
     //*══════════════════ ELSE (Without useless warnings) ═════════════════*/
-    else if (!event_is(QEvent::Polish) && !event_is(QEvent::PolishRequest)) {
-      BAXTER_WARN("Unknown custom callback from non UI component (%s) !",
-                  utils::qt::get_qtevent_name(ev).c_str());
+    else if (!event_is(QEvent::Polish) && !event_is(QEvent::PolishRequest) &&
+             !event_is(QEvent::None)) {
+      BAXTER_WARN("Unknown custom callback from non UI component (%s) %d!",
+                  utils::qt::get_qtevent_name(ev).c_str(), ev->type());
     }
   }
 
@@ -151,7 +159,7 @@ bool Game::notify(QObject *receiver, QEvent *ev) {
   if (!is_null(main_ui) && main_ui->is_made()) {
     if (slave_logic(receiver, ev, true) || bridge_logic(receiver, ev, true) ||
         setup_logic(receiver, ev, true) || game_logic(receiver, ev, true)) {
-      return true;
+      return false;
     }
   }
 
@@ -166,14 +174,16 @@ bool Game::bridge_logic(QObject *receiver, QEvent *ev, bool is_from_ui) {
   }
   //! ━━━━━━━━━━━━━━━━━━━━ Non-UI components callbacks ━━━━━━━━━━━━━━━━━━━━━*/
   else {
-    //*═══════════════════════════ BRIDGE LIST ════════════════════════════*/
+    //*═══════════════════════════ Bridge list ════════════════════════════*/
     if ((event_is(events::BridgesUpdate::type()) ||
          event_is(events::AuthRefresh::type())) &&
         !is_null(main_ui) && main_ui->is_made() && !is_null(ros2_node)) {
       BAXTER_DEBUG(
           "Updating bridges list (%zu registered bridges).",
           ((players_list != nullptr) ? players_list->players.size() : 0));
-      main_ui->refresh_player_list();
+      main_ui->refresh_player_list(ros1_node->is_slaving(),
+                                   ros1_node->get_slave_mode() ==
+                                       ros1::SlaveMode::Block_All);
       return true;
     }
   }
@@ -184,21 +194,20 @@ bool Game::bridge_logic(QObject *receiver, QEvent *ev, bool is_from_ui) {
 bool Game::setup_logic(QObject *receiver, QEvent *ev, bool is_from_ui) {
   //! ━━━━━━━━━━━━━━━━━━━━━━━━━━━━ UI callbacks ━━━━━━━━━━━━━━━━━━━━━━━━━━━━*/
   if (is_from_ui) {
-    //*═════════════════════════ LAUNCHING SETUP ═══════════════════════════*/
-    if (receiver_is(main_ui->get_ui()->game_setup) &&
-        event_is(QEvent::MouseButtonRelease)) {
+    //*═════════════════════════ Launching setup ═══════════════════════════*/
+    if (receiver_is(ui->game_setup) && press_event) {
       //? Setup launching
-      main_ui->get_ui()->game_setup->setEnabled(false);
+      ui->game_setup->setEnabled(false);
       if (!ros2_node->make_setup())
-        main_ui->get_ui()->game_setup->setEnabled(true);
+        ui->game_setup->setEnabled(true);
       return true;
     }
   }
   //! ━━━━━━━━━━━━━━━━━━━━ Non-UI components callbacks ━━━━━━━━━━━━━━━━━━━━━*/
   else {
-    //*═══════════════════════════ SETUP ENDED ═════════════════════════════*/
+    //*═══════════════════════════ Setup ended ═════════════════════════════*/
     if (event_is(events::SetupEnded::type())) {
-      main_ui->get_ui()->game_idling->setEnabled(true);
+      ui->game_idling->setEnabled(true);
       return true;
     }
   }
@@ -209,14 +218,33 @@ bool Game::setup_logic(QObject *receiver, QEvent *ev, bool is_from_ui) {
 bool Game::game_logic(QObject *receiver, QEvent *ev, bool is_from_ui) {
   //! ━━━━━━━━━━━━━━━━━━━━━━━━━━━━ UI callbacks ━━━━━━━━━━━━━━━━━━━━━━━━━━━━*/
   if (is_from_ui) {
-    //*══════════════════════════  GAME CHOOSING ═══════════════════════════*/
-    if (!is_null(main_ui->get_game_loader()) &&
-        main_ui->get_game_loader()->is_made() &&
-        receiver_is(
-            main_ui->get_game_loader()->get_ui()->select_buttons->buttons().at(
-                0)) &&
-        event_is(QEvent::MouseButtonRelease)) {
-      load_game_propeties(main_ui->get_game_loader()->get_file_to_load());
+    //*══════════════════════════  Game choosing ═══════════════════════════*/
+    if (!is_null(game_loader) && game_loader->is_made() &&
+        receiver_is(game_loader->get_ui()->select_buttons->buttons().at(0)) &&
+        press_event) {
+      load_game_propeties(game_loader->get_file_to_load());
+      return true;
+    }
+    //*═══════════════════════════ Idling mode ═════════════════════════════*/
+    else if (receiver_is(ui->game_idling) && press_event) {
+      ui->game_idling->setEnabled(false);
+      ros1_node->set_slave_mode(ros1::SlaveMode::Block_All);
+      ui->game_launch->setEnabled(true);
+      return true;
+    }
+    //*════════════════════════ Launch / Stop Game ═════════════════════════*/
+    else if (receiver_is(ui->game_launch) && press_event) {
+      // Whether to start or stop the game
+      if (game_launched) {
+        ui->game_launch->setText("Start Game");
+        game_launched = false;
+        ros1_node->set_slave_mode(ros1::SlaveMode::Block_All);
+      } else {
+        ui->game_launch->setText("Stop Game");
+        game_launched = true;
+        ros1_node->set_slave_mode(ros1::SlaveMode::Selected_Player);
+      }
+
       return true;
     }
   }
@@ -230,14 +258,19 @@ bool Game::game_logic(QObject *receiver, QEvent *ev, bool is_from_ui) {
 bool Game::slave_logic(QObject *receiver, QEvent *ev, bool is_from_ui) {
   //! ━━━━━━━━━━━━━━━━━━━━━━━━━━━━ UI callbacks ━━━━━━━━━━━━━━━━━━━━━━━━━━━━*/
   if (is_from_ui) {
-    //*═══════════════════════════ SLAVE MODE ═════════════════════════════*/
-    if (receiver_is(main_ui->get_ui()->slave) &&
-        event_is(QEvent::MouseButtonRelease)) {
-      main_ui->get_ui()->slave->setEnabled(false);
+    //*══════════════════════════ Slave On/Off ═════════════════════════════*/
+    if (receiver_is(ui->slave_on) && press_event) {
+      ui->slave_on->setEnabled(false);
       // Set slave to ON or OFF
       (game_launched || !ros1_node->is_slaving())
           ? ros1_node->slave_on(game_launched)
           : ros1_node->slave_off();
+      return true;
+    }
+    //*══════════════════════════ Slave On/Off ═════════════════════════════*/
+    else if (receiver_is(ui->slave_mode) && press_event) {
+      ui->slave_mode->setEnabled(false);
+      // Set slave to ON or OFF
       return true;
     }
   }

@@ -24,9 +24,11 @@ public:
   GameMaster_1(std::shared_ptr<data::PlayerList>);
   static constexpr auto NODE_NAME{"game_master_1"};
 
+  std::shared_ptr<ros::NodeHandle> get_handle() { return _handle; }
+
 private:
   std::shared_ptr<ros::NodeHandle> _handle;
 };
-}; // namespace ecn_baxter::game::ros1
+} // namespace ecn_baxter::game::ros1
 
 #endif

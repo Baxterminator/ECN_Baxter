@@ -60,7 +60,7 @@ public:
   void set_player_list(std::shared_ptr<game::data::PlayerList> list) {
     players = list;
   }
-  void refresh_player_list();
+  void refresh_player_list(bool, bool);
 };
 } // namespace ecn_baxter::gui
 
