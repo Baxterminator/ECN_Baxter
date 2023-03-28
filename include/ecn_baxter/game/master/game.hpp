@@ -66,7 +66,7 @@ private:
    *?                           Game Management
    * ═════════════════════════════════════════════════════════════════════════*/
 
-  bool game_launched = false;
+  bool game_launched = false, game_idle = false;
   std::shared_ptr<data::PlayerList> players_list;
   void load_game_propeties(const std::string &);
 

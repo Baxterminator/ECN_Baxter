@@ -189,11 +189,10 @@ void MainUI::refresh_player_list(bool slaving_on, bool block_all) {
   // Updating SLAVE MODE status
   gui->slave_on_state->setText((slaving_on) ? "ON" : "OFF");
   gui->slave_on->setText((slaving_on) ? "Slave OFF" : "Slave ON");
-  gui->slave_on->setEnabled(true);
+
   // Updating SLAVE MODE status
   gui->slave_mode_state->setText((block_all) ? "Blocked" : "Selected");
-  gui->slave_mode->setText((block_all) ? "Block all" : "Selected users");
-  gui->slave_mode->setEnabled(true);
+  gui->slave_mode->setText((block_all) ? "Only selected" : "Block all");
 }
 
 /**════════════════════════════════════════════════════════════════════════

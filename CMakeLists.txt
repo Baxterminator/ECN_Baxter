@@ -98,9 +98,15 @@ target_include_directories(gripper_node PRIVATE include)
 add_message(gripper_node)
 
 ############################### Jacobian ###############################
-ament_auto_add_executable(jacobian src/game/utils/jacobian.cpp)
+ament_auto_add_executable(jacobian src/utils/jacobian.cpp)
 target_include_directories(jacobian PRIVATE include)
 add_message(jacobian)
+
+############################# Initializer #############################
+ament_auto_add_executable(arms_position
+    src/utils/arms_position.cpp
+)
+target_include_directories(arms_position PRIVATE include)
 
 ############################# Setup Server #############################
 ament_auto_add_executable(setup_server 
@@ -116,12 +122,6 @@ ament_auto_add_library(game_utils
     src/game/data/game_properties.cpp
 )
 target_include_directories(game_utils PRIVATE include ${ROS1_ROOT}/include)
-
-############################# Initializer #############################
-ament_auto_add_executable(initializer
-    src/initializer.cpp
-)
-target_include_directories(initializer PRIVATE include)
 
 ############################# Game Master #############################
 ament_auto_add_executable(game_master

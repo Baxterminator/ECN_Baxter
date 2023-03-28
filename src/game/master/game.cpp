@@ -150,7 +150,7 @@ bool Game::notify(QObject *receiver, QEvent *ev) {
     //*══════════════════ ELSE (Without useless warnings) ═════════════════*/
     else if (!event_is(QEvent::Polish) && !event_is(QEvent::PolishRequest) &&
              !event_is(QEvent::None)) {
-      BAXTER_WARN("Unknown custom callback from non UI component (%s) %d!",
+      BAXTER_WARN("Unknown custom callback from non UI component (%s %d)!",
                   utils::qt::get_qtevent_name(ev).c_str(), ev->type());
     }
   }
@@ -167,7 +167,8 @@ bool Game::notify(QObject *receiver, QEvent *ev) {
 }
 
 /// @brief UI logic for game management
-bool Game::bridge_logic(QObject *receiver, QEvent *ev, bool is_from_ui) {
+bool Game::bridge_logic([[maybe_unused]] QObject *receiver, QEvent *ev,
+                        bool is_from_ui) {
   //! ━━━━━━━━━━━━━━━━━━━━━━━━━━━━ UI callbacks ━━━━━━━━━━━━━━━━━━━━━━━━━━━━*/
   if (is_from_ui) {
 
@@ -184,6 +185,10 @@ bool Game::bridge_logic(QObject *receiver, QEvent *ev, bool is_from_ui) {
       main_ui->refresh_player_list(ros1_node->is_slaving(),
                                    ros1_node->get_slave_mode() ==
                                        ros1::SlaveMode::Block_All);
+      if (!game_idle && !game_launched) {
+        ui->slave_on->setEnabled(true);
+        ui->slave_mode->setEnabled(true);
+      }
       return true;
     }
   }
@@ -198,8 +203,12 @@ bool Game::setup_logic(QObject *receiver, QEvent *ev, bool is_from_ui) {
     if (receiver_is(ui->game_setup) && press_event) {
       //? Setup launching
       ui->game_setup->setEnabled(false);
-      if (!ros2_node->make_setup())
+      ui->game_load->setEnabled(false);
+      if (!ros2_node->make_setup()) {
         ui->game_setup->setEnabled(true);
+        ui->game_load->setEnabled(true);
+      }
+
       return true;
     }
   }
@@ -208,6 +217,8 @@ bool Game::setup_logic(QObject *receiver, QEvent *ev, bool is_from_ui) {
     //*═══════════════════════════ Setup ended ═════════════════════════════*/
     if (event_is(events::SetupEnded::type())) {
       ui->game_idling->setEnabled(true);
+      ui->game_setup->setEnabled(true);
+      ui->game_load->setEnabled(true);
       return true;
     }
   }
@@ -223,28 +234,49 @@ bool Game::game_logic(QObject *receiver, QEvent *ev, bool is_from_ui) {
         receiver_is(game_loader->get_ui()->select_buttons->buttons().at(0)) &&
         press_event) {
       load_game_propeties(game_loader->get_file_to_load());
-      return true;
+      return false;
     }
     //*═══════════════════════════ Idling mode ═════════════════════════════*/
     else if (receiver_is(ui->game_idling) && press_event) {
-      ui->game_idling->setEnabled(false);
-      ros1_node->set_slave_mode(ros1::SlaveMode::Block_All);
-      ui->game_launch->setEnabled(true);
+      if (game_idle) {
+        ros1_node->slave_on();
+        ros1_node->set_slave_mode(ros1::SlaveMode::Block_All);
+        ui->game_idling->setText("Start Game Lobby");
+        ui->slave_on->setEnabled(true);
+        ui->slave_mode->setEnabled(true);
+        ui->game_setup->setEnabled(true);
+        ui->game_load->setEnabled(true);
+        ui->game_launch->setEnabled(false);
+        game_idle = false;
+      } else {
+        ros1_node->slave_on();
+        ros1_node->set_slave_mode(ros1::SlaveMode::Block_All);
+        ui->game_idling->setText("End Game Lobby");
+        ui->slave_on->setEnabled(false);
+        ui->slave_mode->setEnabled(false);
+        ui->game_setup->setEnabled(false);
+        ui->game_load->setEnabled(false);
+        ui->game_launch->setEnabled(true);
+        game_idle = true;
+      }
       return true;
     }
     //*════════════════════════ Launch / Stop Game ═════════════════════════*/
     else if (receiver_is(ui->game_launch) && press_event) {
       // Whether to start or stop the game
       if (game_launched) {
-        ui->game_launch->setText("Start Game");
         game_launched = false;
+        ui->game_launch->setText("Start Game");
+        ui->game_idling->setEnabled(true);
+        ros1_node->slave_on();
         ros1_node->set_slave_mode(ros1::SlaveMode::Block_All);
       } else {
-        ui->game_launch->setText("Stop Game");
         game_launched = true;
+        ui->game_launch->setText("Stop Game");
+        ui->game_idling->setEnabled(false);
+        ros1_node->slave_on();
         ros1_node->set_slave_mode(ros1::SlaveMode::Selected_Player);
       }
-
       return true;
     }
   }
@@ -262,15 +294,17 @@ bool Game::slave_logic(QObject *receiver, QEvent *ev, bool is_from_ui) {
     if (receiver_is(ui->slave_on) && press_event) {
       ui->slave_on->setEnabled(false);
       // Set slave to ON or OFF
-      (game_launched || !ros1_node->is_slaving())
-          ? ros1_node->slave_on(game_launched)
-          : ros1_node->slave_off();
+      (game_launched || !ros1_node->is_slaving()) ? ros1_node->slave_on()
+                                                  : ros1_node->slave_off();
       return true;
     }
-    //*══════════════════════════ Slave On/Off ═════════════════════════════*/
+    //*══════════════════════════ Slave Mode ═════════════════════════════*/
     else if (receiver_is(ui->slave_mode) && press_event) {
       ui->slave_mode->setEnabled(false);
-      // Set slave to ON or OFF
+      ros1_node->set_slave_mode(
+          (ros1_node->get_slave_mode() == ros1::SlaveMode::Block_All)
+              ? ros1::SlaveMode::Selected_Player
+              : ros1::SlaveMode::Block_All);
       return true;
     }
   }

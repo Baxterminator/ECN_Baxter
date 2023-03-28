@@ -169,7 +169,7 @@ void BridgesManager::update_connected_players(
 
 /// @brief Active the slave mode for the bridges
 /// @return return true if the change was successful, false either case
-void BridgesManager::slave_on(bool game_on) { _slaving = true; }
+void BridgesManager::slave_on() { _slaving = true; }
 
 /// @brief Deactivate the slave mode
 /// @return return true if the change was successful, false either case
@@ -186,18 +186,21 @@ void BridgesManager::refresh_force_request() {
     _force_req.request.right_user = GamePlayer::block_player;
     _force_req.request.left_user = GamePlayer::block_player;
 
-    auto pl = _playerlist.lock();
+    if (_slave_mode == SlaveMode::Selected_Player) {
+      auto pl = _playerlist.lock();
 
-    auto player = pl->players.begin();
-    while (player != pl->players.end()) {
-      if (player->wanted_side == ArmSide::RIGHT_ARM ||
-          player->wanted_side == ArmSide::BOTH)
-        _force_req.request.right_user = player->name;
-      if (player->wanted_side == ArmSide::LEFT_ARM ||
-          player->wanted_side == ArmSide::BOTH)
-        _force_req.request.left_user = player->name;
-      player++;
+      auto player = pl->players.begin();
+      while (player != pl->players.end()) {
+        if (player->wanted_side == ArmSide::RIGHT_ARM ||
+            player->wanted_side == ArmSide::BOTH)
+          _force_req.request.right_user = player->name;
+        if (player->wanted_side == ArmSide::LEFT_ARM ||
+            player->wanted_side == ArmSide::BOTH)
+          _force_req.request.left_user = player->name;
+        player++;
+      }
     }
+
   } else {
     _force_req.request.right_user = GamePlayer::free_player;
     _force_req.request.left_user = GamePlayer::free_player;

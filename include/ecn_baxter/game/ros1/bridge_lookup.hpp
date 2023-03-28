@@ -100,7 +100,7 @@ public:
    *?                              Slave mode
    * ════════════════════════════════════════════════════════════════════════**/
 
-  void slave_on(bool = false);
+  void slave_on();
   void slave_off();
   /// @brief Return whether the bridges are in slave mode or not
   inline bool is_slaving() { return _slaving; }

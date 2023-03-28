@@ -9,9 +9,12 @@
  * ════════════════════════════════════════════════════════════════════════**/
 #include "ecn_baxter/game/ros2/client_points.hpp"
 #include "ecn_baxter/action/detail/points_setup__struct.hpp"
+#include "ecn_baxter/game/events/event_target.hpp"
+#include "ecn_baxter/game/events/setup_ended.hpp"
 #include "ecn_baxter/game/utils/logger.hpp"
 #include <algorithm>
 #include <geometry_msgs/TransformStamped.h>
+#include <qapplication.h>
 #include <tf2/LinearMath/Quaternion.h>
 
 namespace ecn_baxter::game::ros2 {
@@ -42,6 +45,8 @@ void SetupPointsClient::handle_result(
     break;
   }
   BAXTER_INFO("Setup done with result %d", result.result->success);
+  QApplication::sendEvent(events::EventTarget::instance(),
+                          new events::SetupEnded());
 }
 
 /// @brief Callback of the feedback sent by the setuping action
