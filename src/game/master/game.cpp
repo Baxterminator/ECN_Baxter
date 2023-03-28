@@ -98,11 +98,11 @@ void Game::load_game_propeties(const std::string &file_path) {
   load_file(file_path);
   main_ui->get_ui()->game_name->setText(game_props->game_name.c_str());
   if (game_props->is_skippable()) {
-    main_ui->get_ui()->setup->setEnabled(false);
-    main_ui->get_ui()->launch->setEnabled(true);
+    main_ui->get_ui()->game_setup->setEnabled(false);
+    main_ui->get_ui()->game_idling->setEnabled(true);
   } else {
-    main_ui->get_ui()->setup->setEnabled(true);
-    main_ui->get_ui()->launch->setEnabled(false);
+    main_ui->get_ui()->game_setup->setEnabled(true);
+    main_ui->get_ui()->game_idling->setEnabled(false);
   }
 
   // Update game properties pointers
@@ -151,7 +151,7 @@ bool Game::notify(QObject *receiver, QEvent *ev) {
     }
     //*═══════════════════════════ SETUP ENDED ════════════════════════════*/
     else if (event_is(SetupEnded::type())) {
-      main_ui->get_ui()->launch->setEnabled(true);
+      main_ui->get_ui()->game_idling->setEnabled(true);
     }
     //*═════════════════════════════ LOGGING ═════════════════════════════*/
     else if (event_is(LogEvent::type())) {
@@ -174,12 +174,12 @@ bool Game::notify(QObject *receiver, QEvent *ev) {
           : ros1_node->slave_off();
     }
     //*══════════════════════════  SETUP PHASE ════════════════════════════*/
-    else if (receiver_is(main_ui->get_ui()->setup) &&
+    else if (receiver_is(main_ui->get_ui()->game_setup) &&
              event_is(QEvent::MouseButtonRelease)) {
       //? Setup launching
-      main_ui->get_ui()->setup->setEnabled(false);
+      main_ui->get_ui()->game_setup->setEnabled(false);
       if (!ros2_node->make_setup())
-        main_ui->get_ui()->setup->setEnabled(true);
+        main_ui->get_ui()->game_setup->setEnabled(true);
 
     }
     //*══════════════════════════  GAME LOADING ═══════════════════════════*/

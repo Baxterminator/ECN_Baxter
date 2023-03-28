@@ -51,7 +51,7 @@ void MainUI::set_users_view() {
 
 /// @brief Setup the internal UI callbacks between widgets
 void MainUI::setup_internal_callbacks() {
-  gui->load_game->installEventFilter(this);
+  gui->game_load->installEventFilter(this);
   gui->users->viewport()->installEventFilter(this);
 
   set_custom_gui_properties();
@@ -61,7 +61,7 @@ void MainUI::setup_internal_callbacks() {
 bool MainUI::eventFilter(QObject *obj, QEvent *e) {
 #define event_is(t) e->type() == t
 #define obj_is(t) obj == t
-  if (obj_is(gui->load_game) && event_is(QEvent::MouseButtonRelease))
+  if (obj_is(gui->game_load) && event_is(QEvent::MouseButtonRelease))
     return launch_game_loader();
   else if (obj_is(gui->users->viewport()) && event_is(QEvent::ContextMenu))
     return make_context_menu(e);
