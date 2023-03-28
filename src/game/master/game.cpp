@@ -19,6 +19,7 @@
 #include <memory>
 #include <qcoreevent.h>
 #include <qglobal.h>
+#include <qobject.h>
 #include <qpushbutton.h>
 #include <rclcpp/logging.hpp>
 #include <rclcpp/node_options.hpp>
@@ -125,45 +126,110 @@ void Game::show_ui() {
   main_ui->show();
 }
 
-/// @brief Logic between UI & Game works
-bool Game::notify(QObject *receiver, QEvent *ev) {
-  using namespace events;
-
-  /*std::cout << "Get event " << utils::qt::get_qtevent_name(ev) << " for "
-            << ((receiver == nullptr) ? "null"
-                                      : receiver->objectName().toStdString())
-  << std::endl;*/
-
-  // Preprocessor directives for easier reading and writings
+// Preprocessor directives for easier reading and writings
 #define event_is(t) (ev->type() == t)
 #define is_null(t) (t == nullptr)
 #define receiver_is(t) (receiver == t)
 
+/// @brief Logic between UI & Game works
+bool Game::notify(QObject *receiver, QEvent *ev) {
   //! ━━━━━━━━━━━━━━━━━━━━ Non-UI components callbacks ━━━━━━━━━━━━━━━━━━━━━*/
-  if (!event_is(QEvent::Create) && receiver_is(EventTarget::instance())) {
+  if (!event_is(QEvent::Create) &&
+      receiver_is(events::EventTarget::instance())) {
+    if (slave_logic(receiver, ev, false) || bridge_logic(receiver, ev, false) ||
+        setup_logic(receiver, ev, false) || game_logic(receiver, ev, false)) {
+      return true;
+    }
+    //*══════════════════ ELSE (Without useless warnings) ═════════════════*/
+    else if (!event_is(QEvent::Polish) && !event_is(QEvent::PolishRequest)) {
+      BAXTER_WARN("Unknown custom callback from non UI component (%s) !",
+                  utils::qt::get_qtevent_name(ev).c_str());
+    }
+  }
+
+  //! ━━━━━━━━━━━━━━━━━━━━━━━━━━━━ UI callbacks ━━━━━━━━━━━━━━━━━━━━━━━━━━━━*/
+  if (!is_null(main_ui) && main_ui->is_made()) {
+    if (slave_logic(receiver, ev, true) || bridge_logic(receiver, ev, true) ||
+        setup_logic(receiver, ev, true) || game_logic(receiver, ev, true)) {
+      return true;
+    }
+  }
+
+  return QApplication::notify(receiver, ev);
+}
+
+/// @brief UI logic for game management
+bool Game::bridge_logic(QObject *receiver, QEvent *ev, bool is_from_ui) {
+  //! ━━━━━━━━━━━━━━━━━━━━━━━━━━━━ UI callbacks ━━━━━━━━━━━━━━━━━━━━━━━━━━━━*/
+  if (is_from_ui) {
+
+  }
+  //! ━━━━━━━━━━━━━━━━━━━━ Non-UI components callbacks ━━━━━━━━━━━━━━━━━━━━━*/
+  else {
     //*═══════════════════════════ BRIDGE LIST ════════════════════════════*/
-    if ((event_is(BridgesUpdate::type()) || event_is(AuthRefresh::type())) &&
+    if ((event_is(events::BridgesUpdate::type()) ||
+         event_is(events::AuthRefresh::type())) &&
         !is_null(main_ui) && main_ui->is_made() && !is_null(ros2_node)) {
       BAXTER_DEBUG(
           "Updating bridges list (%zu registered bridges).",
           ((players_list != nullptr) ? players_list->players.size() : 0));
       main_ui->refresh_player_list();
+      return true;
     }
-    //*═══════════════════════════ SETUP ENDED ════════════════════════════*/
-    else if (event_is(SetupEnded::type())) {
-      main_ui->get_ui()->game_idling->setEnabled(true);
-    }
-    //*═════════════════════════════ LOGGING ═════════════════════════════*/
-    else if (event_is(LogEvent::type())) {
-    }
-    //*══════════════════ ELSE (Without useless warnings) ═════════════════*/
-    else if (!event_is(QEvent::Polish) && !event_is(QEvent::PolishRequest))
-      BAXTER_WARN("Unknown custom callback from non UI component (%s) !",
-                  utils::qt::get_qtevent_name(ev).c_str());
   }
+  return false;
+}
 
+/// @brief UI logic for game management
+bool Game::setup_logic(QObject *receiver, QEvent *ev, bool is_from_ui) {
   //! ━━━━━━━━━━━━━━━━━━━━━━━━━━━━ UI callbacks ━━━━━━━━━━━━━━━━━━━━━━━━━━━━*/
-  if (!is_null(main_ui) && main_ui->is_made()) {
+  if (is_from_ui) {
+    //*═════════════════════════ LAUNCHING SETUP ═══════════════════════════*/
+    if (receiver_is(main_ui->get_ui()->game_setup) &&
+        event_is(QEvent::MouseButtonRelease)) {
+      //? Setup launching
+      main_ui->get_ui()->game_setup->setEnabled(false);
+      if (!ros2_node->make_setup())
+        main_ui->get_ui()->game_setup->setEnabled(true);
+      return true;
+    }
+  }
+  //! ━━━━━━━━━━━━━━━━━━━━ Non-UI components callbacks ━━━━━━━━━━━━━━━━━━━━━*/
+  else {
+    //*═══════════════════════════ SETUP ENDED ═════════════════════════════*/
+    if (event_is(events::SetupEnded::type())) {
+      main_ui->get_ui()->game_idling->setEnabled(true);
+      return true;
+    }
+  }
+  return false;
+}
+
+/// @brief UI logic for game management
+bool Game::game_logic(QObject *receiver, QEvent *ev, bool is_from_ui) {
+  //! ━━━━━━━━━━━━━━━━━━━━━━━━━━━━ UI callbacks ━━━━━━━━━━━━━━━━━━━━━━━━━━━━*/
+  if (is_from_ui) {
+    //*══════════════════════════  GAME CHOOSING ═══════════════════════════*/
+    if (!is_null(main_ui->get_game_loader()) &&
+        main_ui->get_game_loader()->is_made() &&
+        receiver_is(
+            main_ui->get_game_loader()->get_ui()->select_buttons->buttons().at(
+                0)) &&
+        event_is(QEvent::MouseButtonRelease)) {
+      load_game_propeties(main_ui->get_game_loader()->get_file_to_load());
+      return true;
+    }
+  }
+  //! ━━━━━━━━━━━━━━━━━━━━ Non-UI components callbacks ━━━━━━━━━━━━━━━━━━━━━*/
+  else {
+  }
+  return false;
+}
+
+/// @brief UI logic for bridge slaving
+bool Game::slave_logic(QObject *receiver, QEvent *ev, bool is_from_ui) {
+  //! ━━━━━━━━━━━━━━━━━━━━━━━━━━━━ UI callbacks ━━━━━━━━━━━━━━━━━━━━━━━━━━━━*/
+  if (is_from_ui) {
     //*═══════════════════════════ SLAVE MODE ═════════════════════════════*/
     if (receiver_is(main_ui->get_ui()->slave) &&
         event_is(QEvent::MouseButtonRelease)) {
@@ -172,28 +238,12 @@ bool Game::notify(QObject *receiver, QEvent *ev) {
       (game_launched || !ros1_node->is_slaving())
           ? ros1_node->slave_on(game_launched)
           : ros1_node->slave_off();
-    }
-    //*══════════════════════════  SETUP PHASE ════════════════════════════*/
-    else if (receiver_is(main_ui->get_ui()->game_setup) &&
-             event_is(QEvent::MouseButtonRelease)) {
-      //? Setup launching
-      main_ui->get_ui()->game_setup->setEnabled(false);
-      if (!ros2_node->make_setup())
-        main_ui->get_ui()->game_setup->setEnabled(true);
-
-    }
-    //*══════════════════════════  GAME LOADING ═══════════════════════════*/
-    else if (!is_null(main_ui->get_game_loader()) &&
-             main_ui->get_game_loader()->is_made() &&
-             receiver_is(main_ui->get_game_loader()
-                             ->get_ui()
-                             ->select_buttons->buttons()
-                             .at(0)) &&
-             event_is(QEvent::MouseButtonRelease)) {
-      load_game_propeties(main_ui->get_game_loader()->get_file_to_load());
+      return true;
     }
   }
-
-  return QApplication::notify(receiver, ev);
+  //! ━━━━━━━━━━━━━━━━━━━━ Non-UI components callbacks ━━━━━━━━━━━━━━━━━━━━━*/
+  else {
+  }
+  return false;
 }
 } // namespace ecn_baxter::game

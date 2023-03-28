@@ -18,6 +18,8 @@
 #include <chrono>
 #include <memory>
 #include <qapplication.h>
+#include <qcoreevent.h>
+#include <qobject.h>
 #include <rclcpp/executors.hpp>
 #include <thread>
 
@@ -73,6 +75,11 @@ private:
 
   std::unique_ptr<gui::MainUI> main_ui = nullptr;
   bool notify(QObject *, QEvent *) override;
+
+  bool bridge_logic(QObject *, QEvent *, bool);
+  bool game_logic(QObject *, QEvent *, bool);
+  bool setup_logic(QObject *, QEvent *, bool);
+  bool slave_logic(QObject *, QEvent *, bool);
 };
 } // namespace ecn_baxter::game
 
