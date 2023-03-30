@@ -17,7 +17,6 @@
 #include "ecn_baxter/game/ros1/bridge_lookup.hpp"
 #include "ecn_baxter/game/utils/logger.hpp"
 #include "ecn_baxter/game/utils/qtevents.hpp"
-#include <baxter_bridge/monitor.h>
 #include <memory>
 #include <qcoreevent.h>
 #include <qglobal.h>
