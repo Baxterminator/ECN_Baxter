@@ -1,26 +1,30 @@
-/**========================================================================
+/**════════════════════════════════════════════════════════════════════════
  * ?                                ABOUT
  * @author         :  Geoffrey Côte
  * @email          :  geoffrey.cote@centraliens-nantes.org
  * @repo           :  https://github.com/Baxterminator/ecn_baxter/
  * @createdOn      :  08/03/2023
  * @description    :  Setup server part (POINT SETUPING)
- *========================================================================**/
+ * @version        :  rev 23w12.1
+ * ════════════════════════════════════════════════════════════════════════**/
+#include "ecn_baxter/setup/point_server.hpp"
 #include "ecn_baxter/game/data/arm_side.hpp"
-#include <baxter_core_msgs/msg/detail/digital_io_state__struct.hpp>
-#include <ecn_baxter/setup/point_server.hpp>
+#include <chrono>
 #include <rclcpp/node.hpp>
 #include <tf2/time.h>
 
+using namespace std::chrono_literals;
+
 namespace ecn_baxter::setup {
 
-PointServer::PointServer(sptr<rclcpp::Node> node)
-    : BaseServer(node), tf_buffer(node->get_clock()), tf_listener(tf_buffer) {
-  button_left_sub = node->create_subscription<DigitalIOState>(
+PointServer::PointServer(std::shared_ptr<rclcpp::Node> node)
+    : BaseActionServer(node, SERVER_NAME), tf_buffer(node->get_clock()),
+      tf_listener(tf_buffer) {
+  left_sub = node->create_subscription<DigitalIOState>(
       BUTTON_LEFT_TOPIC, QOS, [&](const DigitalIOState::UniquePtr msg) {
         button_callback(msg, ArmSide::LEFT_ARM);
       });
-  button_right_sub = node->create_subscription<DigitalIOState>(
+  right_sub = node->create_subscription<DigitalIOState>(
       BUTTON_RIGHT_TOPIC, QOS, [&](const DigitalIOState::UniquePtr msg) {
         button_callback(msg, ArmSide::RIGHT_ARM);
       });
@@ -54,32 +58,31 @@ void PointServer::button_callback(const DigitalIOState::UniquePtr &msg,
   }
 }
 
-ra::CancelResponse
-PointServer::handle_cancel([[maybe_unused]] const sptr<PointHandle> handle) {
+ra::CancelResponse PointServer::handle_cancel(
+    [[maybe_unused]] const std::shared_ptr<PointHandle> handle) {
   std::cout << "Request to cancel goal" << std::endl;
-  stop = 1;
+  stop_server();
   return rclcpp_action::CancelResponse::ACCEPT;
 }
 
 ra::GoalResponse PointServer::handle_goal(
     [[maybe_unused]] const ra::GoalUUID &uuid,
-    [[maybe_unused]] sptr<const action::PointsSetup::Goal> goal) {
+    [[maybe_unused]] std::shared_ptr<const action::PointsSetup::Goal> goal) {
   std::cout << "☎ Request to setup " << goal->ptns_name.size() << " points !"
             << std::endl;
-  stop = 0;
   return ra::GoalResponse::ACCEPT_AND_EXECUTE;
 }
 
-void PointServer::exec(const sptr<PointHandle> handle) {
+void PointServer::exec(const std::shared_ptr<PointHandle> handle) {
 
   using geometry_msgs::msg::Point;
 
   auto goal = handle->get_goal();
   auto feedback = std::make_shared<action::PointsSetup::Feedback>();
 
-  for (unsigned long i = 0; (i < handle->get_goal()->ptns_name.size()) && !stop;
-       i++) {
-    ArmSide side = bool2side(goal->sides[i]);
+  for (unsigned long i = 0;
+       (i < handle->get_goal()->ptns_name.size()) && !has_to_stop(); i++) {
+    ArmSide side = game::data::bool2side(goal->sides[i]);
 
     //? LOGGING
     std::cout << "\t✎ Making point #" << i + 1
@@ -87,7 +90,7 @@ void PointServer::exec(const sptr<PointHandle> handle) {
               << goal->ptns_name[i] << ") : ";
 
     volatile bool made = false;
-    while (!stop && !made) {
+    while (!has_to_stop() && !made) {
       if ((side == ArmSide::RIGHT_ARM)
               ? (right_button.pressed && !right_button.used)
               : (left_button.pressed && !left_button.used)) {

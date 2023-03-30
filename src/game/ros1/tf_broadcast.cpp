@@ -1,4 +1,4 @@
-/**========================================================================
+/**════════════════════════════════════════════════════════════════════════
  * ?                                ABOUT
  * @author         :  Geoffrey Côte
  * @email          :  geoffrey.cote@centraliens-nantes.org
@@ -6,14 +6,16 @@
  * @createdOn      :  26/02/2023
  * @description    :  Sub-part of the ROS1 game master for publishing tf
  *                    custom transforms
- *========================================================================**/
+ * @version        :  rev 23w12.1
+ * ════════════════════════════════════════════════════════════════════════**/
+#include "ecn_baxter/game/ros1/tf_broadcast.hpp"
 #include "ros/publisher.h"
 #include "ros/time.h"
 #include "ros/wall_timer.h"
-#include <ecn_baxter/game/ros1/tf_broadcast.hpp>
 
 namespace ecn_baxter::game::ros1 {
 
+/// @brief Initialize the broadcaster with a ROS1 node handle
 void TFBroadcaster::tf_broadcast_init(std::weak_ptr<ros::NodeHandle> handle) {
   node_handle = handle;
 }
@@ -34,9 +36,11 @@ void TFBroadcaster::broadcast_transforms() const {
 
   _tf_publisher.publish(s_gprops->setup.ptn_msgs);
 }
+
+/// @brief Update the TF Broadcaster to publish the new TFMessage
 void TFBroadcaster::update_game_props(
     std::weak_ptr<data::GameProperties> gprops) {
-  if (!node_handle.expired()) {
+  if (!node_handle.expired() && _tf_broadcast_timer == nullptr) {
     auto sptr_node = node_handle.lock();
     _tf_broadcast_timer = sptr_node->createWallTimer(
         dur, [this]([[maybe_unused]] const ros::WallTimerEvent &event) {

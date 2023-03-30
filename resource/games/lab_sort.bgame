@@ -1,5 +1,5 @@
 {
-  "name": "Lab Tricolor",
+  "name": "Lab Sort",
   "setup": {
     "nd_pts": [
       {
@@ -8,15 +8,16 @@
         "angles": false
       },
       {
+        "name": "source_left",
+        "side": true,
+        "angles": false
+      },
+      {
         "name": "dest_right",
         "side": false,
         "angles": false
       },
-      {
-        "name": "source_left",
-        "side": false,
-        "angles": false
-      },
+
       {
         "name": "dest_left",
         "side": true,

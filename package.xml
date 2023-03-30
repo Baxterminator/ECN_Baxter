@@ -2,22 +2,30 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>ecn_baxter</name>
-  <version>0.0.1</version>
+  <version>0.1.0</version>
   <description>Baxter's component ROS2 utilitary tool </description>
   <maintainer email="geoffrey.cote@centraliens-nantes.org">Geoffrey Côte</maintainer>
+  <maintainer email="timothee.corroenne@eleves.ec-nantes.fr">Timothée CORROËNNE</maintainer>
   <author>Geoffrey Côte</author>
+  <author>Timothée Corroënne</author>
   <url type="repository">https://github.com/Meltwin-ECN/ecn_baxter</url>
   <license>MIT</license>
 
   <depend>rclcpp</depend>
   <depend>rclcpp_action</depend>
-  <!--<depend>rclpy</depend>-->
+  <depend>baxter_bridge</depend>
   <depend>ament_index</depend>
   <depend>tf2</depend>
   <depend>tf2_ros</depend>
   <depend>Qt5</depend>
   <depend>baxter_core_msgs</depend>
-  <depend>image_orchestra</depend>
+  <depend>std_msgs</depend>
+  <depend>kdl_parser</depend>
+  <depend>sensor_msgs</depend>
+  <depend>frames</depend>
+  <depend>Eigen3</depend>
+  <depend>urdf</depend>
+  <depend>robot_state_publisher</depend>
 
   <buildtool_depend>catkin</buildtool_depend>
   <buildtool_depend>ament_cmake</buildtool_depend>

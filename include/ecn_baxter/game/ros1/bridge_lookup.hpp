@@ -1,4 +1,4 @@
-/**========================================================================
+/**════════════════════════════════════════════════════════════════════════
  * ?                                ABOUT
  * @author         :  Geoffrey Côte
  * @email          :  geoffrey.cote@centraliens-nantes.org
@@ -6,21 +6,22 @@
  * @createdOn      :  19/02/2023
  * @description    :  Sub-part of the ROS1 game master for checking connected
  *                    players
- *========================================================================**/
-
+ * @version        :  rev 23w12.4
+ * ════════════════════════════════════════════════════════════════════════**/
 #ifndef BRIDGE_LOOKUP
 #define BRIDGE_LOOKUP
 
+#include "baxter_core_msgs/BridgePublishersAuth.h"
 #include "baxter_core_msgs/BridgePublishersForce.h"
 #include "ros/service_client.h"
+#include "ros/wall_timer.h"
 #include <ecn_baxter/game/data/game_players.hpp>
-#include <ecn_baxter/utils.hpp>
+#include <memory>
 #include <ros/duration.h>
 #include <ros/master.h>
 #include <ros/node_handle.h>
 #include <vector>
 
-#include <sstream>
 #include <string>
 #include <vector>
 
@@ -28,61 +29,83 @@ namespace ecn_baxter::game::ros1 {
 
 using namespace ecn_baxter::game::data;
 
+enum class SlaveMode { Selected_Player, Block_All };
+
 class BridgesManager {
 private:
   static constexpr auto bridge_name{"baxter_ros1_bridge_"};
-  static constexpr auto slave_service{"/bridge_force"};
+  static constexpr auto force_service{"/bridge_force"};
+  static constexpr auto auth_service{"/bridge_auth"};
 
-  /**========================================================================
-   **                             Utils
-   *========================================================================**/
+  static constexpr auto PLAYER_LIST_EXPIRED{
+      "ROS1 Bridge Lookup: Player list expired !"};
+
+  /**════════════════════════════════════════════════════════════════════════
+   **                                Utils
+   * ════════════════════════════════════════════════════════════════════════**/
+
   std::string extract_name(const std::string &) const;
   bool is_bridge(const std::string &, std::string &) const;
 
-  /**========================================================================
-   **                            Bridge Lookup
-   *========================================================================**/
+  /**════════════════════════════════════════════════════════════════════════
+   *?                             Bridge Lookup
+   * ════════════════════════════════════════════════════════════════════════**/
+  std::weak_ptr<data::PlayerList> _playerlist;
   const ros::WallDuration check_dur{0.5};
-  ros::WallTimer _check_timer;
-  std::function<void(PlayerList &)> _callback;
+  ros::WallTimer _routine;
   void update_connected_players(const std::vector<std::string> &);
   void reset_players_state();
 
-  /**========================================================================
-   **                            Slave mode
-   *========================================================================**/
-  ros::ServiceClient _slave_client;
-  baxter_core_msgs::BridgePublishersForce _slave_req;
-  bool slaving = false;
-  bool send_slave_request();
+  /**════════════════════════════════════════════════════════════════════════
+   *?                              Slave mode
+   * ════════════════════════════════════════════════════════════════════════**/
+  static constexpr auto PREFIX{"Auth: "};
+  static constexpr auto SERVICE_ERROR{
+      "%s %s service wasn't initialized correctly ! Please report it to "
+      "developpers !"};
+  static constexpr auto MONITOR_OFFLINE{
+      "%s monitor (%s) isn't online ! Please start the baxter_bridge !"};
+  static constexpr auto FORCE_REQ_SENT{
+      "%s authorized users sent to the monitor."};
+  static constexpr auto AUTH_REQ_SENT{
+      "%s autorized users list asked to the monitor."};
+
+  const ros::Duration _service_timeout{.5};
+  ros::ServiceClient _force_client, _auth_client;
+  baxter_core_msgs::BridgePublishersForce _force_req;
+  baxter_core_msgs::BridgePublishersAuth _auth_req;
+  bool _slaving = false;
+  SlaveMode _slave_mode = SlaveMode::Selected_Player;
+  void refresh_force_request();
+  void force_routine();
+  void auth_routine();
 
 protected:
-  /**========================================================================
-   *!                           Initialization
-   *========================================================================**/
-  explicit BridgesManager(){};
-  void bridges_init(sptr<ros::NodeHandle>);
-  PlayerList players;
+  /**════════════════════════════════════════════════════════════════════════
+   *!                             Initialization
+   * ════════════════════════════════════════════════════════════════════════**/
 
-  /**========================================================================
-   **                            Bridge Lookup
-   *========================================================================**/
+  explicit BridgesManager(){};
+  void bridges_init(std::shared_ptr<ros::NodeHandle>,
+                    std::shared_ptr<data::PlayerList>);
+
+  /**════════════════════════════════════════════════════════════════════════
+   *?                              Bridge Lookup
+   * ════════════════════════════════════════════════════════════════════════**/
+
   void look_for_briges();
 
 public:
-  /**========================================================================
-   **                            Bridge Lookup
-   *========================================================================**/
-  inline void set_look_up_callback(std::function<void(PlayerList &)> callback) {
-    _callback = callback;
-  }
+  /**════════════════════════════════════════════════════════════════════════
+   *?                              Slave mode
+   * ════════════════════════════════════════════════════════════════════════**/
 
-  /**========================================================================
-   **                            Slave mode
-   *========================================================================**/
-  bool slave_toggle();
-  bool slave_on();
-  bool slave_off();
+  void slave_on();
+  void slave_off();
+  /// @brief Return whether the bridges are in slave mode or not
+  inline bool is_slaving() { return _slaving; }
+  inline SlaveMode get_slave_mode() { return _slave_mode; }
+  inline void set_slave_mode(SlaveMode mode) { _slave_mode = mode; }
 };
 } // namespace ecn_baxter::game::ros1
 

@@ -1,20 +1,20 @@
 #include "QtWebKit"
+#include "ecn_baxter/game/data/local_games.hpp"
+#include "ecn_baxter/game/master/game.hpp"
+#include "ecn_baxter/game/utils/logger.hpp"
 #include "ros/init.h"
 #include <csignal>
-#include <ecn_baxter/game/data/local_games.hpp>
-#include <ecn_baxter/game/master/game.hpp>
 #include <iostream>
 #include <memory>
 
 using namespace ecn_baxter::game;
 
-std::shared_ptr<QApplication> app = nullptr;
+std::unique_ptr<Game> game_master = nullptr;
 
 void shutdown_process() {
   std::cout << "Shutdown !" << std::endl;
-  app->quit();
-  app.reset();
-  Game::stop();
+  game_master->stop();
+  game_master.reset();
 }
 
 void sighandler([[maybe_unused]] int s) { shutdown_process(); }
@@ -24,18 +24,14 @@ int main(int argc, char **argv) {
   // Add callback on force quit to stop everything
   signal(SIGINT, &sighandler);
 
-  app = std::make_shared<QApplication>(argc, argv);
+  game_master = std::make_unique<Game>(argc, argv);
 
-  // Init the two ros nodes
-  if (!Game::Init(argc, argv)) {
-    app.reset();
-    return -1;
+  ecn_baxter::utils::Logger::initialize(game_master->ros2());
+  if (game_master->is_initialized()) {
+    ecn_baxter::utils::Logger::initialize(game_master->ros2());
+    game_master->show_ui();
+    game_master->exec();
   }
-
-  // Launching GUI on main thread
-
-  Game::showUI();
-  app->exec();
 
   shutdown_process();
   return 0;

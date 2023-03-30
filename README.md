@@ -6,7 +6,7 @@ for the robotics programming courses in Centrale Nantes.
 This package was made by the student team **Baxterminator** :
 
 - **_Geoffrey CÔTE_**: main maintainer (especially component-related nodes and game nodes)
-- **_Thimothée Corroëne_**: maintainer of the vision part
+- **_Timothée Corroëne_**: maintainer of the vision part
 
 ## Robot effectors
 

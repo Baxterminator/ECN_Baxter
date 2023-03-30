@@ -11,7 +11,6 @@
 #define PROPERTIES_LOADER_HPP
 
 #include <ecn_baxter/game/data/game_properties.hpp>
-#include <ecn_baxter/utils.hpp>
 #include <fstream>
 #include <iostream>
 #include <rapidjson/document.h>
@@ -25,10 +24,10 @@ using rapidjson::Value;
 
 class GamePropertiesLoader {
 public:
-  static sptr<data::GameProperties> get_game_props();
+  static std::shared_ptr<data::GameProperties> get_game_props();
 
 protected:
-  static sptr<data::GameProperties> game_props;
+  static std::shared_ptr<data::GameProperties> game_props;
   static void load_file(const std::string &);
 
 private:
