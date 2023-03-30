@@ -17,20 +17,25 @@ namespace ecn_baxter::game::data {
 
 /// @brief Structure describing a game player
 struct GamePlayer {
-  std::string name, bridge_name;
+  /// @brief Random player name for blocking the bridge
+  static constexpr auto block_player{"fsjgfdsojlgnwdkjhgsioegj"};
+  /// @brief Void player name for unblocking the bridge
+  static constexpr auto free_player{""};
+
+  std::string name;
   bool connected = false;
   bool new_discovered = true;
-  ArmSide side = ArmSide::NONE;
+  ArmSide wanted_side = ArmSide::NONE;
   unsigned int row_id = 0;
 };
 
-typedef std::vector<GamePlayer> PlayerList;
+struct PlayerList {
+  std::vector<GamePlayer> players = std::vector<GamePlayer>(0);
+  std::string left_user, right_user;
+  int connected = 0;
 
-/// @brief Random player name for blocking the bridge
-constexpr auto block_player{"fsjgfdsojlgnwdkjhgsioegj"};
-
-/// @brief Void player name for unblocking the bridge
-constexpr auto free_player{""};
+  bool is_slaving() { return !left_user.empty() || !right_user.empty(); }
+};
 
 } // namespace ecn_baxter::game::data
 

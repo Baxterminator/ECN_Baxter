@@ -15,7 +15,11 @@
 
 namespace ecn_baxter::game::events {
 
+#ifdef LEGACY_IDL
+enum class Level { Debug, Info, Warn, Error, Fatal, Unset };
+#else
 using Level = rclcpp::Logger::Level;
+#endif
 
 class LogEvent : public QEvent {
 public:

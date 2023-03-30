@@ -15,9 +15,12 @@
 #include "ecn_baxter/game/ros1/game_master_1.hpp"
 #include "ecn_baxter/game/ros2/game_master_2.hpp"
 #include "ecn_baxter/game/ui/main_wrapper.hpp"
+#include "ros/node_handle.h"
 #include <chrono>
 #include <memory>
 #include <qapplication.h>
+#include <qcoreevent.h>
+#include <qobject.h>
 #include <rclcpp/executors.hpp>
 #include <thread>
 
@@ -63,7 +66,7 @@ private:
    *?                           Game Management
    * ═════════════════════════════════════════════════════════════════════════*/
 
-  bool game_launched = false;
+  bool game_launched = false, game_idle = false;
   std::shared_ptr<data::PlayerList> players_list;
   void load_game_propeties(const std::string &);
 
@@ -73,6 +76,11 @@ private:
 
   std::unique_ptr<gui::MainUI> main_ui = nullptr;
   bool notify(QObject *, QEvent *) override;
+
+  bool bridge_logic(QObject *, QEvent *, bool);
+  bool game_logic(QObject *, QEvent *, bool);
+  bool setup_logic(QObject *, QEvent *, bool);
+  bool slave_logic(QObject *, QEvent *, bool);
 };
 } // namespace ecn_baxter::game
 

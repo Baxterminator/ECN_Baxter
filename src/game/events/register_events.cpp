@@ -7,6 +7,7 @@
  * @description    :  Register all the custom events types
  * @version        :  rev 23w12.1
  * ════════════════════════════════════════════════════════════════════════**/
+#include "ecn_baxter/game/events/auth_refresh_event.hpp"
 #include "ecn_baxter/game/events/bridges_update_events.hpp"
 #include "ecn_baxter/game/events/log_event.hpp"
 #include "ecn_baxter/game/events/setup_ended.hpp"
@@ -22,5 +23,6 @@ using Type = QEvent::Type;
 const Type BridgesUpdate::custom_type = new_type();
 const Type SetupEnded::custom_type = new_type();
 const Type LogEvent::custom_type = new_type();
+const Type AuthRefresh::custom_type = new_type();
 
 } // namespace ecn_baxter::game::events
