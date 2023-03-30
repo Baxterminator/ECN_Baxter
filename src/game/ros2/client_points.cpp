@@ -5,7 +5,7 @@
  * @repo           :  https://github.com/Baxterminator/ecn_baxter/
  * @createdOn      :  19/02/2023
  * @description    :  ROS 2 Node part for point setuping
- * @version        :  rev 23w12.1
+ * @version        :  rev 23w12.4
  * ════════════════════════════════════════════════════════════════════════**/
 #include "ecn_baxter/game/ros2/client_points.hpp"
 #include "ecn_baxter/action/detail/points_setup__struct.hpp"

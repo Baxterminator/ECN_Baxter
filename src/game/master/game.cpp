@@ -5,7 +5,7 @@
  * @repo           :  https://github.com/Baxterminator/ecn_baxter/
  * @createdOn      :  19/02/2023
  * @description    :  Main wrapper managing ROS threads as well as UIs
- * @version        :  rev 23w12.2
+ * @version        :  rev 23w12.4
  * ════════════════════════════════════════════════════════════════════════**/
 #include "ecn_baxter/game/master/game.hpp"
 #include "ecn_baxter/game/data/game_players.hpp"

@@ -8,9 +8,11 @@
  * @version        :  rev 23w12.2
  * ════════════════════════════════════════════════════════════════════════**/
 #include "ecn_baxter/game/data/arm_side.hpp"
+#include "ecn_baxter/game/ui/log_view.hpp"
 #include "ui_main.h"
 #include <ecn_baxter/game/ui/main_wrapper.hpp>
 #include <iostream>
+#include <memory>
 #include <qaction.h>
 #include <qcoreevent.h>
 #include <qevent.h>
@@ -55,6 +57,8 @@ void MainUI::setup_internal_callbacks() {
   gui->users->viewport()->installEventFilter(this);
 
   set_custom_gui_properties();
+
+  log_view = std::make_unique<LogView>(gui->log_view);
 }
 
 /// @brief Get all events and process internal events

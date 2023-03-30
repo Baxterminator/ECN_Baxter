@@ -5,7 +5,7 @@
  * @repo           :  https://github.com/Baxterminator/ecn_baxter/
  * @createdOn      :  19/02/2023
  * @description    :  ROS 2 Node part for point setuping
- * @version        :  rev 23w12.1
+ * @version        :  rev 23w12.4
  * ════════════════════════════════════════════════════════════════════════**/
 #ifndef ECN_BAXTER_SETUP_PTN_CLIENT_HPP
 #define ECN_BAXTER_SETUP_PTN_CLIENT_HPP

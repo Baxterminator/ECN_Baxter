@@ -1,3 +1,12 @@
+/**════════════════════════════════════════════════════════════════════════
+ * ?                                ABOUT
+ * @author         :  Geoffrey Côte
+ * @email          :  geoffrey.cote@centraliens-nantes.org
+ * @repo           :  https://github.com/Baxterminator/ecn_baxter/
+ * @createdOn      :  19/03/2023
+ * @description    :  Logging wrapper for the game master
+ * @version        :  rev 23w12.4
+ * ════════════════════════════════════════════════════════════════════════**/
 #include "ecn_baxter/game/utils/logger.hpp"
 
 namespace ecn_baxter::utils {
