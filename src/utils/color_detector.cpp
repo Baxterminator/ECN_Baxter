@@ -1,4 +1,4 @@
-#include <ball_detector/color_detector.hpp>
+#include <ecn_baxter/utils/color_detector.hpp>
 #include <math.h>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>

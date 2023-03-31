@@ -27,6 +27,8 @@
   <depend>urdf</depend>
   <depend>robot_state_publisher</depend>
   <depend>OpenCV</depend>
+  <depend>cv_bridge</depend>
+
 
 
   <buildtool_depend>catkin</buildtool_depend>
