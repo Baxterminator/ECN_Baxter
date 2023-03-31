@@ -19,9 +19,7 @@ using namespace std;
 class ColorTesterNode : public rclcpp::Node
 {
     public:
-    ColorTesterNode() : Node("color_tester_node"){
-
-        //param_subscriber_ = std::make_shared<ParameterEventHandler>(this);
+    ColorTesterNode() : Node("color_tester"){
 
         this->declare_parameter<string>("side", "left");
         side = this->get_parameter("side").get_parameter_value().get<std::string>();

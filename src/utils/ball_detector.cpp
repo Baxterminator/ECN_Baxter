@@ -18,10 +18,10 @@ using namespace std::chrono_literals;
 using namespace ecn;
 using namespace std;
 
-class CircleDetectorNode : public rclcpp::Node
+class BallDetectorNode : public rclcpp::Node
 {
 public:
-    CircleDetectorNode() : Node("circle_node") //ou CircleDetectorNode(rclcpp::NodeOptions options) : Node("test_node", options)
+    BallDetectorNode() : Node("ball_detector") //ou CircleDetectorNode(rclcpp::NodeOptions options) : Node("test_node", options)
     {
         //init color with 5 parameters (has default values but have to be defined to be useful)
         this->declare_parameter<int>("r", 130);
@@ -98,7 +98,6 @@ public:
                                           [&](){pub_image();});
 
     }   
-//    CircleDetectorNode(rclcpp::NodeOptions options) : Node("test_node", options)
 
 private:
     // declare any subscriber / publisher / timer
@@ -110,7 +109,6 @@ private:
     bool im_init=false;
     bool seg=false;
     int count = 0;
-    char color;
     string side;
 
     rclcpp::Publisher<std_msgs::msg::Float32MultiArray>::SharedPtr publisher;
@@ -129,15 +127,10 @@ private:
     {
         // use last_msg to build and publish circle and image
         if (im_init){
-            //cd.findMainContour(im_cv);
-            cv::Mat im_white;
-            //cv::Ptr<cv::xphoto::WhiteBalancer> wb = cv::xphoto::createSimpleWB();
-            //wb->balanceWhite(im_cv,im_white);
-            im_white = im_cv;
             cv::Mat im_cv_proccessed;
             cd.fitCircle();
             //cd.showOutput();
-            cd.process(im_white,im_cv_proccessed,true);
+            cd.process(im_cv,im_cv_proccessed,true);
 
             //std::string path_processed = "/home/ecn/ros2/src/test_projet/img/img_processed_"+std::to_string(count)+".jpg"; //
             //std::string path_processed = "/user/eleves/tcorroenne2021/ros2/src/test_projet/img/img_processed_"+std::to_string(count)+".jpg";
