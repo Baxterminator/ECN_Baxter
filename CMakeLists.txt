@@ -137,7 +137,6 @@ ament_auto_add_executable(game_master
     src/game/master/game.cpp
     src/game/ui/main_wrapper.cpp
     src/game/ui/file_loader_wrapper.cpp
-    src/game/ui/log_view.cpp
     resource/ui/main.ui
     resource/ui/game_loader.ui
 )

@@ -13,7 +13,6 @@
 #include "ecn_baxter/base/base_gui.hpp"
 #include "ecn_baxter/game/data/game_players.hpp"
 #include "ecn_baxter/game/ui/file_loader_wrapper.hpp"
-#include "ecn_baxter/game/ui/log_view.hpp"
 #include "ui_main.h"
 #include <memory>
 #include <qcoreevent.h>
@@ -41,11 +40,6 @@ protected:
   /// QT Designer
   void set_custom_gui_properties() { set_users_view(); }
   void set_users_view();
-
-  /**═════════════════════════════════════════════════════════════════════════
-   *?                                Logging
-   * ═════════════════════════════════════════════════════════════════════════**/
-  std::unique_ptr<LogView> log_view = nullptr;
 
   /**═════════════════════════════════════════════════════════════════════════
    *?                            Event Callbacks
