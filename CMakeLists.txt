@@ -137,13 +137,24 @@ ament_auto_add_executable(game_master
     src/game/master/game.cpp
     src/game/ui/main_wrapper.cpp
     src/game/ui/file_loader_wrapper.cpp
-    src/game/ui/log_view.cpp
     resource/ui/main.ui
     resource/ui/game_loader.ui
 )
 target_include_directories(game_master PRIVATE include ${ROS1_ROOT}/include)
 target_link_libraries(game_master ${game_utils} ${ROS1_LIBS} Qt5::Core Qt5::Widgets Qt5::WebKit Qt5::WebKitWidgets )
 add_message(game_master)
+
+############################# Ball Detector #############################
+ament_auto_add_executable(ball_detector 
+        src/utils/ball_detector.cpp 
+        src/utils/color_detector.cpp)
+target_include_directories(ball_detector PRIVATE ${OpenCV_INCLUDE_DIRS} include)
+
+############################# Color Tester #############################
+ament_auto_add_executable(color_tester 
+        src/utils/color_tester.cpp 
+        src/utils/color_detector.cpp)
+target_include_directories(color_tester PRIVATE ${OpenCV_INCLUDE_DIRS} include)
 
 # =================================================================
 #                           EXPORT OTHERS
